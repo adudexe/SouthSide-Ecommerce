@@ -6,7 +6,7 @@ const express = require("express");
 const addToLocals  = require("./middleware/authmiddleware");
 const session = require("express-session");
 const app = express(); // To assign the instance of express to app
-const mongoose = require("mongoose");
+const connectDB = require("./Database/database");
 const nocache = require("nocache");
 const morgan = require("morgan");
 const flash = require("flash");
@@ -14,6 +14,8 @@ const path = require("path"); //importing path module
 const passport = require('./config/passport');
 // const addtolocals = require("./middleware/authmiddleware");
 
+//To establish connection with the database
+connectDB();
 
 app.set("view engine","ejs"); //setting view engine as ejs
 app.use(express.static(path.join(__dirname,'public')));
@@ -51,19 +53,17 @@ app.use("/admin",adminRouter);
 
 // console.log(userRouter);
 
-// app.use("*",(req,res)=>{
-//     console.log("It should redirect...");
-//     res.redirect("/user/home")
-// })
 
-mongoose.connect(process.env.DB_URI).then(()=>{
-    app.listen(process.env.PORT,()=>{
-        console.log(`The Server is running on the port ${process.env.PORT}`);
-        console.log("http://localhost:3000");
-    })
-}).catch((err)=>{
-    console.log(err);
+//To rerout all the unused routes to used routes...
+app.use("*",(req,res)=>{
+    console.log("It should redirect...");
+    res.redirect("/user/login")
 })
 
+
+app.listen(process.env.PORT,()=>{
+    console.log(`The Server is running on the port ${process.env.PORT}`);
+    console.log("http://localhost:3000");
+})
  
 

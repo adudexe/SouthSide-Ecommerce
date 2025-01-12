@@ -9,7 +9,7 @@ const passport = require("passport");
 const errorHandling = require("../middleware/errorHandling");
 
 // userController
-router.get("/login", userController.loadLoginPage);
+router.get("/login",userAuth.isLogged,userController.loadLoginPage); // Remove userAuth.isLogged From here since it for just constant user....
 router.post("/login", userController.userLogin);
 router.get("/home",userAuth.isLogged,userAuth.isBlocked,userController.loadHomePage);
 router.post("/resentOTP", userController.resendOTP);
@@ -48,10 +48,7 @@ router.post("/cart/add",cartController.addProductToCart);
 //Error Handling Middle ware..
 router.use(errorHandling.errorHandlingMiddleware);
 
-// router.all("*",(req,res)=>{
 
-//     res.redirect("/user/home")
-// })
 
 
 module.exports = router;

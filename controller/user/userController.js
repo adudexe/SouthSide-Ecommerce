@@ -36,14 +36,15 @@ userController.loadHomePage = async (req,res)=>{
 userController.userLogin = async (req,res) => {
     try
     {
+        
         const {email , password} = req.body;
         console.log({email , password});
         const user = await User.findOne({email}); 
-         console.log(user);
+            console.log(user);
         
         if(user)
         {
-           if(!user.isBlocked)
+            if(!user.isBlocked)
             {
                 const match = await bcrypt.compare(password, user.password);
                 if(match)
@@ -52,7 +53,7 @@ userController.userLogin = async (req,res) => {
                     // console.log(req.session.user);
                     // console.log("sessi",req.session.user.isBlocked)
                     // console.log(req.user);
-                    res.status(statusCode.OK).json({success:true,redirected:"/user"});
+                    res.status(statusCode.OK).json({success:true,redirected:"/user/home"});
                 }
                 else
                 {
@@ -63,7 +64,7 @@ userController.userLogin = async (req,res) => {
             {
                 res.status(statusCode.FORBIDDEN).json({message:"Your Account Has Been Blcoked.."});
             }
-           
+            
             
         }
         else
@@ -81,13 +82,22 @@ userController.userLogin = async (req,res) => {
 //To Load Login Page
 userController.loadLoginPage = (req,res) => {
     try{
-            let message = req.session.message || req.flash('success') || req.flash('error') || '' ; // checks if any message is present in the following session or flash message
+            console.log("User Session From Get login",req.session.user)
+            if(req.session.user)
+            {
+                console.log("It should redirect to home");
+                return res.redirect("/user/home");
+            }
+            else
+            {
+                let message = req.session.message || req.flash('success') || req.flash('error') || '' ; // checks if any message is present in the following session or flash message
             delete req.session.message; // The session containing the message will be deleted for new message to be held.
             if(typeof(message)=="object")
             {
                 message = ''
             }
             res.render('./user/loginPage',{ error: message || ''}); // The Login page will be rendered along with the error message.
+            }
     }
     catch(err)
     {
@@ -99,7 +109,14 @@ userController.loadLoginPage = (req,res) => {
 //To Load SignUp Page
 userController.loadSignUpPage = (req,res) => {
     try{
-        res.render("./user/signUpPage",{error:""});
+        if(req.session.user)
+        {
+            res.redirect("/user/home")
+        }   
+        else
+        {
+            return res.render("./user/signUpPage",{error:""});
+        }
     }
     catch(err)
     {

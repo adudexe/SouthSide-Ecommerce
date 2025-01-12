@@ -1,36 +1,36 @@
 const User = require("../model/userModel");
 const cart = require("../model/cartSchema");
 const userAuth = {}
-//constant Login
-userAuth.isLogged = async (req,res,next) => {
-  try{
-      const user = await User.findOne();;
-      req.session.user = user;
-      next()
-  } 
-  catch(error)
-  {
-    console.log(error);
-  }
-}
+
+
+
 
 
 
 //is Logged in
-// userAuth.isLogged = async (req, res, next) => {
-//   try {
-//     //To Check if the user is logged in...
-//     if((req.session && req.session.user) || req.user)
-//     {
-//       return next();
-//     }
-//     res.redirect("/user/login");
-//   }
-//   catch (error) {
-//     console.log("Error in auth"+error);
-//     res.status(500).json({"message":"Internal Server Error"});
-//   }
-// };
+userAuth.isLogged = async (req, res, next) => {
+  try {
+    // To Constantly be Logged in...
+    const user = await User.findOne();
+    req.session.user = user; //to get a const user
+
+    // console.log(req.session.user); //To check if there was a session
+    //Remove the above line becuse it causes constent login
+
+
+    //To Check if the user is logged in...
+    if((req.session && req.session.user) || req.user)
+    {
+      // return res.redirect("/user/home")
+      return next();
+    }
+    res.redirect("/user/login");
+  }
+  catch (error) {
+    console.log("Error in auth"+error);
+    res.status(500).json({"message":"Internal Server Error"});
+  }
+};
 
 //To handle Google Auth User Session
 userAuth.googleSession = async (req, res, next) => {
