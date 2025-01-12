@@ -1,0 +1,98 @@
+<%- include("../partials/admin/header.ejs") %>
+
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">User Management</h2>
+                    <!-- <p>Lorem ipsum dolor sit amet.</p> -->
+                </div>
+            </div>
+            <div class="card mb-4">
+                <header class="card-header">
+                    <div class="row align-items-center">
+                        
+                        <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+                            <select class="form-select">
+                                <option selected>Sort By</option>
+                                <option>Name</option>
+                                <option>Email</option>
+                                <option>Date</option>
+                            </select>
+                        </div>
+                        <!-- <div class="col-md-2 col-6">
+                            <select class="form-select">
+                                <option selected>Status</option>
+                                <option>Active</option>
+                                <option>Blocked</option>
+                                <option>Show all</option>
+                            </select>
+                        </div> -->
+                    </div>
+                </header> <!-- card-header end// -->
+                <div class="card mb-4">
+                    <!-- card-header end// -->
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover fs-6">
+                                <thead>
+                                    <tr>
+                                        <th>#ID</th>
+                                        <th>UserName</th>
+                                        <th>Email</th>
+                                        <th>Status</th>
+                                        <th>Date Joined</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% users.forEach(user => { %>
+                                        <tr>
+                                            <th><%= user.id  %></th>
+                                            <td><b><%= user.name %></b></td>
+                                            <td><%= user.email %></td>
+                                            <td>
+                                                <% if (user.isBlocked) { %>
+                                                    <span class="text-danger" href>Blocked</span>
+                                                <% } else {  %>
+                                                <span class="text-primary" >Not Blocked</span>
+                                                <% } %>
+                                            </td>
+                                            <td><%= user.createdAt.toLocaleDateString('en-GB') %></td>
+                                            <td class="text-end">    
+                                                <% if (user.isBlocked) { %>
+                                                    <a type="button" class="btn btn-outline-info" href="/admin/unblock/<%= user.id %>">UnBlock</a>
+                                                <% }else { %>
+                                                    <a type="button" class="btn btn-outline-danger"  href="/admin/block/<%= user.id %>">Block</a>    
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div> <!-- table-responsive//end -->
+                    </div>
+                    <!-- card-body end// -->
+                </div>
+            <div class="pagination-area mt-30 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start ms-2">
+                        <!-- <p><%= cp %>as/p> -->
+                        <% if (cp+1 > 1) { %>
+                            <li class="page-item"><a class="page-link" href="/admin/page/<%= (cp>0) ? cp-1 : 0 %>"><i class="material-icons md-chevron_left "></i></a></li>
+                        <% } %>
+                        <% for( let index = 1; index <= pageSize; index++ ) { %>
+                            <% if ((cp)==(index-1)) { %>
+                             <li class="page-item active"><a class="page-link" href="/admin/page/<%= index-1 %>"><%= index %></a></li>
+                            <% } else { %>
+                                <li class="page-item"><a class="page-link" href="/admin/page/<%= index-1 %>"><%= index %></a></li>
+                            <% } %>
+                        <% } %>
+                        <% if (cp+1 < pageSize) { %>
+                            <li class="page-item"><a class="page-link" href="/admin/page/<%= (cp < pageSize) ? cp+1 : pageSize %>"><i class="material-icons md-chevron_right"></i></a></li>
+                        <% } %>
+                    </ul>
+                </nav>
+            </div>
+        </section> <!-- content-main end// -->
+
+<%- include('../partials/admin/footer') %>

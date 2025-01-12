@@ -1,0 +1,262 @@
+<%- include("../partials/admin/header.ejs") %>
+<style>
+    #imagePreview {
+    display: flex; /* Flexbox can help maintain a consistent layout */
+    flex-wrap: wrap; /* Allow images to wrap within the container */
+    gap: 10px; /* Space between images */
+    justify-content: flex-start; /* Align items to the left */
+    width: 100%; /* Ensure the container takes up full width */
+    min-height: 200px; /* Optional: Set a minimum height for the container */
+    max-height: 500px; /* Optional: Set a maximum height */
+    overflow-y: auto; /* Allow scrolling if content exceeds the max height */
+}
+.img-thumbnail-container {
+    position: relative; /* Ensure the remove button stays on top */
+    display: inline-block; /* Display images side by side */
+    width: 100px; /* Set a fixed width or use max-width to control size */
+    height: 100px; /* Set a fixed height or use max-height */
+    overflow: hidden; /* Crop images if they exceed container size */
+}
+
+.img-thumbnail-container img {
+    width: 100%; /* Make image fill the container's width */
+    height: 100%; /* Make image fill the container's height */
+    object-fit: cover; /* Crop the image to maintain aspect ratio */
+}
+
+.remove-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(255, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+}
+
+
+#imagePreview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 200px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.img-thumbnail-container {
+    flex: 0 0 100px; /* Control the width of each image container */
+    height: 100px;
+}
+
+
+.img-thumbnail-container img {
+    width: 100%; /* Ensure the image fits the container */
+    height: 100%;
+    object-fit: cover; /* Ensure the image covers the container without distortion */
+}
+
+
+#imagePreview {
+    max-width: 100%;
+    max-height: 300px; /* You can set this to any value that fits your design */
+    overflow-y: auto;
+}
+
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=close" />
+<link href="
+https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.min.css
+" rel="stylesheet">
+<section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Add New Product</h2>
+            </div>
+        </div>
+
+        <div class="card mb-4" id="productCard">
+            <div class="card-body" id="card-body">
+                <form id="productForm" enctype="multipart/form-data">
+                    <div class="row">
+                        <!-- Product Title -->
+                        <div class="col-md-6">
+                            <label for="product_title" class="form-label">Product Title</label>
+                            <input type="text" id="product_title" name="product_title" class="form-control">
+                            <small id="product_title_error" class="text-danger" style="display: none;">Product title is required.</small>
+                        </div>
+                        <!-- Product Price -->
+                        <div class="col-md-6">
+                            <label for="product_price" class="form-label">Product Offer</label>
+                            <input type="number" id="product_offer" name="product_offer" class="form-control" min="0" max="100">
+                            <small id="product_offer_error" class="text-danger" style="display: none;">Product Offer is required.</small>
+                        </div>
+                        <!-- Product Brand -->
+                        <div class="col-md-6">
+                            <label for="product_title" class="form-label">Product Brand</label>
+                            <input type="text" id="product_brand" name="product_brand" class="form-control">
+                            <small id="product_brand_error" class="text-danger" style="display: none;">Product brand is required.</small>
+                        </div>
+
+                        <!-- Product Category -->
+                        <div class="col-md-6">
+                            <label for="product_category" class="form-label">Product Category</label>
+                            <select id="product_category" name="product_category" class="form-select">
+                                <option value="">Select Category</option>
+                                <% category.forEach(element => { %>
+                                    <option value="<%= element._id %>"><%= element.name %></option>
+                                <% }) %>
+                            </select>
+                            <small id="product_category_error" class="text-danger" style="display: none;">Product category is required.</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Product Description -->
+                        <div class="col-md-12">
+                            <label for="product_description" class="form-label" >Product Description</label>
+                            <textarea id="product_description" name="product_description" class="form-control" rows="4"></textarea>
+                            <small id="product_description_error" class="text-danger" style="display: none;">Product Description is required.</small>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6">
+                            <label  class="form-label">Image</label>
+                            <input type="file" id="imagesInput" class="form-control" accept="image/*" multiple>
+                            
+                            <div id="imagePreview" class="col">
+                            <!-- Images Will be displayed Here -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Add Variant Button -->
+                    <div class="col-md-12 mt-4">
+                        <button type="button" class="btn btn-secondary mt-4" id="addVariantBtn">Add Variant</button>
+                    </div>
+
+                    <!-- Variants Preview Section -->
+                    <div id="variantsPreview" class="mt-4 row">
+                        <!-- <h5>Variants Preview</h5> -->
+                        <div id="variantsContainer"></div>
+                    </div>
+
+                <!-- Submit Button -->
+                <button type="button" id="publishBtn" class="btn btn-primary mt-4">Publish Product</button>
+            </form>
+        </div>
+    </div>
+</section>
+<!-- Modal for Adding Variant -->
+<div class="modal fade" id="variantModal" tabindex="-1" aria-labelledby="variantModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="variantModalLabel">Add New Variant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="variant_size" class="form-label">Size</label>
+                        <input type="text" id="variant_size" class="form-control" placeholder="Enter size">
+                        <small id="variant_size_error" class="text-danger" style="display: none;">Product Variant Size is Required</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="variant_color" class="form-label">Color</label>
+                        <input type="text" id="variant_color" class="form-control" placeholder="Enter color">
+                        <small id="variant_color_error" class="text-danger" style="display: none;">Product Variant Color is Required</small>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label for="variant_status" class="form-label">Status</label>
+                        <select id="variant_status" class="form-control" >
+                        <option value="Available">Available</option>
+                        <option value="OutOfStock">OutOfStock</option>
+                        <option value="Discontinued">Discontinued</option>
+                        </select>
+                        <small id="variant_status_error" class="text-danger" style="display: none;">Product Variant Status is Required</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="variant_price" class="form-label">Price</label>
+                        <input type="number" id="variant_price" class="form-control" placeholder="Enter price">
+                        <small id="variant_price_error" class="text-danger" style="display: none;">Product Variant Price is Required</small>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label for="variant_quantity" class="form-label">Quantity</label>
+                        <input type="number" id="variant_quantity" class="form-control" placeholder="Enter quantity">
+                        <small id="variant_quantity_error" class="text-danger" style="display: none;">Product Variant Quantity is Required</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="saveVariantBtn" class="btn btn-primary">Save Variant</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Cropper Modal -->
+<div class="modal fade" id="cropperModal" tabindex="-1" aria-labelledby="cropperModalLabel" >
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cropperModalLabel">Crop Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- <canvas id="cropperCanvas" class="w-100"></canvas> -->
+                 <img src="" alt="" id="cropImage">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="cropButton" class="btn btn-primary">Crop</button>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="main-footer font-xs">
+    <div class="row pb-30 pt-15">
+        <div class="col-sm-6">
+            <script>
+            // document.write(new Date().getFullYear())
+            </script> ©, Evara - HTML Ecommerce Template .
+        </div>
+        <div class="col-sm-6">
+            <div class="text-sm-end">
+                All rights reserved
+            </div>
+        </div>
+    </div>
+</footer>
+</main>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="/admin/assets/js/vendors/jquery-3.6.0.min.js"></script>
+<script src="/admin/assets/js/vendors/bootstrap.bundle.min.js"></script>
+<script src="/admin/assets/js/vendors/select2.min.js"></script>
+<script src="/admin/assets/js/vendors/perfect-scrollbar.js"></script>
+<script src="/admin/assets/js/vendors/jquery.fullscreen.min.js"></script>
+<!-- Main Script -->
+<script src="/admin/assets/js/main.js" type="text/javascript"></script>
+<!-- JS Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="http://localhost:3000/admin/assets/js/vendors/jquery-3.6.0.min.js"></script>
+<script src="cadmin/assets/js/vendors/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
+<script src="/admin/assets/js/product&varientValidation.js"></script>
+
+
+</body>
+
+</html>
+<!-- <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script> -->
+
+
+

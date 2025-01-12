@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>South Side - Sign Up</title>
+  <!-- <link href="assets/css/main.css" rel="stylesheet" type="text/css" /> -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    
+  </script>
+</head>
+
+
+
+
+<body class="bg-white min-h-screen flex items-center justify-center">
+  <!-- Main Container -->
+  <div class="w-full max-w-6xl flex flex-col lg:flex-row items-center lg:items-start justify-between gap-16 p-8">
+    <!-- Left Section -->
+    <div class="text-center lg:text-left space-y-6 flex flex-col justify-spacebetween gap-4 items-center">
+      <h1 class="text-6xl font-extrabold mb-4">SOUTH SIDE</h1>
+      <p class="text-xl font-medium">FIND CLOTHES THAT MATCH YOUR STYLE</p>
+      <button
+        class="flex items-center justify-center bg-gray-100 text-black font-bold py-2 px-6 rounded-lg shadow hover:bg-gray-200 focus:outline-none">
+        <span class="text-2xl font-bold">G</span>
+        <a class="ml-3 text-lg btn" href="/auth/google">Sign Up with Google</a>
+      </button>
+    </div>
+
+    <!-- Right Section (Sign-Up Form) -->
+    <div class="w-full max-w-md bg-black text-white rounded-lg p-8 shadow-lg">
+      <h2 class="text-2xl font-bold text-center mb-8">SIGN UP</h2>
+
+      <!-- Error Message -->
+      <% if (error) { %>
+        <div id="serverErrorMessage" class="text-red-500 text-sm font-medium mb-4"></div>
+      <% } %>
+      
+
+      <form id="signUpForm" class="space-y-6" method="POST">
+        
+          <label for="name" class="block text-sm font-medium mb-2">Name</label>
+          <input type="text" id="name" name="name" placeholder="Enter your name"
+            class="w-full px-4 py-3 rounded bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500">
+            <div class="text-red-500 text-sm font-medium mb-4" id="nameErrorMessage"></div>
+        
+        
+          <label for="email" class="block text-sm font-medium mb-2">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email"
+            class="w-full px-4 py-3 rounded bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500">
+          <div class=" text-red-500 text-sm font-medium mb-4" id="emailErrorMessage"></div>
+          
+        
+          <label for="password" class="block text-sm font-medium mb-2">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password"
+            class="w-full px-4 py-3 rounded bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500">
+          <div class="text-red-500 text-sm font-medium mb-4" id="passwordErrorMessage"></div>
+          
+        
+          <label for="confirmPassword" class="block text-sm font-medium mb-2">Re-enter Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter your password"
+            class="w-full px-4 py-3 rounded bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500">
+          <div class="text-red-500 text-sm font-medium mb-4" id="confirmErrorMessage"></div>
+          
+        <button type="submit"
+          class="w-full py-3 bg-gray-100 text-black font-semibold rounded-lg hover:bg-gray-200 focus:outline-none">
+          SIGN UP
+        </button>
+        <p class="text-sm text-center mt-4">
+          Already have an account? <a href="/login" class="text-gray-300 hover:text-white underline">Login</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+
+<!-- OTP Modal -->
+<div id="otpModal" class=" hidden fixed inset-0 bg-black bg-opacity-75 flex flex-col gap-12 items-center justify-center">
+  <div id="toast-simple" class=" hidden flex items-center w-full max-w-xs p-4 space-x-4 rtl:space-x-reverse text-gray-500 bg-white divide-x rtl:divide-x-reverse divide-gray-200 rounded-lg shadow dark:text-gray-400 dark:divide-gray-700 dark:bg-gray-800 " role="alert">
+    <svg class="w-5 h-5 text-blue-600 dark:text-blue-500 rotate-45" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 20">
+        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 17 8 2L9 1 1 19l8-2Zm0 0V9"/>
+    </svg>
+    <div class="ps-4 text-sm font-normal" id="toastMessage"></div>
+  </div>
+
+  <div class="bg-white text-black rounded-lg p-8 shadow-lg max-w-sm w-full space-y-6">
+    <h2 class="text-xl font-bold text-center">Verify OTP</h2>
+    <form id="otpForm"  class="space-y-4">
+      
+      <div>
+        <label for="otp" class="block text-sm font-medium mb-2">Enter OTP</label>
+        <input type="text" id="otp" name="otp" placeholder="Enter the OTP"
+        class="w-full px-4 py-3 rounded bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-gray-500"
+        maxlength="6" " />
+        <!-- oninput="validateOTPInput(this) -->
+      </div>
+      <p class="text-sm text-gray-700" id="timer">You can resend OTP in 60s</p>
+      <button id="resendOTP" type="button" onclick="resend()"
+        class="w-full py-2 bg-gray-100 text-black font-semibold rounded-lg hover:bg-gray-200 focus:outline-none"
+        >Resend OTP</button>
+        
+      <button id="sendOTP" onclick="validateAndSubmitOTP()"
+        class="w-full py-2 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 focus:outline-none"> 
+        Submit OTP
+      </button>
+    </form>
+    <div id="otpErrorMessage" class="hidden text-red-500 text-sm font-medium"></div>
+  </div>
+</div>
+
+
+<script src="/javascript/validation.js"></script>
+</body>
+</html>

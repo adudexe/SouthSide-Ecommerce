@@ -1,0 +1,197 @@
+<%- include("../partials/admin/header.ejs") %>
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Category Management </h2>
+                    <!-- <p>Brand and vendor management</p> -->
+                </div>
+                <div>
+                <!-- Trigger Button for Modal -->
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                    <i class="text-muted material-icons md-post_add"></i>Add New Category
+                </button>
+
+                </div>
+            </div>
+            
+            
+            <div class="card mb-4 ">
+                <div class="CardBody card-body d-flex flex-row gap-3 flex-wrap" id="category-list">
+                    <% category.forEach(element => { %>
+                <!-- col.// -->
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                        <figure class="card border-1">
+                            
+                                <div class="card-header bg-white text-center">
+                                    <h6 class="card-title m-0"><%= element.name %></h6>
+                                </div>
+                                <figcaption class="card-body text-center ">
+                                    <% if (element.isListed) { %>
+                                        <a type="button" class="btn btn-danger" href="/admin/category/unlist/<%= element._id %>">Unlist</a>
+                                    <% } else { %>
+                                        <a type="button" class="btn btn-primary" href="/admin/category/list/<%= element._id %>">List</a>
+                                    <!-- <a href="#"> 13 items </a> -->
+                                        <% } %>
+                                </figcaption>
+                        </figure>
+                    </div>
+                    <% }) %>
+                </div> <!-- row.// -->
+            </div> <!-- card-body end// -->
+            
+           <!-- Add Category Modal -->
+            <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addCategoryForm">
+                                <div class="mb-3">
+                                    <label for="categoryName" class="form-label">Category Name</label>
+                                    <input type="text" class="form-control" id="categoryName" name="categoryName"  placeholder="Enter category name">
+                                    <div id="categoryNameError" class="text-danger"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="categoryDescription" class="form-label">Category Description</label>
+                                    <textarea class="form-control" id="categoryDescription" name="categoryDescription" rows="3" placeholder="Enter description (optional)"></textarea>
+                                    <div id="categoryDescriptionError" class="text-danger"></div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Add Category</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </section> <!-- content-main end// -->
+        <footer class="main-footer font-xs">
+            <div class="row pb-30 pt-15">
+                <div class="col-sm-6">
+                    <script>
+                    document.write(new Date().getFullYear())
+                    </script> ©, Evara - HTML Ecommerce Template .
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end">
+                        All rights reserved
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+   
+    <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/vendors/select2.min.js"></script>
+    <script src="assets/js/vendors/perfect-scrollbar.js"></script>
+    <script src="assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="assets/js/main.js" type="text/javascript"></script>
+    <script>
+        document.getElementById('addCategoryForm').addEventListener('submit', async function(event) {
+    try {
+        // Clear previous error messages
+        clearErrors();
+        event.preventDefault();
+
+        // Get form data
+        const categoryName = document.getElementById('categoryName').value.trim();
+        const categoryDescription = document.getElementById('categoryDescription').value.trim();
+
+        // Form validation
+        let isValid = true;
+        if (!categoryName) {
+            const categoryNameError = document.getElementById('categoryNameError');
+            categoryNameError.textContent = 'Category name is required.';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            event.preventDefault();
+            return;
+        }
+
+        // Prepare form data to send
+        const formData = {
+            categoryName,
+            categoryDescription
+        };
+
+        // Send the data via Fetch API
+        const response = await fetch('/admin/categoryManagement', { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Category added successfully!');
+            $('#addCategoryModal').modal('hide');
+            document.getElementById('addCategoryForm').reset();
+
+            // Refresh the category list
+            refreshCategoryList();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while adding the category.');
+    }
+});
+
+// Function to clear error messages
+function clearErrors() {
+    const categoryNameError = document.getElementById('categoryNameError');
+    if (categoryNameError) categoryNameError.textContent = '';
+}
+
+
+async function refreshCategoryList() {
+    try {
+        const response = await fetch('/admin/category/updateList'); // Your server endpoint to fetch the updated category list
+        const data = await response.json();
+
+        // console.log(data);
+
+        if (data.success) {
+            const categoryListContainer = document.querySelector('.content-main .CardBody');
+            categoryListContainer.innerHTML = ''; // Clear the existing list
+
+            data.categories.forEach(category => {
+                const categoryCard = `
+                    <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                        <figure class="card border-1">
+                            <div class="card-header bg-white text-center">
+                                <h6 class="card-title m-0">${category.name}</h6>
+                            </div>
+                            <figcaption class="card-body text-center">
+                                ${category.isListed ? 
+                                    `<button type="button" class="btn btn-danger" href="/admin/category/unlist/${category.id}">Unlist</button>` : 
+                                    `<button type="button" class="btn btn-primary" href="/admin/category/list/${category.id}">List</button>`
+                                }
+                            </figcaption>
+                        </figure>
+                    </div>
+                `;
+                categoryListContainer.innerHTML += categoryCard;
+            });
+        } else {
+            alert('Error fetching categories');
+        }
+    } catch (error) {
+        console.error('Error refreshing category list:', error);
+    }
+}
+
+</script>
+</body>
+
+</html>
