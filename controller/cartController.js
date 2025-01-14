@@ -17,6 +17,112 @@ cartController.loadCartPage = async (req,res)=>{
     }
 }
 
+cartController.cartQuantityIncrementer = async (req,res)=>{
+    try
+    {
+        // To increase the quantity in the cart...
+        const {newQuantity,productId,variantId} = req.body
+
+        console.log({newQuantity,productId,variantId})
+
+        const userId = req.session.user._id;
+
+        //cart details from cart Database...
+        const cartDetails = await cart.findOne({userId:userId});
+        console.log("Cart Details - ", cartDetails);
+
+        //product details from product database...
+        const productDetails = await products.findOne({_id:productId});
+        console.log("Product Details - ",productDetails);
+
+        const productVariantDetails = productDetails.variants.find((item)=>{
+            return item._id.toString() == variantId 
+        })
+
+        console.log("Product Variant Details- ",productVariantDetails);
+
+        //To check if the user has exceeded the maximum quantity..
+        if(newQuantity>5)
+        {
+            return res.status(statusCode.FORBIDDEN).json({success:false,message:"Max Quantity Reached.."});
+        }
+        if(productVariantDetails.quantity < newQuantity)
+        {
+            return res.status(statusCode.FORBIDDEN).json({success:false,message:"Not Enought product Available..."});
+        }
+        //To update the cart quantity with new quantity....
+        const updatedCart = await cart.findOneAndUpdate({userId:userId , "items.variantId":variantId},{$set:{"items.$.quantity":newQuantity}},{new:true});
+        
+        console.log("Updated Cart - ",updatedCart);
+
+        if(updatedCart)
+        {
+            return res.status(statusCode.OK).json({success:true})
+        }
+        else
+        {
+            return res.status(statusCode.OK).json({success:false , message:"Internal Server"});
+        }
+    }
+    catch(err)
+    {
+        console.log("Error in incramenting the Product",err);
+        res.status(statusCode.INTERNAL_SERVER_ERROR).json({success:false,message:"Internal Server Error.."});
+    }
+}
+
+cartController.cartQuantityDecrementer = async (req,res)=>{
+    try{
+        // To increase the quantity in the cart...
+        const {newQuantity,productId,variantId} = req.body
+
+        console.log({newQuantity,productId,variantId})
+
+        const userId = req.session.user._id;
+
+        //cart details from cart Database...
+        const cartDetails = await cart.findOne({userId:userId});
+        console.log("Cart Details - ", cartDetails);
+
+        //product details from product database...
+        const productDetails = await products.findOne({_id:productId});
+        console.log("Product Details - ",productDetails);
+
+        const productVariantDetails = productDetails.variants.find((item)=>{
+            return item._id.toString() == variantId 
+        })
+
+        console.log("Product Variant Details- ",productVariantDetails);
+
+        //To check if the user has exceeded the maximum quantity..
+        if(newQuantity<1)
+        {
+            return res.status(statusCode.FORBIDDEN).json({success:false,message:"Minimum possible quantity...."});
+        }
+        // if(productVariantDetails.quantity < newQuantity)
+        // {
+        //     return res.status(statusCode.FORBIDDEN).json({success:false,message:"Not Enought product Available..."});
+        // }
+        //To update the cart quantity with new quantity....
+        const updatedCart = await cart.findOneAndUpdate({userId:userId , "items.variantId":variantId},{$set:{"items.$.quantity":newQuantity}},{new:true});
+        
+        console.log("Updated Cart - ",updatedCart);
+
+        if(updatedCart)
+        {
+            return res.status(statusCode.OK).json({success:true})
+        }
+        else
+        {
+            return res.status(statusCode.OK).json({success:false , message:"Internal Server"});
+        }
+    }
+    catch(error)
+    {
+        console.log("Error in Decrementing Product",error)
+    }
+}
+
 
 cartController.addProductToCart = async (req,res) => {
     try
@@ -31,7 +137,7 @@ cartController.addProductToCart = async (req,res) => {
         //To get the details of the specific Product Variant  from the cart
         const cartProductVariant =  (cartProductsDetails.items).find((item)=>{
             // console.log("Cart Variant",item);
-            return item.variantId.toString() === variantId.toString() ? item : false;
+            return item.variantId.toString() === variantId ? item : false;
         })
         // console.log("Cart Variant Details -",cartProductVariant);
         
@@ -104,6 +210,48 @@ cartController.addProductToCart = async (req,res) => {
     catch(error)
     {
         console.log("Error in adding product to cart",error);
+    }
+}
+
+
+cartController.deleteProductFromCart = async (req,res) => {
+    try{
+        //Getting product id and variant id from front end..
+        const {productId,variantId} = req.body
+        
+        //Getting user id from session...
+        const userId = req.session.user._id;
+
+        const cartDetails = await cart.findOne({userId:userId});
+
+        // console.log("Cart Details -",cartDetails);
+
+        const productDetails = await products.findOne({_id:productId});
+
+        const productVariantDetails = productDetails.variants.find(item => item._id.toString() === variantId);
+
+        console.log("Product Variant Details - ",productVariantDetails);
+
+        if(!productVariantDetails)
+        {
+            return res.status(statusCode.BAD_REQUEST).json({success:false , message:"Invalid Product.."});
+        }
+
+        const updatedCart = await cart.updateOne({userId:userId, "items.variantId":variantId},{$pull:{items:{variantId:variantId}}});
+
+        if(updatedCart)
+        {
+            return res.status(statusCode.OK).json({success:true,message:"Product Deleted...",updatedCart});
+        }
+        else
+        {
+            return res.status(statusCode.INTERNAL_SERVER_ERROR).json({success:false,message:"Internal Sever Error"});
+        }
+        
+    }
+    catch(err)
+    {
+        console.log("Error in deleting products from cart",err);
     }
 }
 

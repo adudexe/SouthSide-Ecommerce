@@ -41,6 +41,9 @@ router.get("/product/:id",productController.loadProductPage);
 //Cart Controller 
 router.get("/cart",cartController.loadCartPage);
 router.post("/cart/add",cartController.addProductToCart);
+router.patch("/cart/quantityinc",cartController.cartQuantityIncrementer);
+router.patch("/cart/quantitydec",cartController.cartQuantityDecrementer);
+router.delete("/cart/delete/",cartController.deleteProductFromCart);
 
 
 
