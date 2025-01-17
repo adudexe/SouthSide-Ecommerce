@@ -3,16 +3,12 @@ const cart = require("../model/cartSchema");
 const userAuth = {}
 
 
-
-
-
-
 //is Logged in
 userAuth.isLogged = async (req, res, next) => {
   try {
     // To Constantly be Logged in...
-    const user = await User.findOne();
-    req.session.user = user; //to get a const user
+    // const user = await User.findOne();
+    // req.session.user = user; //to get a const user
 
     // console.log(req.session.user); //To check if there was a session
     //Remove the above line becuse it causes constent login
@@ -24,10 +20,14 @@ userAuth.isLogged = async (req, res, next) => {
       // return res.redirect("/user/home")
       return next();
     }
-    res.redirect("/user/login");
+    else
+    {
+      return res.redirect("/user/login");
+    }
+    // res.redirect("/user/login");
   }
   catch (error) {
-    console.log("Error in auth"+error);
+    console.log("Error in auth",error);
     res.status(500).json({"message":"Internal Server Error"});
   }
 };
@@ -37,13 +37,14 @@ userAuth.googleSession = async (req, res, next) => {
   try {
     // Fetch the user from the database by their ID
     const user = await User.findById(req.user.id); // Use findById instead of find
-    
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     // Store user in session
     req.session.user = user;
+   
+
 
     // Check if the user is blocked
     if (user.isBlocked) {
@@ -62,7 +63,6 @@ userAuth.googleSession = async (req, res, next) => {
 }
 
 
-
 userAuth.isBlocked = async (req,res,next) => {
   try {
     const user = await User.findById(req.session.user._id);
@@ -78,8 +78,9 @@ userAuth.isBlocked = async (req,res,next) => {
         return res.redirect("/user/login");  
         }) 
     }
-    //Cart Checking and Allotement
+    // Cart Checking and Allotement
     const userId = req.session.user._id
+    
     const cartDetails = await cart.findOne({userId:userId});
     if(!cartDetails)
     {
@@ -100,12 +101,6 @@ userAuth.isBlocked = async (req,res,next) => {
     console.log("Error in Checking Blocked...",error);
   }
 }
-
-
-
-
-
-
 
 
 //is Blocked

@@ -63,7 +63,7 @@
             class="w-full px-4 py-3 rounded bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-500">
           <div class="text-red-500 text-sm font-medium mb-4" id="confirmErrorMessage"></div>
           
-        <button type="submit"
+        <button 
           class="w-full py-3 bg-gray-100 text-black font-semibold rounded-lg hover:bg-gray-200 focus:outline-none">
           SIGN UP
         </button>
@@ -100,7 +100,7 @@
         class="w-full py-2 bg-gray-100 text-black font-semibold rounded-lg hover:bg-gray-200 focus:outline-none"
         >Resend OTP</button>
         
-      <button id="sendOTP" onclick="validateAndSubmitOTP()"
+      <button id="sendOTP" onclick="validateAndSubmitOTP(event)"
         class="w-full py-2 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 focus:outline-none"> 
         Submit OTP
       </button>

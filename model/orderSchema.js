@@ -1,17 +1,17 @@
 const mongoose = require("mongoose");
 const {v4:uuidv4} = require("uuid");
 const orderSchema = mongoose.Schema({
-    orderId:{
-        type:String,
-        default:()=>uuidv4(),
-        unique:true
-    },
+    // orderId:{
+    //     type:String,
+    //     default:()=>uuidv4(),
+    //     unique:true
+    // },
     orderItems:[{
         //status
         product:{
             type:mongoose.Schema.ObjectId,
             ref:"Products",
-            unique:ture,
+            // unique:ture,
         },
         quantity:{
             type:Number,
@@ -37,7 +37,7 @@ const orderSchema = mongoose.Schema({
     addres:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
-        required:ture
+        // required:ture
     },
     invoiceDate:{
         type:Date
@@ -58,4 +58,4 @@ const orderSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.mongo("Order",orderSchema);
+module.exports = mongoose.model("Order",orderSchema);

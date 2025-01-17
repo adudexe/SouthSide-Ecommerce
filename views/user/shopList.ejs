@@ -165,70 +165,178 @@
                 <div class="breadcrumb">
                     <a href="index.html" rel="nofollow">Home</a>
                     <span></span> Shop
-                    <span></span> Your Cart
                 </div>
             </div>
         </div>
         <section class="mt-50 mb-50">
             <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <!-- (cartItems.items).length -->
-                        <!-- <p><%= //cartItems %></p> -->
-                       <% if (cartItems) { %>
-                        <% if ((cartItems.items).length) { %>
-                            <div class="table-responsive">
-                                <table class="table shopping-summery text-center clean">
-                                    <thead>
-                                        <tr class="main-heading">
-                                            <th scope="col">Image</th>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">Price</th>
-                                            <th scope="col">Quantity</th>
-                                            <th scope="col">Subtotal</th>
-                                            <th scope="col">Remove</th>
-                                        </tr>
-                                    </thead>
-                                    <% cartItems.items.forEach(element => { %>
-                                        <!-- <p><%= //element%> </p> -->
-                                        <tbody class="cartDetails">
-                                            <tr>
-                                                <% let productDetails = element.productId.variants.find((item)=>{return item._id == element.variantId.toString() }) %>
-                                                <td class="image product-thumbnail"><img src="/<%=element.productId.productImages[0]%>" alt="element"></td>
-                                                <td class="product-des product-name product-table-name" data-product-id="<%= element.productId._id  %>" data-variant-id="<%= productDetails._id %>">
-                                                    <h5 class="product-name"><a href="/user/product/<%= element.productId._id %>"><%= element.productId.productName %></a></h5>
-                                                    <p class="font-xs"> <%= element.productId.description %> <br>  <span>Size: <%=productDetails.size%></span> <span>&nbsp;</span> <span>Color:  <%=productDetails.color%></span>
-                                                    </p>
-                                                </td>
-                                                <!-- <p><%= //productDetails %></p> -->
-                                                <td class="price" data-title="Price"><span>$<%=productDetails.price%></span></td>
-                                                <td class="text-center" data-title="Stock">
-                                                    <div class="detail-qty border radius  m-auto cartQuantity" >
-                                                        <a href="#" class="qty-up"  ><i class="fi-rs-angle-small-up"></i></a>
-                                                        <span class="qty-val" id="cart"><%=element.quantity %></span>
-                                                        <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
-                                                    </div>
-                                                </td>
-                                                <td class="text-right" data-title="Cart">
-                                                    <span>$65.00 </span>
-                                                </td>
-                                                <td class="action cart-remove" data-title="Remove"><a href="#" class="text-muted"><i class="fi-rs-trash"></i></a></td>
-                                            </tr>
-                                        </tbody>
-                                    <% }) %>
-                                </table>
+                <div class="row flex-row-reverse">
+                    <div class="col-lg-9">
+                        <div class="shop-product-fillter">
+                            <div class="totall-product">
+                                <!-- <p> We found <strong class="text-brand">688</strong> items for you!</p> -->
+                                <div class="search-style-2">
+                                    <form action="#">
+                                        <input type="text" placeholder="Search for items...">
+                                    </form>
+                                </div>
                             </div>
-                            <div class="cart-action text-end">
-                                <!-- <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a> -->
-                                <a class="btn "><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                           
+                            <div class="sort-by-product-area">
+                                <div class="sort-by-cover mr-10">
+                                    <!-- <div class="sort-by-product-wrap">
+                                        <div class="sort-by">
+                                            <span><i class="fi-rs-apps"></i>Show:</span>
+                                        </div>
+                                        <div class="sort-by-dropdown-wrap">
+                                            <span> 50 <i class="fi-rs-angle-small-down"></i></span>
+                                        </div>
+                                    </div> -->
+                                    <div class="sort-by-dropdown">
+                                        <ul>
+                                            <li><a class="active" href="#">50</a></li>
+                                            <li><a href="#">100</a></li>
+                                            <li><a href="#">150</a></li>
+                                            <li><a href="#">200</a></li>
+                                            <li><a href="#">All</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="sort-by-cover">
+                                    <div class="sort-by-product-wrap">
+                                        <div class="sort-by">
+                                            <span><i class="fi-rs-apps-sort"></i>Sort by:</span>
+                                        </div>
+                                        <div class="sort-by-dropdown-wrap">
+                                            <span> Featured <i class="fi-rs-angle-small-down"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="sort-by-dropdown">
+                                        <ul>
+                                            <li><a class="active" href="#">Featured</a></li>
+                                            <li><a href="#">Price: Low to High</a></li>
+                                            <li><a href="#">Price: High to Low</a></li>
+                                            <li><a href="#">Release Date</a></li>
+                                            <li><a href="#">Avg. Rating</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
-                        <% } else { %>
-                            <div> Empty Cart </div>
-                        <% } %>
-                       <% } else { %>
-                        <div> Empty Cart </div>
-                        <% } %>
-                        <!-- <div class="divider center_icon mt-50 mb-50"><i class="fi-rs-fingerprint"></i></div> -->
+                        </div>
+                        <p><%= cartDetails %></p>
+                        <div class="row product-grid-3">
+                        <% cartDetails.forEach(element => { %>
+                                <div class="col-lg-4 col-md-4 col-12 col-sm-6">
+                                    <div class="product-cart-wrap mb-30">
+                                        <div class="product-img-action-wrap">
+                                            <div class="product-img product-img-zoom">
+                                                <% //(element.productImages).forEach(img => { %>
+                                                    <a href="shop-product-right.html"> 
+                                                        <img class="default-img" src="/<%=element.productImages[0]%>" alt=""> 
+                                                        <img class="hover-img" src="/<%=element.productImages[1] %>" alt=""> 
+                                                    </a>
+                                                <%// }) %>
+                                            </div>
+                                            <div class="product-action-1">
+                                                <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal">
+    <i class="fi-rs-search"></i></a>
+                                                <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
+                                                <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
+                                            </div>
+                                            <div class="product-badges product-badges-position product-badges-mrg">
+                                                <!-- <span class="hot">Hot</span> -->
+                                            </div>
+                                        </div>
+                                        <div class="product-content-wrap">
+                                            <div class="product-category">
+                                                <a href="shop-grid-right.html"></a>
+                                            </div>
+                                            <h2><a href="shop-product-right.html"><%= element.productName %></a></h2>
+                                            <div class="rating-result" title="90%">
+                                                <span>
+                                                    <span>90%</span>
+                                                </span>
+                                            </div>
+                                            <div class="product-price">
+                                                <span>$<%= //element.variant[0].price %> </span>
+                                                <span class="old-price">$245.8</span>
+                                            </div>
+                                            <div class="product-action-1 show">
+                                                <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html"><i class="fi-rs-shopping-bag-add"></i></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        <% }) %>
+                        </div>
+                        <!--pagination-->
+                        <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination justify-content-start">
+                                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">02</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">03</a></li>
+                                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
+                                    <li class="page-item"><a class="page-link" href="#">16</a></li>
+                                    <li class="page-item"><a class="page-link" href="#"><i class="fi-rs-angle-double-small-right"></i></a></li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 primary-sidebar sticky-sidebar">
+                        <div class="widget-category mb-30">
+                            <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
+                             <!-- [0].category.name -->
+                             <ul class="categories">
+                                <% cartDetails.forEach(element => { %>
+                                    <li><a href=""><%= element.category.name %></a></li> 
+                                <% }) %>
+                                </ul>
+                        </div>
+                        <!-- Fillter By Price -->
+                        <div class="sidebar-widget price_range range mb-30">
+                            <div class="widget-header position-relative mb-20 pb-10">
+                                <h5 class="widget-title mb-10">Fill by price</h5>
+                                <div class="bt-1 border-color-1"></div>
+                            </div>
+                            <div class="price-filter">
+                                <div class="price-filter-inner">
+                                    <div id="slider-range"></div>
+                                    <div class="price_slider_amount">
+                                        <div class="label-input">
+                                            <span>Range:</span><input type="text" id="amount" name="price" placeholder="Add Your Price" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-group">
+                                <div class="list-group-item mb-10 mt-10">
+                                    <label class="fw-900">Color</label>
+                                    <div class="custome-checkbox">
+                                        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox1" value="">
+                                        <label class="form-check-label" for="exampleCheckbox1"><span>Red (56)</span></label>
+                                        <br>
+                                        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox2" value="">
+                                        <label class="form-check-label" for="exampleCheckbox2"><span>Green (78)</span></label>
+                                        <br>
+                                        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox3" value="">
+                                        <label class="form-check-label" for="exampleCheckbox3"><span>Blue (54)</span></label>
+                                    </div>
+                                    <label class="fw-900 mt-15">Item Condition</label>
+                                    <div class="custome-checkbox">
+                                        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox11" value="">
+                                        <label class="form-check-label" for="exampleCheckbox11"><span>New (1506)</span></label>
+                                        <br>
+                                        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox21" value="">
+                                        <label class="form-check-label" for="exampleCheckbox21"><span>Refurbished (27)</span></label>
+                                        <br>
+                                        <input class="form-check-input" type="checkbox" name="checkbox" id="exampleCheckbox31" value="">
+                                        <label class="form-check-label" for="exampleCheckbox31"><span>Used (45)</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="shop-grid-right.html" class="btn btn-sm btn-default"><i class="fi-rs-filter mr-5"></i> Fillter</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -360,185 +468,6 @@
             </div>
         </div>
     </div>
-    <script>
-        document.addEventListener("DOMContentLoaded",()=>{
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-
-            document.querySelectorAll(".cartDetails").forEach((container)=>{
-                //since the cart details will be in different container so an listene should be there for all the container's
-                const qtyUp = container.querySelector(".qty-up");
-                const qtyDown = container.querySelector(".qty-down");
-                const quantity = container.querySelector(".qty-val");
-                const remove = container.querySelector(".cart-remove")
-                
-                
-                // let currentQuantity = parseInt(quantity.textContent);
-                // console.log(currentQuantity)
-
-                qtyUp.addEventListener("click",async (e)=>{
-                    e.preventDefault();
-                    const productId = container.querySelector(".product-table-name").getAttribute("data-product-id");
-                    //Getting product details from backend 
-                    const variantId = container.querySelector(".product-table-name").getAttribute("data-variant-id");
-                    //updating the variant details in the backend.
-
-                    //To get the current quantity from the text document...
-                    let currentQuantity = parseInt(quantity.textContent);
-                    //assign the new quantity to a variable for checking and validation puropose..
-                    let newQuantity = currentQuantity + 1;
-                    //To store the new quantity in Java Script Object
-                    let data = {};
-
-                    //To check if the quantity has exceeded the maximum number..
-                    if(newQuantity>=5)
-                    {
-                        Toast.fire({
-                        icon: "error",
-                        title: "Max Quantity Reached.."
-                        });
-                    }
-                    data.newQuantity = newQuantity;
-                    data.productId = productId;
-                    data.variantId = variantId;
-
-                    let response = await fetch("/user/cart/quantityinc",{
-                        method:"PATCH",
-                        headers:{
-                            "Content-Type":"application/json"
-                        },
-                        body:JSON.stringify(data)
-                    })
-                    console.log(response)
-                    let details = await response.json();
-                    console.log(details)
-                    if(details.success)
-                    {
-                        // Toast.fire({
-                        // icon: "error",
-                        // title: "Max Quantity Reached.."
-                        // });
-                        quantity.textContent = newQuantity
-                    }
-                    else
-                    {
-                        Toast.fire({
-                        icon: "error",
-                        title: details.message || "Internal Server Error.."
-                        });
-                    }
-                })
-
-                qtyDown.addEventListener("click",async (e)=>{
-                    
-                    e.preventDefault();
-                        const productId = container.querySelector(".product-table-name").getAttribute("data-product-id");
-                        //Getting product details from backend 
-                        const variantId = container.querySelector(".product-table-name").getAttribute("data-variant-id");
-                        //updating the variant details in the backend.
-    
-                        //To get the current quantity from the text document...
-                        let currentQuantity = parseInt(quantity.textContent);
-                        //assign the new quantity to a variable for checking and validation puropose..
-                        let newQuantity = currentQuantity - 1;
-                        //To store the new quantity in Java Script Object
-                        let data = {};
-    
-                        //To check if the quantity has exceeded the maximum number..
-                        if(newQuantity>=5)
-                        {
-                            Toast.fire({
-                            icon: "error",
-                            title: "Max Quantity Reached.."
-                            });
-                        }
-                        data.newQuantity = newQuantity;
-                        data.productId = productId;
-                        data.variantId = variantId;
-    
-                        let response = await fetch("/user/cart/quantitydec",{
-                            method:"PATCH",
-                            headers:{
-                                "Content-Type":"application/json"
-                            },
-                            body:JSON.stringify(data)
-                        })
-                        console.log(response)
-                        let details = await response.json();
-                        console.log(details)
-                        if(details.success)
-                        {
-                            // Toast.fire({
-                            // icon: "error",
-                            // title: "Max Quantity Reached.."
-                            // });
-                            quantity.textContent = newQuantity
-                        }
-                        else
-                        {
-                            Toast.fire({
-                            icon: "error",
-                            title: details.message || "Internal Server Error.."
-                            });
-                        }  
-                    })
-                
-                remove.addEventListener("click",async (e)=>{
-                    const productId = container.querySelector(".product-table-name").getAttribute("data-product-id");
-                    //Getting product details from backend 
-                    const variantId = container.querySelector(".product-table-name").getAttribute("data-variant-id");
-                    //updating the variant details in the backend.
-
-                    const data = {} 
-                    data.productId = productId;
-                    data.variantId = variantId;
-
-                    let response = await fetch("/user/cart/delete/",{
-                        method:"DELETE",
-                        headers:{
-                            "Content-Type":"application/json"
-                        },
-                        body:JSON.stringify(data)
-                    })
-
-                    console.log(response);
-
-                    let details = await response.json();
-
-                    console.log(details);
-                    if(details.success)
-                    {
-                        window.location.reload();
-                    }
-                    else
-                    {
-                        Toast.fire({
-                        icon: "error",
-                        title: details.message || "Internal Server Error.."
-                        });                               
-                    }
-
-                })
-                
-            })
-
-            
-
-                
-        })
-            
-        
-
-    </script>
     <!-- Vendor JS-->
     <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
     <script src="assets/js/vendor/jquery-3.6.0.min.js"></script>
@@ -558,6 +487,8 @@
     <script src="assets/js/plugins/isotope.js"></script>
     <script src="assets/js/plugins/scrollup.js"></script>
     <script src="assets/js/plugins/jquery.vticker-min.js"></script>
+    <script src="assets/js/plugins/jquery.theia.sticky.js"></script>
+    <script src="assets/js/plugins/jquery.elevatezoom.js"></script>
     <!-- Template  JS -->
     <script src="./assets/js/main.js?v=3.4"></script>
     <script src="./assets/js/shop.js?v=3.4"></script>

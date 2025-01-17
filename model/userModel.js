@@ -4,7 +4,6 @@ const userSchema = new mongoose.Schema({
     name:{
         type:String,
         require:true,
-        
     },
     email:{
         type:String,
@@ -26,6 +25,10 @@ const userSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
+    cart:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Cart"
+    },
     orders:[{
         type:mongoose.Schema.Types.ObjectId, 
         ref:"Order"
@@ -38,10 +41,7 @@ const userSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId ,
         ref:"Wallet"
     }],
-    cart:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Cart"
-    }]
+    
 },{timestamps:true});
 
 

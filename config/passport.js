@@ -1,6 +1,10 @@
 const passport = require("passport");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require("../model/userModel"); // Assuming you have a User model
+const Wishlist = require("../model/wishlistSchema");
+const Cart = require("../model/cartSchema");
+const Wallet = require("../model/walletSchema");
+
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -24,12 +28,24 @@ async (accessToken, refreshToken, profile, done) => {
             console.log(profile.email)
             //if user present with the email and no google id is present 
             user = await User.findOne({email:profile.email[0].value})
-            console.log()
+            // console.log()
             // console.log("hi2")
             if(user)
             {
                 user.googleId = profile.id;
                 await user.save();
+                const newUserCart = await new Cart({
+                userId:savedUser._id
+                })
+                await newUserCart.save();
+                const newUserWallet = await new Wallet({
+                userId:savedUser._id
+                })
+                await newUserWallet.save();
+                const newUserWishList = await new Wishlist({
+                userId:savedUser._id
+                })
+                await newUserWishList.save();
                 req.session.user = user;
             }
             else

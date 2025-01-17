@@ -4,12 +4,13 @@ const userAuth = require("../middleware/auth");
 const userController = require("../controller/user/userController");
 const addressController = require("../controller/addressController");
 const productController = require("../controller/productController");
+const shopController = require("../controller/shopController");
 const cartController = require("../controller/cartController");
 const passport = require("passport");
 const errorHandling = require("../middleware/errorHandling");
 
 // userController
-router.get("/login",userAuth.isLogged,userController.loadLoginPage); // Remove userAuth.isLogged From here since it for just constant user....
+router.get("/login",userController.loadLoginPage); // Remove userAuth.isLogged From here since it for just constant user....
 router.post("/login", userController.userLogin);
 router.get("/home",userAuth.isLogged,userAuth.isBlocked,userController.loadHomePage);
 router.post("/resentOTP", userController.resendOTP);
@@ -36,6 +37,9 @@ router.get("/auth/google/callback",passport.authenticate('google', {failureRedir
 
 //Product Controller 
 router.get("/product/:id",productController.loadProductPage);
+
+//ShopList Controller
+router.get("/shop",shopController.loadShopPage);
 
 
 //Cart Controller 

@@ -1,5 +1,9 @@
 // const express = require("express");
 const User = require("../../model/userModel");
+const OTPDB = require("../../model/otpModal");
+const Wishlist = require("../../model/wishlistSchema");
+const Cart = require("../../model/cartSchema");
+const Wallet = require("../../model/walletSchema");
 const session = require("express-session");
 const flash = require("connect-flash");
 const statusCode = require("../../public/javascript/statusCodes");
@@ -13,7 +17,6 @@ const userController = {};
 //To Load Home Page
 userController.loadHomePage = async (req,res)=>{
     try{
-
         // console.log("Home Page")
         // req.session.user = {
         //     id:req.user.id,
@@ -36,11 +39,16 @@ userController.loadHomePage = async (req,res)=>{
 userController.userLogin = async (req,res) => {
     try
     {
-        
         const {email , password} = req.body;
         console.log({email , password});
-        const user = await User.findOne({email}); 
-            console.log(user);
+        const user = await User.findOne({email})
+        // console.log(user.orders);
+        // const cart = await cart.find({userId:user._id})
+
+
+        // //To set the cart id in the user modal during login
+        // const cartDetailsUpdate = await User.findByIdAndUpdate(user._id,{cart:card._id});
+        // console.log(cartDetailsUpdate);
         
         if(user)
         {
@@ -82,10 +90,10 @@ userController.userLogin = async (req,res) => {
 //To Load Login Page
 userController.loadLoginPage = (req,res) => {
     try{
-            console.log("User Session From Get login",req.session.user)
+            // console.log("User Session From Get login",req.session.user)
             if(req.session.user)
             {
-                console.log("It should redirect to home");
+                // console.log("It should redirect to home");
                 return res.redirect("/user/home");
             }
             else
@@ -173,36 +181,68 @@ userController.verifyOTP = async (req, res) => {
    try {
        const userOtp = req.body.otp;
        
-        console.log("OTP is "+req.session.OTP)
-
        console.log("User OTP is "+userOtp);
-       
+
+       const savedOTP = await OTPDB.findOne({OTP:userOtp});
+
+       console.log("Saved OTP - ",savedOTP);
+
        // Compare OTP
-       if (userOtp == req.session.OTP) {
+      if(savedOTP)
+      {
+        if(savedOTP.OTP == userOtp)
+        {
+            const deleteOTP = await OTPDB.findByIdAndDelete(savedOTP._id);
+            if(deleteOTP)
+            {
+                console.log("OTP Successfully Deleted..");
+            }
+            else
+            {
+                console.log("OTP Not deleted")
+            }
+            res.status(statusCode.OK).json({
+                message:"Otp Verified Sucessfully",
+                redirectTo:"/user/login"
+               });
+    
+               // Create new user
+               const newUser = await new User({
+                   name: req.session.userData.name,
+                   email: req.session.userData.email,
+                   password: req.session.userData.password
+               });
+                // console.log(newUser);
+               // Save new user to the database
+               const savedUser = await newUser.save();
+               if (savedUser) {
+                   console.log(savedUser);
+                   console.log("User has been added");
+               } 
+               const newUserCart = await new Cart({
+                userId:savedUser._id
+               })
+               await newUserCart.save();
+               const newUserWallet = await new Wallet({
+                userId:savedUser._id
+               })
+               await newUserWallet.save();
+               const newUserWishList = await new Wishlist({
+                userId:savedUser._id
+               })
+               await newUserWishList.save();
+
+        } 
+        else
+        {
+               res.status(statusCode.BAD_REQUEST).json({ message: "OTP Not Verified" });
+        }
+    }
+    else
+    {
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).json({message:"OTP Not found"});
+    }
         
-           res.status(statusCode.OK).json({
-            message:"Otp Verified Sucessfully",
-            redirectTo:"/user/login"
-           });
-
-           // Create new user
-           const newUser = await new User({
-               name: req.session.userData.name,
-               email: req.session.userData.email,
-               password: req.session.userData.password
-           });
-
-        //    console.log(newUser);
-
-           // Save new user to the database
-           const savedUser = await newUser.save();
-           if (savedUser) {
-               console.log(savedUser);
-               console.log("User has been added");
-           } 
-       } else {
-           res.status(statusCode.BAD_REQUEST).json({ message: "OTP Not Verified" });
-       }
    } catch (err) {
        console.error(err);
        res.status(statusCode.INTERNAL_SERVER_ERROR).json({ message: "An error occurred" });
@@ -234,16 +274,32 @@ userController.userLogout = (req,res)=> {
 userController.resendOTP = async (req,res) => {
     try{
         const {email} = req.session.userData;
-        req.session.OTP = null;
-        console.log("sessionOTP"+req.session.OTP);
+        
+        const savedOTP = await OTPDB.findOne({email:email});
+        if(savedOTP)
+        {
+            const DeleteOTP = await OTPDB.findOneAndDelete({email:email});
+            console.log("Deleted OTP :",DeleteOTP);
+        }
+        else
+        {
+
+        }
+        
         const {resend} = req.body;
-        console.log(resend);
+        
         if(resend)
         {
         const OTP = generateOTP();
-            req.session.OTP = OTP;
-            req.session.save()
-        console.log("New OTP is "+req.session.OTP);
+            const resentOTP = new OTPDB({
+                OTP:OTP,
+                email:email,
+                createdAt: new Date(),
+            });
+            const newOTP = await resentOTP.save();
+            console.log("New OTP ",newOTP);
+            
+        // console.log("New OTP is "+req.session.OTP);
         console.log("Email is"+email);
         const emailSent = await sendVerificationEmail( email,OTP );
         if(!emailSent)
@@ -263,49 +319,65 @@ userController.resendOTP = async (req,res) => {
 }
 
 //To Collect Data From SignUPPage
-userController.registerUser = async (req,res) =>{
-    try
-    {
-
-        //store the otp in db 
+userController.registerUser = async (req, res) => {
+    try {
         
-        // console.log('registerUser')
-        // console.log(req.body)
-        const { name , email , password } = req.body;
-        // console.log(name,email);
+
+        // Destructure the input fields from the request body
+        const { name, email, password } = req.body;
+        console.log({ name, email, password });
+
+        // Check if the user already exists
         const existingUser = await User.findOne({ email });
-        // console.log(existingUser[0]);
-        if(existingUser)
-        {
-            return res.status(statusCode.COFLICT).json({
-                message:"Email Already in use",
-                redirectTo:"/user/login"
+        // console.log(existingUser);
+
+        if (existingUser) {
+            return res.status(409).json({
+                message: "Email Already in use",
+                redirectTo: "/user/login",
             });
         }
-        const OTP = generateOTP();
-        console.log("The OTP is "+OTP);
 
-        const emailSent = await sendVerificationEmail( email,OTP );
+        // Generate OTP
+        const otp = generateOTP();
+        console.log("The OTP is " + otp);
 
-        if(!emailSent)
-        {
-            return res.status(statusCode.INTERNAL_SERVER_ERROR).send("Failed to send email");
+        // Save OTP in the OTP database with an expiration time (optional)
+        const otpRecord = new OTPDB({
+            OTP: otp,
+            email:email,
+            createdAt: new Date(),
+        });
+        const savedOTP = await otpRecord.save();
+        console.log(savedOTP);
+
+        if (savedOTP) {
+            console.log("We are in Saved OTP");
+            // Send OTP email
+            const emailSent = await sendVerificationEmail(email, otp);
+
+            if (!emailSent) {
+                return res.status(500).send("Failed to send email");
+            }
+
+            // Hash the password before storing it
+            const hashedPassword = await bcrypt.hash(password, 12);
+
+            // Store user data in session
+            req.session.userData = {
+                name,
+                email,
+                password: hashedPassword,
+            };
+            console.log("OTP Successfully Sent");
+            // Respond with OTP verification form prompt
+            return res.status(200).json({ verifyOTPForm: true });
+        } else {
+            return res.status(500).json({ message: "Internal Server Error" });
         }
-
-        const hashedPassword = await bcrypt.hash(password,12);
-
-        req.session.OTP = OTP,
-        req.session.userData = {
-            name,
-            email,
-            password:hashedPassword,
-        } 
-        return res.status(statusCode.OK).json({ verfyOTPForm:true });
-    }
-    catch(err)
-    {
-        console.log('Error in RegisterPage ' +err);
-        res.redirect("/user/pageNotFound");
+    } catch (err) {
+        console.log("Error in RegisterPage: " , err);
+        res.status(500).json({ message: "An error occurred while processing your request" });
     }
 }
 

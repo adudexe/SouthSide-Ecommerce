@@ -71,7 +71,7 @@ const signUpForm = document.getElementById('signUpForm');
                 email:email.value,
                 password:passwordInput.value
             }
-            const response = await fetch('/signup', {
+            const response = await fetch('/user/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',  // Specify Content-Type as JSON
@@ -86,12 +86,13 @@ const signUpForm = document.getElementById('signUpForm');
             console.log('data');
             console.log(data);
 
-            if(data.verfyOTPForm)
+            if(data.verifyOTPForm)
             {
                 showOTPModal();
             }
             else 
             {
+                console.log("OTP Vefiyfailed ")
                 alert(data.message);
                 window.location.href = data.redirectTo;
                 // console.log(response)
@@ -110,7 +111,7 @@ const signUpForm = document.getElementById('signUpForm');
         message.innerText = `An OTP is sent to ${email.value}`;
         setTimeout(()=>{
             toastMessage.classList.add("hidden");
-        },4000)
+        },17000)
         otpModal.classList.remove("hidden");
         startOTPTimer(); // Start the OTP timer
     }
@@ -120,7 +121,7 @@ const signUpForm = document.getElementById('signUpForm');
         const resendButton = document.getElementById('resendOTP');
         const sendButton = document.getElementById('sendOTP');
         let timer;
-        let timeLeft=6;
+        let timeLeft=60;
         sendButton.classList.remove("hidden")
          resendButton.classList.add("hidden")
         // sendButton.disbled = true;
@@ -144,7 +145,7 @@ const signUpForm = document.getElementById('signUpForm');
 
     function resend(){
         startOTPTimer();
-        fetch("/resentOTP",{
+        fetch("/user/resentOTP",{
             method:"POST",
             headers:{
                 "Content-Type":"application/json"
@@ -156,6 +157,7 @@ const signUpForm = document.getElementById('signUpForm');
 
     
     async function validateAndSubmitOTP() {
+        try {
         event.preventDefault(); // Prevent the form from submitting normally
     
         const otpInput = document.getElementById("otp");
@@ -172,9 +174,9 @@ const signUpForm = document.getElementById('signUpForm');
         return;
         }
     
-        try {
+        
         // Send OTP to the backend for verification
-        const response = await fetch("/verifyOtp", {
+        const response = await fetch("/user/verifyOtp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ otp }),
@@ -186,6 +188,7 @@ const signUpForm = document.getElementById('signUpForm');
 
         console.log("data")
         console.log(data);
+
         if (response.ok) {
             alert( data.message || "OTP verified successfully!");
             document.getElementById('otpForm').reset();
