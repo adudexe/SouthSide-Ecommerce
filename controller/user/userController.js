@@ -404,4 +404,15 @@ userController.updateDetails = async (req,res)=>{
 }
 
 
+
+userController.forgetPassword = async (req,res) =>{
+    try{
+        console.log("Forget Password");
+    }   
+    catch(err)
+    {
+        console.log("Error in Foget Password",err);
+    }
+}
+
 module.exports = userController

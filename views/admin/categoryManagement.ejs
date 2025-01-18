@@ -162,26 +162,29 @@ async function refreshCategoryList() {
         // console.log(data);
 
         if (data.success) {
-            const categoryListContainer = document.querySelector('.content-main .CardBody');
-            categoryListContainer.innerHTML = ''; // Clear the existing list
-
+            const categoryListContainer = document.querySelector('.CardBody');
+            // categoryListContainer.innerHTML = ''; // Clear the existing list
+            const div = document.createElement("div");
+            div.classList.add("col-6");
+            div.classList.add("col-xl-2");
+            div.classList.add("col-lg-3");
+            div.classList.add("col-md-4");
             data.categories.forEach(category => {
-                const categoryCard = `
-                    <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                div.innerHTML = `
+                    
                         <figure class="card border-1">
                             <div class="card-header bg-white text-center">
                                 <h6 class="card-title m-0">${category.name}</h6>
                             </div>
                             <figcaption class="card-body text-center">
                                 ${category.isListed ? 
-                                    `<button type="button" class="btn btn-danger" href="/admin/category/unlist/${category.id}">Unlist</button>` : 
-                                    `<button type="button" class="btn btn-primary" href="/admin/category/list/${category.id}">List</button>`
+                                    `<a type="button" class="btn btn-danger" href="/admin/category/unlist/${category._id}">Unlist</a>` : 
+                                    `<a type="button" class="btn btn-primary" href="/admin/category/list/${category._id}">List</a>`
                                 }
                             </figcaption>
                         </figure>
-                    </div>
                 `;
-                categoryListContainer.innerHTML += categoryCard;
+                categoryListContainer.appendChild(div);
             });
         } else {
             alert('Error fetching categories');

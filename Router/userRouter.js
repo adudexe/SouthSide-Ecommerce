@@ -18,6 +18,7 @@ router.get("/signup", userController.loadSignUpPage);
 router.post("/signup", userController.registerUser);
 router.post("/verifyOtp", userController.verifyOTP);
 router.get("/userLogout",userController.userLogout);
+router.get("/forgetPassword",userController.forgetPassword)
 
 //addressController
 router.get("/myAccount",userAuth.isLogged,userAuth.isBlocked,addressController.loadMyAccount);
