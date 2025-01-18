@@ -40,6 +40,10 @@ router.get("/product/:id",productController.loadProductPage);
 
 //ShopList Controller
 router.get("/shop",shopController.loadShopPage);
+router.get("/shop/search",shopController.searchItem);
+router.get("/shop/sort",shopController.sortProduct);
+router.get("/shop/category",shopController.categorySort);
+
 
 
 //Cart Controller 
