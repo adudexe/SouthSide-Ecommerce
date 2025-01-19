@@ -40,6 +40,7 @@
                    
                     <!-- Product Category -->
                     <div class="col-md-6">
+                        <!-- <p><%= //productDetails.category %></p> -->
                         <label for="product_category" class="form-label">Product Category</label>
                         <select id="product_category" name="product_category" class="form-select">
                             <option value="">Select Category</option>
@@ -47,7 +48,9 @@
                                 <% if (productDetails.category == element._id.toString()) { %>
                                     <option value="<%= element.id %>" selected><%= element.name %></option>
                                 <% } else { %>
-                                    <option value="<%= element.id %>"><%= element.name %></option>
+                                    <% if (element.isListed) { %>
+                                        <option value="<%= element.id %>"><%= element.name %></option>
+                                    <% } %>
                                 <% } %>
                             <% }) %>
                         </select>

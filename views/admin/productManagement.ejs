@@ -10,7 +10,7 @@
             <a href="/admin/addProduct" class="btn btn-primary btn-sm rounded">Add New Product</a>
         </div>
     </div>
-    <p><%= products %></p>
+    <!-- <p><%= //products %></p> -->
     <div class="card mb-4" id="productCard">
         <header class="card-header">
             <div class="row align-items-center">
@@ -34,36 +34,39 @@
             </div>
         </header>
         <div class="card-body" id="card-body">
-            <!-- <p><%= //products[0].varients[0] %></p> -->
-            <% products.forEach(element => { %>
-                
-                <% if (!element.isDeleted) { %>
-                    <article class="itemlist">
-                        <div class="row align-items-center">
-                            <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
-                                <a class="itemside" href="#">
-                                    <div class="left">
-                                        <img src="/<%= element.productImages[0] %>" class="img-sm img-thumbnail" alt="Item">
-                                    </div>
-                                    <div class="info">
-                                        <h6 class="mb-0 ms-5"><%= element.productName %></h6>
-                                    </div>
-                                </a>
+            <% let count=0; %>
+                <% products.forEach(element => { %>
+                    <% if (!element.isDeleted) { %>
+                        <% count++; %>
+                        <article class="itemlist">
+                            <div class="row align-items-center">
+                                <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+                                    <a class="itemside" href="#">
+                                        <div class="left">
+                                            <img src="/<%= element.productImages[0] %>" class="img-sm img-thumbnail" alt="Item">
+                                        </div>
+                                        <div class="info">
+                                            <h6 class="mb-0 ms-5"><%= element.productName %></h6>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-lg-2 col-sm-2 col-4 col-price">
+                                    <span>$<%= element.variants[0].price %></span>
+                                </div>
+                                <div class="col-lg-1 col-sm-2 col-4 col-date">
+                                    <span><%= element.createdAt.toLocaleDateString('en-GB') %></span>
+                                </div>
+                                <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
+                                    <a href="/admin/products/edit/<%= element._id %>" class="btn btn-sm font-sm rounded btn-brand">Edit</a>
+                                    <a class="btn btn-sm font-sm btn-light rounded delete-btn" data-id="<%= element._id %>">Delete</a>
+                                </div>
                             </div>
-                            <div class="col-lg-2 col-sm-2 col-4 col-price">
-                                <span>$<%= element.variants[0].price %></span>
-                            </div>
-                            <div class="col-lg-1 col-sm-2 col-4 col-date">
-                                <span><%= element.createdAt.toLocaleDateString('en-GB') %></span>
-                            </div>
-                            <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
-                                <a href="/admin/products/edit/<%= element._id %>" class="btn btn-sm font-sm rounded btn-brand">Edit</a>
-                                <a class="btn btn-sm font-sm btn-light rounded delete-btn" data-id="<%= element._id %>">Delete</a>
-                            </div>
-                        </div>
-                    </article>
+                        </article>
+                    <% } %>
+                <% }) %>
+                <% if (count==0) { %>
+                    <p>No Products Found</p>
                 <% } %>
-            <% }) %>
         </div>
     </div>
 
@@ -109,109 +112,8 @@
 <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
 <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
 
-<script>
-    const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-        }
-    });
+<script src="/admin/assets/js/deleteProduct.js"></script>
 
-    const cardBody = document.getElementById("card-body");
-
-    // Add event listener to delete buttons
-    document.querySelectorAll(".delete-btn").forEach((button) => {
-        button.addEventListener("click", async (e) => {
-            const productId = e.target.getAttribute("data-id");
-
-            let result = await Swal.fire({
-                title: "Are you sure?",
-                text: "You won't be able to revert this!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Yes, delete it!"
-            });
-
-            if (result.isConfirmed) {
-                const response = await fetch(`/admin/products/${productId}`, {
-                    method: "DELETE"
-                });
-
-                const details = await response.json();
-
-                if (response.ok) {
-                    Toast.fire({
-                        icon: "success",
-                        title: details.message || "Product Deleted Successfully"
-                    });
-
-                    // Re-render the product list after deletion
-                    const updatedProducts = details.product; // Assuming response contains updated product list
-                    cardBody.innerHTML = "";
-
-                    updatedProducts.forEach((element) => {
-                        if (!element.isDeleted) {
-                            const itemList = document.createElement("article");
-                            itemList.classList.add("itemlist");
-                            itemList.innerHTML = `
-                                <div class="row align-items-center">
-                                    <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
-                                        <a class="itemside" href="#">
-                                            <div class="left">
-                                                <img src="/${element.productImage[0]}" class="img-sm img-thumbnail" alt="Item">
-                                            </div>
-                                            <div class="info">
-                                                <h6 class="mb-0">${element.productName}</h6>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-2 col-4 col-price">
-                                        <span>$${element.salePrice}</span>
-                                    </div>
-                                    <div class="col-lg-1 col-sm-2 col-4 col-date">
-                                        <span>${new Date(element.createdAt).toLocaleDateString('en-GB')}</span>
-                                    </div>
-                                    <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
-                                        <a href="/admin/product/edit/${element._id}" class="btn btn-sm font-sm rounded btn-brand">Edit</a>
-                                        <a class="btn btn-sm font-sm btn-light rounded delete-btn" data-id="${element._id}">Delete</a>
-                                    </div>
-                                </div>
-                            `;
-                            cardBody.appendChild(itemList);
-                        }
-                    });
-                } else {
-                    Toast.fire({
-                        icon: "error",
-                        title: details.message || "Internal Server Error"
-                    });
-                }
-            }
-        });
-    });
-</script>
-<footer class="main-footer font-xs">
-    <div class="row pb-30 pt-15">
-        <div class="col-sm-6">
-            <script>
-            // document.write(new Date().getFullYear())
-            </script> ©, Evara - HTML Ecommerce Template .
-        </div>
-        <div class="col-sm-6">
-            <div class="text-sm-end">
-                All rights reserved
-            </div>
-        </div>
-    </div>
-</footer>
-</main>
 <script src="/admin/assets/js/vendors/jquery-3.6.0.min.js"></script>
 <script src="/admin/assets/js/vendors/bootstrap.bundle.min.js"></script>
 <script src="/admin/assets/js/vendors/select2.min.js"></script>

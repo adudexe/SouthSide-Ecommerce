@@ -315,11 +315,14 @@ adminController.addProducts = async (req, res) => {
 adminController.deleteProduct = async (req,res) => {
     try {
         const productId = req.params.id;
+        
+        const deleteProduct = await Product.findByIdAndUpdate(productId,{isDeleted:true});
         const product = await Product.find();
-        const deleteProduct = await Product.findByIdAndDelete({_id:productId});
+        // console.log("Deleted Product",deleteProduct);
+        // console.log("Deleted Product",deleteProduct);
         if(deleteProduct)
         {
-            return res.status(statusCodes.OK).json({message:"Product Has Been Sucessfully Deleted"});
+            return res.status(statusCodes.OK).json({message:"Product Has Been Sucessfully Deleted" , product});
         }
         else
         {
