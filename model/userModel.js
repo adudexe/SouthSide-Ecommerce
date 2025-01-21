@@ -25,10 +25,10 @@ const userSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
-    cart:{
+    cart:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Cart"
-    },
+    }],
     orders:[{
         type:mongoose.Schema.Types.ObjectId, 
         ref:"Order"

@@ -96,15 +96,14 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.min.css
                             <input type="number" id="product_offer" name="product_offer" class="form-control" min="0" max="100">
                             <small id="product_offer_error" class="text-danger" style="display: none;">Product Offer is required.</small>
                         </div>
-                        <!-- Product Brand -->
+                        <!-- Image -->
                         <div class="col-md-6">
-                            <label for="product_title" class="form-label">Product Brand</label>
-                            <input type="text" id="product_brand" name="product_brand" class="form-control">
-                            <small id="product_brand_error" class="text-danger" style="display: none;">Product brand is required.</small>
+                            <label  class="form-label">Image</label>
+                            <input type="file" id="imagesInput" class="form-control" accept="image/*" multiple>
                         </div>
 
                         <!-- Product Category -->
-                        <div class="col-md-6">
+                        <div class="col-md-6">                            
                             <label for="product_category" class="form-label">Product Category</label>
                             <select id="product_category" name="product_category" class="form-select">
                                 <option value="">Select Category</option>
@@ -128,8 +127,6 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.min.css
                     </div>
                     <div class="row mt-2">
                         <div class="col-md-6">
-                            <label  class="form-label">Image</label>
-                            <input type="file" id="imagesInput" class="form-control" accept="image/*" multiple>
                             
                             <div id="imagePreview" class="col">
                             <!-- Images Will be displayed Here -->

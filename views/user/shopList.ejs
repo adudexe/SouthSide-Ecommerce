@@ -79,6 +79,16 @@
                                 </div>
                             </div>
                         </div>
+                        <% let arr = new Set(); %>
+                        <% cartDetails.forEach((element)=>{ 
+                            if(!arr.has(element.category.name))
+                            {
+                                arr.add(element.category);
+                            }    
+                        }) %>
+                        <% //arr.forEach((element)=>{ %>
+                            <!-- <p><%= //element %></p> -->
+                        <% //}) %>
                         <!-- <p><%= //cartDetails[0].isBlocked %></p> -->
                         <div class="row product-grid-3" id="shop-products">
                         <% cartDetails.forEach(element => { %>
@@ -151,9 +161,9 @@
                              <!-- [0].category.name -->
                               
                              <ul class="categories" id="categorie">
-                                <% cartDetails.forEach(element => { %>
-                                    <% if (element.category.isListed) { %>
-                                        <li><a href="#" class="catgo-items"><%= element.category.name %></a></li> 
+                                <% arr.forEach(element => { %>
+                                    <% if (element.isListed) { %>
+                                        <li><a href="#" class="catgo-items"><%= element.name %></a></li> 
                                     <% } %>
                                 <% }) %>
                                 </ul>

@@ -223,12 +223,12 @@ adminController.productUpdatePage = async (req,res) =>{
 
 adminController.addProducts = async (req, res) => {
     try {
-        // console.log(req.body); // Log the request body for debugging
-        // console.log(req.files); // Log the uploaded files
+        console.log(req.body); // Log the request body for debugging
+        console.log(req.files); // Log the uploaded files
 
         // console.log(JSON.parse(req.body.variants))
         // Parse the variants string into an actual JavaScript array
-        const { productTitle, productOffer, productBrand, productCategory, productDescription, variants } = req.body;
+        const { productTitle, productOffer,  productCategory, productDescription, variants } = req.body;
 
         // Check if the variants field exists and is a valid string (or array)
         let parsedVariants = [];
@@ -243,7 +243,7 @@ adminController.addProducts = async (req, res) => {
         }
 
         // Validate required fields
-        if (!productTitle || !productOffer || !productBrand || !productCategory || !productDescription) {
+        if (!productTitle || !productOffer  || !productCategory || !productDescription) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
 
@@ -262,7 +262,8 @@ adminController.addProducts = async (req, res) => {
                 productImages.push(file[1][0].path);  // Save file paths
             });
         }
-        console.log(productImages)
+        // console.log(productImages)
+        // let finalPrice =  
 
         // console.log("Parsed Variants",parsedVariants);
 
@@ -272,6 +273,7 @@ adminController.addProducts = async (req, res) => {
             color: variant.color,
             status: variant.status,
             price: variant.price,
+            salePrice:((variant.price * productOffer) / 100),
             quantity: variant.quantity,
         }));
 
@@ -287,7 +289,7 @@ adminController.addProducts = async (req, res) => {
         const newProduct = await new Product({
             productName: productTitle,
             description: productDescription,
-            brand: productBrand,
+            // brand: productBrand,
             category: productCategory,
             productOffer: productOffer,
             productImages,  // Save image file paths
@@ -318,7 +320,6 @@ adminController.deleteProduct = async (req,res) => {
         
         const deleteProduct = await Product.findByIdAndUpdate(productId,{isDeleted:true});
         const product = await Product.find();
-        // console.log("Deleted Product",deleteProduct);
         // console.log("Deleted Product",deleteProduct);
         if(deleteProduct)
         {

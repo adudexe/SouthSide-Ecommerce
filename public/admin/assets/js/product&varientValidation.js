@@ -31,6 +31,18 @@ document.addEventListener("DOMContentLoaded", (e) => {
             currentFileIndex = 0; // Reset index
 
             Array.from(files).forEach((file, index) => {
+                
+                
+                if (!file.type.startsWith('image/')) {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Please Select an Image",
+                        icon: "error"
+                    });
+                    return; // Skip this file
+                }
+
+
                 if (selectedFiles.length < 3) {
                     const reader = new FileReader();
                     reader.onload = function (e) {
@@ -253,7 +265,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
             const formFields = [
                 { element: document.getElementById("product_title"), errorElement: document.getElementById("product_title_error") },
                 { element: document.getElementById("product_offer"), errorElement: document.getElementById("product_offer_error") },
-                { element: document.getElementById("product_brand"), errorElement: document.getElementById("product_brand_error") },
+                // { element: document.getElementById("product_brand"), errorElement: document.getElementById("product_brand_error") },
                 { element: document.getElementById("product_category"), errorElement: document.getElementById("product_category_error") },
                 { element: document.getElementById("product_description"), errorElement: document.getElementById("product_description_error") }
             ];
@@ -299,7 +311,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
             const formData = new FormData();
             formData.append('productTitle', document.getElementById("product_title").value);
             formData.append('productOffer', document.getElementById("product_offer").value);
-            formData.append('productBrand', document.getElementById("product_brand").value);
+            // formData.append('productBrand', document.getElementById("product_brand").value);
             formData.append('productCategory', document.getElementById("product_category").value);
             formData.append('productDescription', document.getElementById("product_description").value);
             formData.append('variants', JSON.stringify(variants));
@@ -349,7 +361,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
             document.getElementById("imagePreview").innerHTML = ''; // Clear image previews
             document.getElementById("product_title").value = "";
             document.getElementById("product_offer").value = "";
-            document.getElementById("product_brand").value = "";
+            // document.getElementById("product_brand").value = "";
             document.getElementById("product_category").value = "";
             document.getElementById("product_description").value = "";
             selectedFiles = [];

@@ -6,6 +6,7 @@ const addressController = require("../controller/addressController");
 const productController = require("../controller/productController");
 const shopController = require("../controller/shopController");
 const cartController = require("../controller/cartController");
+const forgetController = require("../controller/forgetController");
 const passport = require("passport");
 const errorHandling = require("../middleware/errorHandling");
 
@@ -18,7 +19,12 @@ router.get("/signup", userController.loadSignUpPage);
 router.post("/signup", userController.registerUser);
 router.post("/verifyOtp", userController.verifyOTP);
 router.get("/userLogout",userController.userLogout);
-router.get("/forgetPassword",userController.forgetPassword)
+
+//forgetController
+router.post("/forgetPassword",forgetController.forgetPassword)
+router.post("/forgetPassword/otpMatch",forgetController.OTPMatch);
+router.post("/forgetPassword/newPassword",forgetController.newPassword);
+
 
 //addressController
 router.get("/myAccount",userAuth.isLogged,userAuth.isBlocked,addressController.loadMyAccount);

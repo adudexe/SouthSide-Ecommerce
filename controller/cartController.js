@@ -23,7 +23,7 @@ cartController.cartQuantityIncrementer = async (req,res)=>{
         // To increase the quantity in the cart...
         const {newQuantity,productId,variantId} = req.body
 
-        console.log({newQuantity,productId,variantId})
+        // console.log({newQuantity,productId,variantId})
 
         const userId = req.session.user._id;
 
