@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <div class="product-cart-wrap">
                                         <div class="product-img-action-wrap">
                                             <div class="product-img product-img-zoom">
-                                                <a href="shop-product-right.html"> 
+                                                <a href="/user/product/${product._id}"> 
                                                     <img class="default-img" src="/${product.productImages[0]}" alt=""> 
                                                     <img class="hover-img" src="/${product.productImages[1]}" alt=""> 
                                                 </a>
@@ -66,10 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                             </div>
                                         </div>
                                         <div class="product-content-wrap">
-                                            <h2><a href="shop-product-right.html">${product.productName}</a></h2>
+                                            <h2><a href="/user/product/${product._id}">${product.productName}</a></h2>
                                             <div class="product-price">
-                                                <span>$${product.variants[0].price}</span>
-                                                <span class="old-price">$${product.oldPrice}</span>
+                                                <span>$${product.variants[0].salePrice}</span>
+                                                <span class="old-price">$${product.variants[0].price}</span>
                                             </div>
                                             <div class="product-action-1 show">
                                                 <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html">

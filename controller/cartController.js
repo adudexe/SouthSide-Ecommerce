@@ -4,17 +4,30 @@ const statusCode = require("../public/javascript/statusCodes");
 const cartController = {};
 
 
-cartController.loadCartPage = async (req,res)=>{
+cartController.loadCartPage = async (req, res) => {
     try {
         const userId = req.session.user._id;
-        const cartDetails = await cart.findOne({userId:userId}).populate('items.productId');
-        // const productDetails =  await products.find();
+        const cartDetails = await cart.findOne({ userId: userId }).populate('items.productId');
+        const productDetails = await products.find();
+        
+        // Calculate total price of cart items
+        const totalPrice = cartDetails.items.reduce((total, element) => {
+            const product = element.productId; // Get the product details
+            const variant = product.variants.find(variant => variant._id.toString() === element.variantId.toString()); // Find the selected variant
+            
+            // Add the price of the variant * quantity to the total
+            return total + (variant.salePrice * element.quantity);
+        }, 0); // Initial value is 0
+
+        console.log("TotalPrice is ", totalPrice); // Logs total price
+
         console.log(cartDetails);
-        res.render("./user/cartPage",{cartItems:cartDetails});
+        res.render("./user/cartPage", { cartItems: cartDetails, products: productDetails, totalPrice: totalPrice });
     } catch (error) {
-        console.log("Error in Loading Cart",error);
+        console.log("Error in Loading Cart", error);
     }
 }
+
 
 
 cartController.cartQuantityIncrementer = async (req,res)=>{

@@ -172,7 +172,11 @@
         <section class="mt-50 mb-50">
             <div class="container">
                 <div class="row">
+                    <% if (true) { %>
+                        <p>TotalPrice:<%= totalPrice %></p>
+                    <% } %>
                     <div class="col-12">
+                        
                         <!-- (cartItems.items).length -->
                         <!-- <p><%= //cartItems %></p> -->
                        <% if (cartItems) { %>
@@ -185,15 +189,20 @@
                                             <th scope="col">Name</th>
                                             <th scope="col">Price</th>
                                             <th scope="col">Quantity</th>
-                                            <th scope="col">Subtotal</th>
+                                            <!-- <th scope="col">Subtotal</th> -->
                                             <th scope="col">Remove</th>
                                         </tr>
                                     </thead>
+                                    <% products.forEach((element)=>{ %>
+                                    <p><%= //element %></p>
+                                    <%})%>
+                                    <p><%= //cartItems.items %></p>
                                     <% cartItems.items.forEach(element => { %>
-                                        <!-- <p><%= //element%> </p> -->
+                                        <p><%= //element.productId.variants[0]%> </p>
                                         <tbody class="cartDetails">
                                             <tr>
                                                 <% let productDetails = element.productId.variants.find((item)=>{return item._id == element.variantId.toString() }) %>
+                                                
                                                 <td class="image product-thumbnail"><img src="/<%=element.productId.productImages[0]%>" alt="element"></td>
                                                 <td class="product-des product-name product-table-name" data-product-id="<%= element.productId._id  %>" data-variant-id="<%= productDetails._id %>">
                                                     <h5 class="product-name"><a href="/user/product/<%= element.productId._id %>"><%= element.productId.productName %></a></h5>
@@ -201,7 +210,7 @@
                                                     </p>
                                                 </td>
                                                 <!-- <p><%= //productDetails %></p> -->
-                                                <td class="price" data-title="Price"><span>$<%=productDetails.price%></span></td>
+                                                <td class="price" data-title="Price"><span>$<%=productDetails.salePrice%></span></td>
                                                 <td class="text-center" data-title="Stock">
                                                     <div class="detail-qty border radius  m-auto cartQuantity" >
                                                         <a href="#" class="qty-up"  ><i class="fi-rs-angle-small-up"></i></a>
@@ -209,9 +218,9 @@
                                                         <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
                                                     </div>
                                                 </td>
-                                                <td class="text-right" data-title="Cart">
+                                                <!-- <td class="text-right" data-title="Cart">
                                                     <span>$65.00 </span>
-                                                </td>
+                                                </td> -->
                                                 <td class="action cart-remove" data-title="Remove"><a href="#" class="text-muted"><i class="fi-rs-trash"></i></a></td>
                                             </tr>
                                         </tbody>
@@ -219,8 +228,9 @@
                                 </table>
                             </div>
                             <div class="cart-action text-end">
+                              
                                 <!-- <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a> -->
-                                <a class="btn "><i class="fi-rs-shopping-bag mr-10"></i>Continue Shopping</a>
+                                <a class="btn" href="/user/checkout"><i class="fi-rs-shopping-bag mr-10"></i>Checkout</a>
                             </div>
                         <% } else { %>
                             <div> Empty Cart </div>

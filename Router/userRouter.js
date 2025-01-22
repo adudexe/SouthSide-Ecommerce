@@ -7,6 +7,7 @@ const productController = require("../controller/productController");
 const shopController = require("../controller/shopController");
 const cartController = require("../controller/cartController");
 const forgetController = require("../controller/forgetController");
+const checkoutController = require("../controller/checkoutController");
 const passport = require("passport");
 const errorHandling = require("../middleware/errorHandling");
 
@@ -51,8 +52,6 @@ router.get("/shop/search",shopController.searchItem);
 router.get("/shop/sort",shopController.sortProduct);
 router.get("/shop/category",shopController.categorySort);
 
-
-
 //Cart Controller 
 router.get("/cart",cartController.loadCartPage);
 router.post("/cart/add",cartController.addProductToCart);
@@ -61,6 +60,8 @@ router.patch("/cart/quantitydec",cartController.cartQuantityDecrementer);
 router.delete("/cart/delete/",cartController.deleteProductFromCart);
 
 
+//Checkout Controller
+router.get("/checkout",checkoutController.loadCheckout);
 
 
 //Error Handling Middle ware..

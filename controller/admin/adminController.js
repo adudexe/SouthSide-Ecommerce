@@ -273,7 +273,7 @@ adminController.addProducts = async (req, res) => {
             color: variant.color,
             status: variant.status,
             price: variant.price,
-            salePrice:((variant.price * productOffer) / 100),
+            salePrice:(variant.price - ((variant.price * productOffer) / 100)),
             quantity: variant.quantity,
         }));
 
