@@ -62,6 +62,9 @@ router.delete("/cart/delete/",cartController.deleteProductFromCart);
 
 //Checkout Controller
 router.get("/checkout",checkoutController.loadCheckout);
+router.post("/checkout/address/add",checkoutController.addNewAddress);
+router.get("/chekcout/address/set/:id",checkoutController.setAddress);
+router.put("/checkout/address/update/:id",checkoutController.updateAddress);
 
 
 //Error Handling Middle ware..

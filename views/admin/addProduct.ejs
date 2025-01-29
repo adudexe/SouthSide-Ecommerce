@@ -160,11 +160,27 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.min.css
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <!-- <div class="col-md-6">
                         <label for="variant_size" class="form-label">Size</label>
                         <input type="text" id="variant_size" class="form-control" placeholder="Enter size">
+                        
+                    </div> -->
+                    <div class="col-md-6">
+                        <label for="variant_size" class="form-label">Size</label>
+                        <select id="variant_size" class="form-control">
+                            <option value="" disabled selected>Select size</option>
+                            <option value="XS">XS</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
+                            <option value="3XL">3XL</option>
+                            <option value="4XL">4XL</option>
+                            <option value="5XL">5XL</option>
+                        </select>
                         <small id="variant_size_error" class="text-danger" style="display: none;">Product Variant Size is Required</small>
-                    </div>
+                    </div>                    
                     <div class="col-md-6">
                         <label for="variant_color" class="form-label">Color</label>
                         <input type="text" id="variant_color" class="form-control" placeholder="Enter color">

@@ -286,8 +286,10 @@
                     <div class="tab-pane fade show active" id="tab-one" role="tabpanel" aria-labelledby="tab-one">
                         <!-- <p><%= //products %></p> -->
                         <div class="row product-grid-4">
-                            <% if (!products.isDeleted || !products.isBlocked) { %>
+                            
                                 <% products.forEach(element => { %>
+                                    <p><%= //element.isDeleted %></p>
+                                    <% if (!element.isDeleted && !element.isBlocked) { %>
                                     <div class="col-lg-3 col-md-4 col-12 col-sm-6">
                                         <div class="product-cart-wrap mb-30">
                                             <div class="product-img-action-wrap">
@@ -326,8 +328,9 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <% } %>
                                 <% }) %>
-                            <% } %>
+                           
                            
                         <!--End product-grid-4-->
                     </div>

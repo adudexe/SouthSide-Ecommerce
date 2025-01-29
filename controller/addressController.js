@@ -85,7 +85,18 @@ addressController.updateAddresById = async (req,res) => {
         // console.log(req.params);
         const addressId=req.params.id;
         // console.log("params",addressId);
+        //if primary then check if the address is already primary.. 
+            //retrive all the address based on the userId
+        const userAddress = await Address.findOne({userId:req.session.user._id,isPrimary:true});
+        // console.log("User Address",userAddress);
+        if(userAddress)
+        {
+          //If any isPrimary is set then change that to false..... 
+            const isPrimary = await Address.findOneAndUpdate({userId:req.session.user._id,isPrimary:true},{$set:{isPrimary:false}});
+        }
         const updateData = req.body
+        // console.log('Update Data',updateData);
+
         // console.log(req.body);
         const updateAddress = await Address.findOneAndUpdate({_id:addressId},{$set:updateData},{new:true});
         // console.log(updateAddress);

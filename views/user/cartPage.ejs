@@ -173,7 +173,7 @@
             <div class="container">
                 <div class="row">
                     <% if (true) { %>
-                        <p>TotalPrice:<%= totalPrice %></p>
+                        <p>TotalPrice: $<%= totalPrice %></p>
                     <% } %>
                     <div class="col-12">
                         
@@ -206,7 +206,7 @@
                                                 <td class="image product-thumbnail"><img src="/<%=element.productId.productImages[0]%>" alt="element"></td>
                                                 <td class="product-des product-name product-table-name" data-product-id="<%= element.productId._id  %>" data-variant-id="<%= productDetails._id %>">
                                                     <h5 class="product-name"><a href="/user/product/<%= element.productId._id %>"><%= element.productId.productName %></a></h5>
-                                                    <p class="font-xs"> <%= element.productId.description %> <br>  <span>Size: <%=productDetails.size%></span> <span>&nbsp;</span> <span>Color:  <%=productDetails.color%></span>
+                                                     <p> <span>Size: <%=productDetails.size%></span> <span>&nbsp;</span> <span>Color:  <%=productDetails.color%></span>
                                                     </p>
                                                 </td>
                                                 <!-- <p><%= //productDetails %></p> -->

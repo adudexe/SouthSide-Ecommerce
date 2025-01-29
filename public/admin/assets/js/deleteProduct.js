@@ -80,6 +80,7 @@ try {
                                         <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
                                             <a href="/admin/product/edit/${element._id}" class="btn btn-sm font-sm rounded btn-brand">Edit</a>
                                             <a class="btn btn-sm font-sm btn-light rounded delete-btn" data-id="${element._id}">Delete</a>
+                                            <a href="#" class="btn btn-sm btn-danger rounded" data-id="${element._id}">Block</a>
                                         </div>
                                     </div>
                                 `;
