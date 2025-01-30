@@ -89,7 +89,7 @@
                         </div>
 
                         <!-- Payment Methods -->
-                        <div class="payment-methods mt-4 pt-4 border-top">
+                        <div class="payment-methods mt-4 pt-4 border-top" id="payment-methods">
                             <h5 class="mb-3">Payment Method</h5>
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="radio" name="payment_option" id="cod" value="cod" checked>
@@ -97,7 +97,12 @@
                                     Cash on Delivery
                                 </label>
                             </div>
-
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="payment_option" id="online" value="online">
+                                <label class="form-check-label" for="online">
+                                    Razor Pay
+                                </label>
+                            </div>
                             <!-- Place Order Button -->
                             <button type="button" class="btn btn-primary w-100 mt-3" onclick="placeOrder()">
                                 Place Order
@@ -337,17 +342,34 @@
 </div>
 <script>
     //Place Order
-    function placeOrder() {
-        //The Payment Mehod the address details and the product details should be sent to the backend for placing the order.
-            const primaryAddress = document.querySelector('#primary-address .address-details');
+        function placeOrder() {
+            //The Payment Mehod the address details and the product details should be sent to the backend for placing the order.
+                const primaryAddress = document.querySelector('#primary-address .address-details');
+                //Get the Payment Method
+                // Get the selected payment option value
+            const paymentOption = document.querySelector('input[name="payment_option"]:checked').value;
+
+            // Log it to the console (optional, for debugging)
+            console.log('Selected Payment Option:', paymentOption);
+
+            // Send the selected value to the backend using fetch
+            const orderType = {"OrderType":paymentOption};
             
+            
+
+
+
+
+
+            
+
             if (!primaryAddress) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Address Required',
                     text: 'Please select or add a delivery address before placing the order.'
                 });
-                return;
+                // return;
             }
     
             Swal.fire({
@@ -366,7 +388,8 @@
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
-                            }
+                            },
+                            body:JSON.stringify(orderType),
                         });
                         
                         const details = await response.json();

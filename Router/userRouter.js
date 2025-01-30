@@ -54,11 +54,11 @@ router.get("/shop/sort",shopController.sortProduct);
 router.get("/shop/category",shopController.categorySort);
 
 //Cart Controller 
-router.get("/cart",cartController.loadCartPage);
-router.post("/cart/add",cartController.addProductToCart);
-router.patch("/cart/quantityinc",cartController.cartQuantityIncrementer);
-router.patch("/cart/quantitydec",cartController.cartQuantityDecrementer);
-router.delete("/cart/delete/",cartController.deleteProductFromCart);
+router.get("/cart",productAvailability.quantity,cartController.loadCartPage);
+router.post("/cart/add",productAvailability.quantity,cartController.addProductToCart);
+router.patch("/cart/quantityinc",productAvailability.quantity,cartController.cartQuantityIncrementer);
+router.patch("/cart/quantitydec",productAvailability.quantity,cartController.cartQuantityDecrementer);
+router.delete("/cart/delete/",productAvailability.quantity,cartController.deleteProductFromCart);
 
 
 //Checkout Controller
@@ -67,6 +67,10 @@ router.post("/checkout/address/add",checkoutController.addNewAddress);
 router.get("/chekcout/address/set/:id",checkoutController.setAddress);
 router.put("/checkout/address/update/:id",checkoutController.updateAddress);
 router.post("/checkout/placeorder",productAvailability.quantity,checkoutController.placeOrder);
+
+
+//Order Controller
+router.get("/myAccount/orders",)
 
 //Error Handling Middle ware..
 router.use(errorHandling.errorHandlingMiddleware);

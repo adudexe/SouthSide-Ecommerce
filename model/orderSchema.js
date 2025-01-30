@@ -1,17 +1,60 @@
 const mongoose = require("mongoose");
-const {v4:uuidv4} = require("uuid");
 const orderSchema = mongoose.Schema({
-    // orderId:{
-    //     type:String,
-    //     default:()=>uuidv4(),
-    //     unique:true
-    // },
+    userId:{
+        type:mongoose.Schema.ObjectId,
+        ref:"User",
+    },
     orderItems:[{
-        //status
-        product:{
-            type:mongoose.Schema.ObjectId,
-            ref:"Products",
-            // unique:ture,
+            product:{
+                productName : {
+                    type:String,
+                    required:true
+                },
+                description:{
+                    type:String,
+                    required:true
+                },
+                category:{
+                    type:mongoose.Schema.Types.ObjectId,
+                    ref:"Category",
+                    required:true,
+                },
+                productOffer:{
+                    type:Number,
+                    default:0,
+                },
+                variants:[{
+                    size: {
+                        type: String,
+                        required: false, // Optional, depending on your use case
+                    },
+                    color: {
+                        type: String,
+                        required: false, // Optional, depending on your use case
+                    },
+                    price: {
+                        type: Number,
+                        required: true,
+                    },
+                    salePrice: {
+                        type: Number,
+                        default: null,
+                    },
+                    quantity: {
+                        type: Number,
+                        default: 0,
+                        min: 0,
+                    },
+                    status: {
+                        type: String,
+                        enum: ["Available", "OutOfStock", "Discontinued"],
+                        default: "Available",
+                    },
+                }],
+            productImages:{
+                type:[String],
+                required:true,
+            }
         },
         quantity:{
             type:Number,
@@ -35,9 +78,45 @@ const orderSchema = mongoose.Schema({
         required:true
     },
     addres:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User",
-        // required:ture
+        name:{
+            type:String,
+            required:true,
+            tirm:true,
+        },
+        street: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        city: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        state: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        postalCode: {
+            type: String,
+            required: true,
+        },
+        country: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        phone: {
+            type: String,
+            required: true,
+            match: [/^\+?\d{1,4}?[-.\s]?\(?\d+\)?[-.\s]?\d+[-.\s]?\d+$/, 'Please enter a valid phone number'], // General phone number validation
+        },
+        isPrimary: {
+            type: Boolean,
+            default: false,
+            required: true,  // Only one primary address can be true for a user
+        }
     },
     invoiceDate:{
         type:Date
@@ -45,7 +124,7 @@ const orderSchema = mongoose.Schema({
     status:{
         type:String,
         required:true,
-        enum:['Pending','Processed','Shipped','Delivered','Cancelled','Return Request','Returned']
+        enum:['Pending','Processed','Shipped','Delivered','Cancelled','Return Request','Returned','Refunded']
     },
     createdOn:{
         type:Date,
