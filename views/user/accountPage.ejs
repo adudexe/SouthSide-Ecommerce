@@ -258,41 +258,34 @@
                                             <div class="card-header">
                                                 <h5 class="mb-0">Your Orders</h5>
                                             </div>
+                                            <p><%= //orders %></p>
+                                            
                                             <div class="card-body">
                                                 <div class="table-responsive">
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
-                                                                <th>Order</th>
                                                                 <th>Date</th>
-                                                                <th>Status</th>
+                                                                <!-- <th>Status</th> -->
                                                                 <th>Total</th>
                                                                 <th>Actions</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>#1357</td>
-                                                                <td>March 45, 2020</td>
-                                                                <td>Processing</td>
-                                                                <td>$125.00 for 2 item</td>
-                                                                <td><a href="#" class="btn-small d-block">View</a></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>#2468</td>
-                                                                <td>June 29, 2020</td>
-                                                                <td>Completed</td>
-                                                                <td>$364.00 for 5 item</td>
-                                                                <td><a href="#" class="btn-small d-block">View</a></td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>#2366</td>
-                                                                <td>August 02, 2020</td>
-                                                                <td>Completed</td>
-                                                                <td>$280.00 for 3 item</td>
-                                                                <td><a href="#" class="btn-small d-block">View</a></td>
-                                                            </tr>
-                                                        </tbody>
+                                                        <% orders.forEach(element => { %>
+                                                            <!-- <p><%= //element %></p> -->
+                                                                <tr>
+                                                                    <td><%= (element.createdOn).toLocaleDateString('en-US', {
+                                                                        month: 'long',  // Full month name (e.g., "March")
+                                                                        day: 'numeric', // Day of the month (e.g., "25")
+                                                                        year: 'numeric' // Full year (e.g., "2020")
+                                                                      }); %></td>
+                                                                    <!-- <td><%= //element.status %></td> -->
+                                                                    <td>$<%= element.totalPrice %></td>
+                                                                    <td><a href="/user/myAccount/orders/<%=element._id %>" class="btn-small d-block order-btn">View</a></td>
+                                                                </tr>
+                                                        <% }) %>
+                                                    </tbody>
                                                     </table>
                                                 </div>
                                             </div>
@@ -677,6 +670,9 @@
             </div>
         </div>
     </div>
+    <script>
+        
+    </script>
     <script src="/javascript/addressUpdateAndDelete.js"></script>
     <script src="/javascript/editProfile.js"></script>
     <!-- SweetAlert2 CDN -->

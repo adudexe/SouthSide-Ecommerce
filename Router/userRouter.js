@@ -9,6 +9,7 @@ const cartController = require("../controller/cartController");
 const forgetController = require("../controller/forgetController");
 const checkoutController = require("../controller/checkoutController");
 const productAvailability = require("../middleware/productAvailability");
+const orderController = require("../controller/orderController");
 const passport = require("passport");
 const errorHandling = require("../middleware/errorHandling");
 
@@ -70,7 +71,8 @@ router.post("/checkout/placeorder",productAvailability.quantity,checkoutControll
 
 
 //Order Controller
-router.get("/myAccount/orders",)
+router.get("/myAccount/orders/:id",orderController.loadOrderDetails);
+router.get("/myAccount/order/cancel/:id",orderController.cancelOrder);
 
 //Error Handling Middle ware..
 router.use(errorHandling.errorHandlingMiddleware);

@@ -236,7 +236,8 @@ checkoutController.placeOrder = async (req, res) => {
                         productImages: product.productImages
                     },
                     quantity: item.quantity,
-                    price: variant.salePrice * item.quantity
+                    price: variant.salePrice * item.quantity,
+                    status: 'Pending', // Default status when the order is created
                 });
 
                 // Add to total price
@@ -265,8 +266,8 @@ checkoutController.placeOrder = async (req, res) => {
             finalAmount: finalAmount,
             addres: primaryAddress,  // Use the primary address for shipping
             invoiceDate: new Date(),
-            status: 'Pending', // Default status when the order is created
-            couponApplied: cartItems.couponApplied || false
+            couponApplied: cartItems.couponApplied || false,
+            paymentMethod: OrderType
         });
 
         // Save the order to the database

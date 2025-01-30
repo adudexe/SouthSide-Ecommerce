@@ -1,5 +1,6 @@
 const addressController = {};
 const Address =  require("../model/userAddress");
+const Order = require("../model/orderSchema");
 const statusCode = require("../public/javascript/statusCodes");
 
 
@@ -7,9 +8,10 @@ addressController.loadMyAccount = async (req,res) => {
     try{
         let address = [];
         address =  await Address.find({userId:req.session.user._id});
-
+        const orders = await Order.find({userId:req.session.user._id});
+        console.log(orders);
         //To Check Wheather if any address is present for this User
-        res.render("./user/accountPage",{address});
+        res.render("./user/accountPage",{address,orders});
         //Render the account page with the userAddress
         
         //{Address:address.address}

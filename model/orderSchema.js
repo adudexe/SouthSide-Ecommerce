@@ -3,6 +3,7 @@ const orderSchema = mongoose.Schema({
     userId:{
         type:mongoose.Schema.ObjectId,
         ref:"User",
+        required:true
     },
     orderItems:[{
             product:{
@@ -63,6 +64,11 @@ const orderSchema = mongoose.Schema({
         price:{
             type:Number,
             default:0
+        },
+        status:{
+            type:String,
+            required:true,
+            enum:['Pending','Processed','Shipped','Delivered','Cancelled','Return Request','Returned','Refunded']
         }
     }],
     totalPrice:{
@@ -121,11 +127,6 @@ const orderSchema = mongoose.Schema({
     invoiceDate:{
         type:Date
     },
-    status:{
-        type:String,
-        required:true,
-        enum:['Pending','Processed','Shipped','Delivered','Cancelled','Return Request','Returned','Refunded']
-    },
     createdOn:{
         type:Date,
         default:Date.now,
@@ -134,7 +135,17 @@ const orderSchema = mongoose.Schema({
     couponApplied:{
         type:Boolean,
         default:false
-    }
+    },
+    paymentMethod:{
+        type:String,
+        required:true,
+    },
+    // status:{
+    //     type:String,
+    //     required:true,
+    //     enum:['Pending','Processed','Shipped','Delivered','Cancelled','Return Request','Returned','Refunded']
+    // } 
+
 })
 
 module.exports = mongoose.model("Order",orderSchema);
