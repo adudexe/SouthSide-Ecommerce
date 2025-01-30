@@ -11,6 +11,7 @@ checkoutController.loadCheckout = async (req, res) => {
         // console.log("User Id", userId);
         let address = [];
         let variants = [];
+        let quantity = [];
         let shipping = 0;
         //find the product details and varients and send it to the front end...
         const products = await Product.find
@@ -21,15 +22,20 @@ checkoutController.loadCheckout = async (req, res) => {
         const cart = await Cart.findOne({ userId: userId }).populate('items.productId');
         // console.log("Cart Items",cart);
 
+        
 
         (cart.items).find((item)=>{
-            console.log("Items",item.productId.isBlocked);
+            // console.log("Items",item);
             if(!(item.productId.isDeleted) && !(item.productId.isBlocked) )
             {
                 return (item.productId.variants).find((variant)=>{
                     if(variant._id.toString() === (item.variantId).toString())
-                    {
-                        variants.push(variant)
+                    {   
+                        // console.log("item",item);
+                        // console.log("item quantity",item.quantity);
+                        // total = total*item.quantity
+                        variants.push(variant);
+                        quantity.push(item.quantity);
                     }
                 })
             }
@@ -37,11 +43,12 @@ checkoutController.loadCheckout = async (req, res) => {
         })
         // console.log("Cart Product Variants",variants);
         address = await Address.find({ userId: userId });
-        
-        let total = variants.reduce((acc, product) => {
-            return acc + product.salePrice;
-        }, 0);
-        
+
+        let total = variants.reduce((acc, product,i) => {
+            return acc + (product.salePrice * quantity[i]);
+        }, 0);        
+
+        console.log("Total",total);
 
         // console.log(total);
         // console.log("Addresss",address);

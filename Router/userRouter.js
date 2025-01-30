@@ -8,6 +8,7 @@ const shopController = require("../controller/shopController");
 const cartController = require("../controller/cartController");
 const forgetController = require("../controller/forgetController");
 const checkoutController = require("../controller/checkoutController");
+const productAvailability = require("../middleware/productAvailability");
 const passport = require("passport");
 const errorHandling = require("../middleware/errorHandling");
 
@@ -61,11 +62,11 @@ router.delete("/cart/delete/",cartController.deleteProductFromCart);
 
 
 //Checkout Controller
-router.get("/checkout",checkoutController.loadCheckout);
+router.get("/checkout",productAvailability.quantity,checkoutController.loadCheckout);
 router.post("/checkout/address/add",checkoutController.addNewAddress);
 router.get("/chekcout/address/set/:id",checkoutController.setAddress);
 router.put("/checkout/address/update/:id",checkoutController.updateAddress);
-router.post("/checkout/placeorder",checkoutController.placeOrder);
+router.post("/checkout/placeorder",productAvailability.quantity,checkoutController.placeOrder);
 
 //Error Handling Middle ware..
 router.use(errorHandling.errorHandlingMiddleware);

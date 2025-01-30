@@ -194,66 +194,66 @@
         });
     
         // Handle place order functionality
-        function placeOrder() {
-            const primaryAddress = document.querySelector('#primary-address .address-details');
+        // function placeOrder() {
+        //     const primaryAddress = document.querySelector('#primary-address .address-details');
             
-            if (!primaryAddress) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Address Required',
-                    text: 'Please select or add a delivery address before placing the order.'
-                });
-                return;
-            }
+        //     if (!primaryAddress) {
+        //         Swal.fire({
+        //             icon: 'warning',
+        //             title: 'Address Required',
+        //             text: 'Please select or add a delivery address before placing the order.'
+        //         });
+        //         return;
+        //     }
     
-            Swal.fire({
-                title: 'Confirm Order',
-                text: 'Are you sure you want to place this order?',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, place order!',
-                cancelButtonText: 'No, cancel'
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    try {
-                        const response = await fetch('/user/place-order', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        });
+        //     Swal.fire({
+        //         title: 'Confirm Order',
+        //         text: 'Are you sure you want to place this order?',
+        //         icon: 'question',
+        //         showCancelButton: true,
+        //         confirmButtonColor: '#3085d6',
+        //         cancelButtonColor: '#d33',
+        //         confirmButtonText: 'Yes, place order!',
+        //         cancelButtonText: 'No, cancel'
+        //     }).then(async (result) => {
+        //         if (result.isConfirmed) {
+        //             try {
+        //                 const response = await fetch('/user/place-order', {
+        //                     method: 'POST',
+        //                     headers: {
+        //                         'Content-Type': 'application/json'
+        //                     }
+        //                 });
                         
-                        const details = await response.json();
+        //                 const details = await response.json();
                         
-                        if (details.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Order Placed Successfully!',
-                                text: details.message || 'Your order has been placed successfully.',
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => {
-                                window.location.href = '/user/orders';
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
-                                text: details.message || 'Failed to place the order'
-                            });
-                        }
-                    } catch (error) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error!',
-                            text: 'An unexpected error occurred while placing your order'
-                        });
-                    }
-                }
-            });
-        }
+        //                 if (details.success) {
+        //                     Swal.fire({
+        //                         icon: 'success',
+        //                         title: 'Order Placed Successfully!',
+        //                         text: details.message || 'Your order has been placed successfully.',
+        //                         showConfirmButton: false,
+        //                         timer: 2000
+        //                     }).then(() => {
+        //                         window.location.href = '/user/orders';
+        //                     });
+        //                 } else {
+        //                     Swal.fire({
+        //                         icon: 'error',
+        //                         title: 'Error!',
+        //                         text: details.message || 'Failed to place the order'
+        //                     });
+        //                 }
+        //             } catch (error) {
+        //                 Swal.fire({
+        //                     icon: 'error',
+        //                     title: 'Error!',
+        //                     text: 'An unexpected error occurred while placing your order'
+        //                 });
+        //             }
+        //         }
+        //     });
+        // }
     
         document.getElementById("updateSubmitButton").addEventListener("click", async (e) => {
         e.preventDefault();
