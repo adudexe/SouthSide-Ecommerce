@@ -196,7 +196,7 @@
                                     </div>
                                     <!-- End Gallery -->
                                 </div>
-                                <div class="col-md-6 col-sm-12 col-xs-12">
+                                <div class="col-md-6 col-sm-12 col-xs-12" id="productClass">
                                     <div class="detail-info">
                                         <h2 class="title-detail"><%= productDetails.productName %></h2>
                                         <div class="product-detail-rating">
@@ -204,10 +204,10 @@
                                                 <!-- <span> Brands: <a href="shop-grid-right.html">Bootstrap</a></span> -->
                                             </div>
                                         </div>
-                                        <div class="clearfix product-price-cover">
+                                        <div class="clearfix product-price-cover" id="productPrice">
                                             <div class="product-price primary-color float-left">
-                                                <ins><span class="text-brand">$<%= productDetails.variants[1].salePrice %></span></ins>
-                                                <ins><span class="old-price font-md ml-15">$<%= productDetails.variants[1].price %></span></ins>
+                                                <ins><span class="text-brand">$<%= productDetails.variants[0].salePrice %></span></ins>
+                                                <ins><span class="old-price font-md ml-15">$<%= productDetails.variants[0].price %></span></ins>
                                                 <span class="save-price  font-md color3 ml-15"><%= productDetails.productOffer%> % Off</span>
                                             </div>
                                         </div>
@@ -281,7 +281,7 @@
                                             <!-- <li class="mb-5">SKU: <a href="#">FWM15VKT</a></li>
                                             <li class="mb-5">Tags: <a href="#" rel="tag">Cloth</a>, <a href="#" rel="tag">Women</a>, <a href="#" rel="tag">Dress</a> </li> -->
                                         </ul>
-                                </div>
+                                    </div>
                                     <!-- Detail Info -->
                             </div>
                             </div>
@@ -843,7 +843,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         const varinatInfo = document.getElementById("details");
+        const prodductPrice = document.getElementById("productPrice");
         const addToCartButton = document.getElementById('add-to-cart');
+        const productDetails = JSON.parse(document.getElementById("product-container").getAttribute("data-details"));
         let variantValue = null;
         let variantDetails = {}
         let isValid = false;
@@ -853,9 +855,11 @@
                 let variant = e.target.getAttribute('data-variant');
                 // console.log(variant);
                 let variantObject = JSON.parse(variant);
+                // console.log(variantObject)
                 variantValue = e.target.value;
-                console.log(variantValue);
+                // console.log(variantValue);
                 variantDetails = variantObject;
+                
 
                 let quantityLi = varinatInfo.querySelector("#quantity");
                 // console.log(quantityLi);
@@ -877,6 +881,23 @@
                     li.innerHTML = `<p>Availability:<span class="in-stock text-success ml-5">${variantObject.quantity}\tItems In Stock</span></p>`
                     varinatInfo.appendChild(li);
                 }
+
+                prodductPrice.innerHTML = "";
+
+                //Product Price Change..
+                const div = document.createElement("div");
+                div.classList.add("product-price");
+                div.classList.add("primary-color");
+                div.classList.add("float-left");
+
+                div.innerHTML = `
+                        <ins><span class="text-brand">$${variantObject.salePrice }</span></ins>
+                        <ins><span class="old-price font-md ml-15">$${variantObject.price}</span></ins>
+                        <span class="save-price  font-md color3 ml-15">${productDetails.productOffer} % Off</span>                        
+                `
+                // console.log(div);
+                prodductPrice.appendChild(div);
+                
             })
         })
 
@@ -955,6 +976,9 @@
                 }
             }
         })
+    
+    
+    
     </script>
 
     <script>

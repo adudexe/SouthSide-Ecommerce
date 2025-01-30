@@ -43,33 +43,48 @@
                 <div class="col-lg-8">
                     <div class="order-summary bg-white p-4 rounded shadow-sm mb-4">
                         <h4 class="mb-4">Order Summary</h4>
+                        <p><%= //cart.items %></p>
+                        
+                        
+                        
                         <div class="order-products mb-4">
-                            <% //cart.items.forEach(function(item) { %>
+                            <% cart.items.forEach(function(item) { %>
+                                    <!-- <p>Cart<%= //item.variantId %></p> -->
+                                <% let cartItem = variants.find(function(variant) { 
+                                   return  (variant._id).toString() ==  (item.variantId).toString()    
+                                }); %>
+                                 <!-- <p>Cart Item<%= //cartItem %></p> -->
+                                
                             <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                                <img src="/uploads/products/<%= //item.product.images[0] %>" alt="Product" class="img-fluid rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                                <!-- <p><%= //item.productId%></p> -->
+                                <img src="/<%= item.productId.productImages[0] %>" alt="Product" class="img-fluid rounded" style="width: 80px; height: 80px; object-fit: cover;">
                                 <div class="ms-3 flex-grow-1">
-                                    <h6 class="mb-0"><%= //item.product.name %></h6>
-                                    <small class="text-muted">Qty: <%= //item.quantity %></small>
+                                    <h6 class="mb-0"><%= item.productId.productName %></h6>
+                                    <small class="text-muted">Size: <%= cartItem.size %></small>
+                                    <br>
+                                    <small class="text-muted">Color: <%= cartItem.color %></small>
+                                    <br>
+                                    <small class="text-muted">Qty: <%= item.quantity %></small>
                                 </div>
                                 <div class="ms-3">
-                                    <span class="fw-bold">₹<%= //item.price * item.quantity %></span>
+                                    <span class="fw-bold">₹<%= cartItem.salePrice * item.quantity %></span>
                                 </div>
                             </div>
-                            <% //}); %>
+                            <% }); %>
                         </div>
 
                         <div class="order-totals">
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Subtotal</span>
-                                <span class="fw-bold">₹<%= //subtotal %></span>
+                                <span class="fw-bold"><%= total %> </span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Shipping</span>
-                                <span class="fw-bold">₹<%= //shipping %></span>
+                                <span class="fw-bold">₹<%= shipping %></span>
                             </div>
                             <div class="d-flex justify-content-between border-top pt-3 mt-3">
                                 <span class="h5 mb-0">Total</span>
-                                <span class="h5 mb-0 text-brand">₹<%= //total %></span>
+                                <span class="h5 mb-0 text-brand">₹<%= total %></span>
                             </div>
                         </div>
 
@@ -320,5 +335,8 @@
         </div>
     </div>
 </div>
+<script>
+    //Place Order
+</script>
 
 <script src="/javascript/checkoutAddressManagement.js"></script>

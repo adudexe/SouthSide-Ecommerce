@@ -1,5 +1,7 @@
 const Cart = require("../model/cartSchema");
+const Product = require("../model/productScheme");
 const Address = require("../model/userAddress");
+const Order = require("../model/orderSchema");
 const checkoutController = {};
 
 
@@ -8,10 +10,45 @@ checkoutController.loadCheckout = async (req, res) => {
         const userId = req.session.user._id;
         // console.log("User Id", userId);
         let address = [];
+        let variants = [];
+        let shipping = 0;
+        //find the product details and varients and send it to the front end...
+        const products = await Product.find
+
+
+
         // Fetch the cart and address data
-        const cart = await Cart.findOne({ userId: userId });
+        const cart = await Cart.findOne({ userId: userId }).populate('items.productId');
+        // console.log("Cart Items",cart);
+
+
+        (cart.items).find((item)=>{
+            console.log("Items",item.productId.isBlocked);
+            if(!(item.productId.isDeleted) && !(item.productId.isBlocked) )
+            {
+                return (item.productId.variants).find((variant)=>{
+                    if(variant._id.toString() === (item.variantId).toString())
+                    {
+                        variants.push(variant)
+                    }
+                })
+            }
+            // console.log("Variant Id",item.variantId);
+        })
+        // console.log("Cart Product Variants",variants);
         address = await Address.find({ userId: userId });
+        
+        let total = variants.reduce((acc, product) => {
+            return acc + product.salePrice;
+        }, 0);
+        
+
+        // console.log(total);
         // console.log("Addresss",address);
+
+        // console.log("Cart Details",cart);
+
+        // Total Price =
 
         if (!cart) {
             console.log("Cart not found for user", userId);
@@ -25,6 +62,9 @@ checkoutController.loadCheckout = async (req, res) => {
         // Render the checkout page with cart and address data
         res.render("./user/checkout", {
             cart,
+            total,
+            shipping,
+            variants,
             userAddress: address || null, // Pass the address (or null if not found) as 'userAddress' for clarity
         });
     } catch (err) {
@@ -139,6 +179,18 @@ checkoutController.updateAddress = async (req,res) => {
     {
         console.log("Error in Updating Addresss",err);
         return res.status(500).send("Error in Updaing Addresss");
+    }
+}
+
+
+
+checkoutController.placeOrder = async () => {
+    try{
+
+    }
+    catch(err)
+    {
+        console.log("Error in Placing Order in Checkout",err);
     }
 }
 
