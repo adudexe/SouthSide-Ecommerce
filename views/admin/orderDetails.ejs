@@ -1,0 +1,312 @@
+<%- include("../partials/admin/header.ejs") %>
+        <section class="content-main">
+            <div class="content-header">
+                <div>
+                    <h2 class="content-title card-title">Order detail</h2>
+                </div>
+            </div>
+            <div class="card">
+                <header class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+                            <span>
+                                <!-- <i class="material-icons md-calendar_today"></i> <b>Wed, Aug 13, 2022, 4:34PM</b> -->
+                            </span> <br>
+                            <small class="text-muted" id="OrderId">Order ID: <%= orderDetails._id %></small>
+                        </div>
+                        <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+                            <div class="d-flex align-items-start justify-content-end gap-2">
+                                <select id="globalStatus" class=" form-select d-inline-block mb-lg-0 mb-15 mw-200">
+                                    <option value="">Change All Statuses</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Processing">Processing</option>
+                                    <option value="Shipped">Shipped</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                    <option value="Refunded">Refunded</option>
+                                    <option value="Returned">Returned</option>
+                                </select>
+                                <button class="btn btn-primary" onclick="updateAllStatuses()">Apply to All</button>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                <div class="card-body">
+                    <div class="row mb-50 mt-20 order-info-wrap">
+                        <div class="col-md-4">
+                            <article class="icontext align-items-start">
+                                <span class="icon icon-sm rounded-circle bg-primary-light">
+                                    <i class="text-primary material-icons md-person"></i>
+                                </span>
+                                <div class="text">
+                                    <h6 class="mb-1">Customer</h6>
+                                    <p class="mb-1">
+                                        <%= orderDetails.addres.name %> <br> <%= orderDetails.userId.email %> <br> +91 <%= orderDetails.addres.phone %>
+                                    </p>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="col-md-4">
+                            <article class="icontext align-items-start">
+                                <span class="icon icon-sm rounded-circle bg-primary-light">
+                                    <i class="text-primary material-icons md-local_shipping"></i>
+                                </span>
+                                <div class="text">
+                                    <h6 class="mb-1">Order info</h6>
+                                    <p class="mb-1">
+                                        Shipping: Fargo express <br> Pay method: <%= orderDetails.paymentMethod %> 
+                                    </p>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="col-md-4">
+                            <article class="icontext align-items-start">
+                                <span class="icon icon-sm rounded-circle bg-primary-light">
+                                    <i class="text-primary material-icons md-place"></i>
+                                </span>
+                                <div class="text">
+                                    <h6 class="mb-1">Deliver to</h6>
+                                    <p class="mb-1">
+                                        City: <%= orderDetails.addres.city %> <br><%= orderDetails.addres.street %>, <%= orderDetails.addres.state %> <br> <%= orderDetails.addres.postalCode %>
+                                    </p>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-7">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th width="35%">Product</th>
+                                            <th width="15%">Unit Price</th>
+                                            <th width="15%">Quantity</th>
+                                            <th width="20%">Status</th>
+                                            <th width="15%" class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                       <% orderDetails.orderItems.forEach((element, index) => { %>
+                                        <!-- <p><%= element %></p> -->
+                                        <tr>
+                                            <td>
+                                                <a class="itemside" href="#">
+                                                    <div class="left">
+                                                        <img src="/<%= element.product.productImages[0] %>" width="40" height="40" class="img-xs" alt="Item">
+                                                    </div>
+                                                    <div class="info"><%= element.product.productName %> <%=  element.product.variants[0].color %>, <%= element.product.variants[0].size %> </div>
+                                                </a>
+                                            </td>
+                                            <td> $44.25 </td>
+                                            <td> 2 </td>
+                                            <td>
+                                                <select class="form-select product-status" 
+                                                        data-item-id="<%= element._id %>">
+                                                    <option value="Pending" <%= element.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                                    <option value="Processing" <%= element.status === 'Processing' ? 'selected' : '' %>>Processing</option>
+                                                    <option value="Shipped" <%= element.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                                    <option value="Delivered" <%= element.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                    <option value="Cancelled" <%= element.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                                    <option value="Refunded" <%= element.status === 'Refunded' ? 'selected' : '' %>>Refunded</option>
+                                                    <option value="Returned" <%= element.status === 'Returned' ? 'selected' : '' %>>Returned</option>
+                                                </select>
+                                            </td>
+                                            <td class="text-end"> $99.50 </td>
+                                        </tr>
+                                       <% }) %> 
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-lg-1"></div>
+                        <div class="col-lg-4">
+                            <div class="box shadow-sm bg-light">
+                                <h6 class="mb-15">Payment info</h6>
+                                <p>
+                                    Business name: <%= orderDetails.addres.name %> <br>
+                                    Phone: +91 <%= orderDetails.addres.phone %> <br>
+                                    Method: <%= orderDetails.paymentMethod.toUpperCase() %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <footer class="main-footer font-xs">
+            <div class="row pb-30 pt-15">
+                <div class="col-sm-6">
+                    <script>
+                    document.write(new Date().getFullYear())
+                    </script> ©, Evara - HTML Ecommerce Template .
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end">
+                        All rights reserved
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Include SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Status Update Script -->
+    <script>
+        // console.log("Id")
+        
+        
+
+        // Function to handle individual status updates
+        function updateStatus(selectElement) {
+            // console.log(selectElement.dataset);
+            // const productId = selectElement.getAttribute("data-product-id");
+            const itemId = selectElement.getAttribute("data-item-id");
+            const newStatus = selectElement.value;
+            const orderId = document.querySelector("#OrderId").innerText.split(":")[1].trim();
+            
+            // console.log({itemId,orderId});
+            sendStatusUpdate({
+                orderId,
+                itemId,
+                status: newStatus
+            });
+        }
+
+        // Function to update all statuses at once
+        function updateAllStatuses() {
+            // console.log("ProductId",document.getElementById("globalStatus"));
+            const globalStatus = document.getElementById('globalStatus').value;
+            if (!globalStatus) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Please select a status first',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            // Confirm before updating all
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'This will update the status of all products in this order',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, update all',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const statusSelects = document.querySelectorAll('.product-status');
+                    const orderId = document.querySelector("#OrderId").innerText.split(":")[1].trim();
+                    const updates = {
+                            orderId,
+                            // productId: select.dataset.productId,
+                            // itemId: select.dataset.itemId,
+                            status: globalStatus
+                        };
+                    console.log(statusSelects);
+                    // Update all select elements and collect updates
+                    statusSelects.forEach(select => {
+                        select.value = updates.status;  
+                    });
+
+                    // Send bulk update request
+                    // console.log("JI")
+                    console.log("Updates",updates)
+                    sendBulkStatusUpdate(updates);
+                }
+            });
+        }
+
+        // Function to send individual status update
+        function sendStatusUpdate(data) {
+            fetch('/admin/orderManagement/details/singleStatus', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Status updated successfully',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    throw new Error(data.message || 'Update failed');
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'Failed to update status',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        }
+
+        // Function to send bulk status update
+        function sendBulkStatusUpdate(updates) {
+            fetch('/admin/orderManagement/details/bukStatus', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ updates })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'All statuses updated successfully',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    throw new Error(data.message || 'Bulk update failed');
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'Failed to update statuses',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        }
+
+        // Add event listeners when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add change event listeners to all product status selects
+            document.querySelectorAll('.product-status').forEach(select => {
+                select.addEventListener('change', function() {
+                    // console.log("change")
+                    console.log(this)
+                    updateStatus(this);
+                });
+            });
+        });
+    </script>
+    
+    <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/vendors/select2.min.js"></script>
+    <script src="assets/js/vendors/perfect-scrollbar.js"></script>
+    <script src="assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="assets/js/main.js" type="text/javascript"></script>
+</body>
+
+</html>
