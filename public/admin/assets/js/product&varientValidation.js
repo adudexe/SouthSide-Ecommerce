@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
             Array.from(files).forEach((file, index) => {
                 
                 
+                
                 if (!file.type.startsWith('image/')) {
                     Swal.fire({
                         title: "Error",
@@ -66,6 +67,8 @@ document.addEventListener("DOMContentLoaded", (e) => {
 
                         imagePreview.appendChild(imgContainer);
                         selectedFiles.push(file);
+
+                        console.log(selectedFiles);
 
                         // Open cropper when an image is clicked
                         imgElement.onclick = function () {

@@ -204,7 +204,7 @@ adminController.productUpdatePage = async (req,res) =>{
         {
             console.log("Invalid Id");
         }
-        const productDetails = await Product.findOne({_id:productId});
+        const productDetails = await Product.findOne({_id:productId}).populate('category')
         const categoryDetails =  await Category.find();
 
         if(!productDetails)
@@ -422,6 +422,18 @@ adminController.listCategory = async (req,res) => {
 }
 
 
+adminController.updateProduct = async () => {
+    try
+    {
+        console.log(req.body);
+    }
+    catch(err)
+    {
+        console.log("Error in updating Product..",err);
+    }
+}
+
+
 adminController.logout = (req,res) =>
 {
     try
@@ -437,6 +449,8 @@ adminController.logout = (req,res) =>
         console.log("Error in logout"+err);
     }
 }
+
+
 
 
 module.exports = adminController;

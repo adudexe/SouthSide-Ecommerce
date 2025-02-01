@@ -21,7 +21,7 @@ admin.get("/addProduct",adminAuth.requireAuth,adminController.addProduct);
 admin.delete("/products/:id",adminAuth.requireAuth,adminController.deleteProduct);
 admin.post("/products/add",adminAuth.requireAuth,adminController.upload,adminController.addProducts)
 admin.get("/products/edit/:id",adminAuth.requireAuth,adminController.productUpdatePage)
-
+admin.put("/products/edit",adminAuth.requireAuth,adminController.updateProduct)
 //Category Management
 admin.get("/categoryManagement",adminAuth.requireAuth,adminController.loadCategory);
 admin.post("/categoryManagement",adminAuth.requireAuth,adminController.manageCategory);

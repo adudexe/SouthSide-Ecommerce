@@ -55,7 +55,7 @@ router.get("/shop/sort",shopController.sortProduct);
 router.get("/shop/category",shopController.categorySort);
 
 //Cart Controller 
-router.get("/cart",productAvailability.quantity,cartController.loadCartPage);
+router.get("/cart",cartController.loadCartPage);
 router.post("/cart/add",productAvailability.quantity,cartController.addProductToCart);
 router.patch("/cart/quantityinc",productAvailability.quantity,cartController.cartQuantityIncrementer);
 router.patch("/cart/quantitydec",productAvailability.quantity,cartController.cartQuantityDecrementer);
@@ -63,10 +63,10 @@ router.delete("/cart/delete/",productAvailability.quantity,cartController.delete
 
 
 //Checkout Controller
-router.get("/checkout",productAvailability.quantity,checkoutController.loadCheckout);
-router.post("/checkout/address/add",checkoutController.addNewAddress);
-router.get("/chekcout/address/set/:id",checkoutController.setAddress);
-router.put("/checkout/address/update/:id",checkoutController.updateAddress);
+router.get("/checkout",checkoutController.loadCheckout);
+router.post("/checkout/address/add",productAvailability.quantity,checkoutController.addNewAddress);
+router.get("/chekcout/address/set/:id",productAvailability.quantity,checkoutController.setAddress);
+router.put("/checkout/address/update/:id",productAvailability.quantity,checkoutController.updateAddress);
 router.post("/checkout/placeorder",productAvailability.quantity,checkoutController.placeOrder);
 
 

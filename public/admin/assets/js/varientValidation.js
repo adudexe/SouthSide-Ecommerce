@@ -1,3 +1,4 @@
+console.log("Variant Validation")
 let selectedImages = []; // Store selected files for upload
     let cropper;
     let selectedImage; // To hold the selected image for cropping
@@ -12,6 +13,7 @@ let selectedImages = []; // Store selected files for upload
     // Handle the image selection
     imageInput.addEventListener('change', function(event) {
         const files = event.target.files;
+        console.log(files)
         if (files.length === 0) {
             document.getElementById('image_error').style.display = 'block';
             return;
@@ -23,6 +25,7 @@ let selectedImages = []; // Store selected files for upload
 
         // Loop through files and create image previews
         Array.from(files).forEach(file => {
+            console.log("File is ",file)
             const reader = new FileReader();
             reader.onload = function(e) {
                 const imgElement = document.createElement('img');
