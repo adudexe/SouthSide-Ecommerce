@@ -75,6 +75,18 @@ router.post('/verify-payment',checkoutController.onlinePayment );
 router.get("/myAccount/orders/:id",orderController.loadOrderDetails);
 router.get("/myAccount/order/cancel/:id",orderController.cancelOrder);
 
+
+
+//Wishlist Controller
+// router.get("/wishtlist",);
+// router.post("/wishlist",);
+// router.delete("/wishlist",);
+
+//Wallet Controller
+
+
+
+
 //Error Handling Middle ware..
 router.use(errorHandling.errorHandlingMiddleware);
 

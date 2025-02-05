@@ -351,7 +351,7 @@
             const paymentOption = document.querySelector('input[name="payment_option"]:checked').value;
 
             // Log it to the console (optional, for debugging)
-            console.log('Selected Payment Option:', paymentOption);
+            // console.log('Selected Payment Option:', paymentOption);
 
             // Send the selected value to the backend using fetch
             const orderType = {"OrderType":paymentOption};
@@ -398,11 +398,11 @@
                                     body: JSON.stringify({ amount, currency: 'INR', receipt: 'receipt#1', notes: {} })
                                 });
 
-                                console.log("Responce is",response)
+                                // console.log("Responce is",response)
 
                                 const order = await response.json();
-                                console.log("Order is ",order.order.phone);
-                                console.log("Order is ",order.order.email);
+                                // console.log("Order is ",order.order.phone);
+                                // console.log("Order is ",order.order.email);
 
                                 // Open Razorpay Checkout
                                 const options = {
@@ -417,7 +417,7 @@
                                     prefill: {
                                     name:""+order.order.userName+"" ,
                                     email: ""+order.order.email+"",
-                                    contact:order.order.phone
+                                    contact:""+order.order.phone+""
                                     },
                                     theme: {
                                     color: '#F37254'
@@ -436,12 +436,22 @@
                                             })
                                         }).then(res => res.json())
                                             .then(data => {
-                                                console.log("data is",data)
+                                                // console.log("data is",data)
                                             if (data.success) {
-                                                alert("Paymet Succesfull..");
+                                                Swal.fire({
+                                                    title: "Order Placed..!",
+                                                    text: "Paymet Succesfull..",
+                                                    icon: "success"
+                                                });
+                                                // alert("Paymet Succesfull..");
                                                 // window.location.href = '/payment-success';
                                             } else {
-                                                alert(data.message||'Payment verification failed');
+                                                Swal.fire({
+                                                    title: "Failed To Place Order...",
+                                                    text: data.message||'Payment verification failed',
+                                                    icon: "error"
+                                                });
+                                                // alert(data.message||'Payment verification failed');
                                             }
                                             }).catch(error => {
                                             console.error('Error:', error);
