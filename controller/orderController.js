@@ -7,7 +7,10 @@ orderController.loadOrderDetails = async (req,res) => {
         const orderId = req.params.id;
         // console.log(orderId)
         const Order = await Orders.find({userId:userId,_id:orderId});
-        res.render("./user/orderDetails",{Order});
+        res.render("./user/orderDetails", {
+            Order,
+            currentPage: 'orderDetails'
+        });
     }
     catch(err)
     {

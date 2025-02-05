@@ -72,7 +72,7 @@ router.post("/create-order",checkoutController.createOrder)
 router.post('/verify-payment',checkoutController.onlinePayment );
 
 //Order Controller
-router.get("/myAccount/orders/:id",orderController.loadOrderDetails);
+router.get("/myAccount/order/:id",orderController.loadOrderDetails);
 router.get("/myAccount/order/cancel/:id",orderController.cancelOrder);
 
 

@@ -71,6 +71,23 @@
         background-color: #f5f5f5;
     }
 
+    .header-middle.header-middle-ptb-1.d-none.d-lg-block {
+        border-bottom: none !important;
+    }
+    
+    .header-style-1 .header-middle-ptb-1 {
+        border-bottom: none !important;
+    }
+    
+    .header-middle {
+        border: none !important;
+    }
+    .order-details-page .header-middle,
+    .order-details-page .header-middle-ptb-1,
+    .order-details-page .header-style-1 .header-middle-ptb-1 {
+        border: none !important;
+        border-bottom: none !important;
+    }
     </style>
 
     <!-- Favicon -->
@@ -83,7 +100,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body>
+<body class="<%= locals.currentPage === 'orderDetails' ? 'order-details-page' : '' %>">
     <!-- Modal
     <div class="modal fade custom-modal" id="onloadModal" tabindex="-1" aria-labelledby="onloadModalLabel" aria-hidden="true">
         <div class="modal-dialog">

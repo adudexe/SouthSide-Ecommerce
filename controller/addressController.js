@@ -8,7 +8,8 @@ addressController.loadMyAccount = async (req,res) => {
     try{
         let address = [];
         address =  await Address.find({userId:req.session.user._id});
-        const orders = await Order.find({userId:req.session.user._id});
+        const orders = await Order.find({userId:req.session.user._id}).sort({createdOn:-1});
+
         console.log(orders);
         //To Check Wheather if any address is present for this User
         res.render("./user/accountPage",{address,orders});

@@ -1,4 +1,80 @@
-﻿<%- include('../partials/user/header') %>
+<%- include('../partials/user/header') %>
+<style>
+    .order-card {
+        transition: all 0.3s ease;
+        border-radius: 15px !important;
+    }
+    
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .shadow-hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .w-3 {
+        width: 6px !important;
+    }
+    
+    .badge {
+        font-weight: 500;
+        letter-spacing: 0.3px;
+    }
+    
+    .badge i {
+        font-size: 0.8em;
+    }
+    
+    .btn-outline-success {
+        border-width: 2px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.2);
+    }
+    
+    .text-success {
+        color: #2ecc71 !important;
+    }
+    
+    .bg-success {
+        background-color: #2ecc71 !important;
+    }
+    
+    .btn-outline-success {
+        color: #2ecc71;
+        border-color: #2ecc71;
+    }
+    
+    .btn-outline-success:hover {
+        background-color: #2ecc71;
+        border-color: #2ecc71;
+    }
+    
+    .order-date p, .order-total p {
+        font-size: 1.1rem;
+    }
+    
+    .text-muted {
+        color: #6c757d !important;
+    }
+    
+    @media (max-width: 768px) {
+        .order-card .card-body {
+            padding: 1rem !important;
+        }
+        
+        .btn-outline-success {
+            width: 100%;
+            margin-top: 1rem;
+        }
+    }
+</style>
     <div class="mobile-header-active mobile-header-wrapper-style">
         <div class="mobile-header-wrapper-inner">
             <div class="mobile-header-top">
@@ -254,39 +330,80 @@
                                     </div>
                                       
                                     <div class="tab-pane fade" id="orders" role="tabpanel" aria-labelledby="orders-tab">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="mb-0">Your Orders</h5>
+                                        <div class="card border-0 shadow-sm">
+                                            <div class="card-header bg-white border-0">
+                                                <h5 class="mb-0 text-success">Your Orders</h5>
                                             </div>
-                                            <p><%= //orders %></p>
-                                            
-                                            <div class="card-body">
-                                                <div class="table-responsive">
-                                                    <table class="table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Date</th>
-                                                                <!-- <th>Status</th> -->
-                                                                <th>Total</th>
-                                                                <th>Actions</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
+                                            <div class="card-body p-4">
+                                                <div class="row g-4">
+                                                    <% if (orders.length === 0) { %>
+                                                        <div class="col-12 text-center py-5">
+                                                            <div class="empty-orders">
+                                                                <i class="fas fa-shopping-bag text-muted mb-4" style="font-size: 3rem;"></i>
+                                                                <h4 class="text-muted mb-3">No Orders Yet</h4>
+                                                                <p class="text-muted mb-4">Looks like you haven't made any orders yet.</p>
+                                                                <a href="/shop" class="btn btn-success rounded-pill px-4">
+                                                                    <i class="fas fa-store me-2"></i>Start Shopping
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    <% } else { %>
                                                         <% orders.forEach(element => { %>
-                                                            <!-- <p><%= //element %></p> -->
-                                                                <tr>
-                                                                    <td><%= (element.createdOn).toLocaleDateString('en-US', {
-                                                                        month: 'long',  // Full month name (e.g., "March")
-                                                                        day: 'numeric', // Day of the month (e.g., "25")
-                                                                        year: 'numeric' // Full year (e.g., "2020")
-                                                                      }); %></td>
-                                                                    <!-- <td><%= //element.status %></td> -->
-                                                                    <td>$<%= element.totalPrice %></td>
-                                                                    <td><a href="/user/myAccount/orders/<%=element._id %>" class="btn-small d-block order-btn">View</a></td>
-                                                                </tr>
+                                                            <div class="col-12">
+                                                                <div class="order-card card border-0 shadow-hover position-relative overflow-hidden">
+                                                                    <div class="position-absolute top-0 start-0 w-3 h-100 bg-success"></div>
+                                                                    <div class="card-body p-4">
+                                                                        <div class="row align-items-center">
+                                                                            <div class="col-md-3">
+                                                                                <div class="order-date mb-3 mb-md-0">
+                                                                                    <h6 class="text-muted mb-1">Order Date</h6>
+                                                                                    <p class="mb-0 fw-bold">
+                                                                                        <%= (element.createdOn).toLocaleDateString('en-US', {
+                                                                                            month: 'long',
+                                                                                            day: 'numeric',
+                                                                                            year: 'numeric'
+                                                                                        }); %>
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3">
+                                                                                <div class="order-status mb-3 mb-md-0">
+                                                                                    <h6 class="text-muted mb-1">Status</h6>
+                                                                                    <% if (element.status === "Pending") { %>
+                                                                                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">
+                                                                                            <i class="fas fa-clock me-1"></i>
+                                                                                            <%= element.status %>
+                                                                                        </span>
+                                                                                    <% } else if (element.status === "Success") { %>
+                                                                                        <span class="badge bg-success px-3 py-2 rounded-pill">
+                                                                                            <i class="fas fa-check me-1"></i>
+                                                                                            <%= element.status %>
+                                                                                        </span>
+                                                                                    <% } else if (element.status === "Canceled") { %>
+                                                                                        <span class="badge bg-danger px-3 py-2 rounded-pill">
+                                                                                            <i class="fas fa-times me-1"></i>
+                                                                                            <%= element.status %>
+                                                                                        </span>
+                                                                                    <% } %>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3">
+                                                                                <div class="order-total mb-3 mb-md-0">
+                                                                                    <h6 class="text-muted mb-1">Total Amount</h6>
+                                                                                    <p class="mb-0 fw-bold text-success">$<%= element.totalPrice %></p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3 text-md-end">
+                                                                                <a href="/user/myAccount/order/<%= element._id %>" class="btn btn-outline-success btn-sm rounded-pill px-4">
+                                                                                    <i class="fas fa-eye me-2"></i>View Details
+                                                                                </a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         <% }) %>
-                                                    </tbody>
-                                                    </table>
+                                                    <% } %>
                                                 </div>
                                             </div>
                                         </div>
