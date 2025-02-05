@@ -76,7 +76,7 @@
                         <div class="order-totals">
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Subtotal</span>
-                                <span class="fw-bold"><%= total %> </span>
+                                <span class="fw-bold total-amount"><%= total %> </span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Shipping</span>
@@ -340,6 +340,7 @@
         </div>
     </div>
 </div>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     //Place Order
         function placeOrder() {
@@ -355,13 +356,9 @@
             // Send the selected value to the backend using fetch
             const orderType = {"OrderType":paymentOption};
             
-            
 
+           
 
-
-
-
-            
 
             if (!primaryAddress) {
                 Swal.fire({
@@ -384,38 +381,121 @@
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        const response = await fetch('/user/checkout/placeorder', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body:JSON.stringify(orderType),
-                        });
                         
-                        const details = await response.json();
-                        
-                        if (details.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Order Placed Successfully!',
-                                text: details.message || 'Your order has been placed successfully.',
-                                showConfirmButton: false,
-                                timer: 2000
-                            }).then(() => {
-                                window.location.href = '/user/orders';
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error!',
-                                text: details.message || 'Failed to place the order'
-                            });
+                        if(orderType.OrderType ==="online")
+                        {
+
+                            const amount = document.querySelector(".total-amount").innerText
+                            // payNow();
+                            // async function payNow() {
+                                // Create order by calling the server endpoint
+                                const response = await fetch('/user/create-order', {
+                                    method: 'POST',
+                                    headers: {
+                                    'Content-Type': 'application/json'
+                                    },
+                                    // body:JSON.stringify(orderType),
+                                    body: JSON.stringify({ amount, currency: 'INR', receipt: 'receipt#1', notes: {} })
+                                });
+
+                                console.log("Responce is",response)
+
+                                const order = await response.json();
+                                console.log("Order is ",order.order.phone);
+                                console.log("Order is ",order.order.email);
+
+                                // Open Razorpay Checkout
+                                const options = {
+                                    key: order.order.payment_id, // Replace with your Razorpay key_id
+                                    amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                                    currency: 'INR',
+                                    name:order.order.userName,
+                                    contact:order.order.phone,
+                                    description: 'Test Transaction',
+                                    order_id: order.order.order_id, // This is the order_id created in the backend
+                                    callback_url: 'http://localhost:3000/payment-success', // Your success URL
+                                    prefill: {
+                                    name:""+order.order.userName+"" ,
+                                    email: ""+order.order.email+"",
+                                    contact:order.order.phone
+                                    },
+                                    theme: {
+                                    color: '#F37254'
+                                    },
+                                    handler: function (response) {
+                                        fetch('/user/verify-payment', {
+                                            method: 'POST',
+                                            headers: {
+                                            'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({
+                                                order:order, 
+                                                razorpay_order_id: response.razorpay_order_id,
+                                                razorpay_payment_id: response.razorpay_payment_id,
+                                                razorpay_signature: response.razorpay_signature
+                                            })
+                                        }).then(res => res.json())
+                                            .then(data => {
+                                                console.log("data is",data)
+                                            if (data.success) {
+                                                alert("Paymet Succesfull..");
+                                                // window.location.href = '/payment-success';
+                                            } else {
+                                                alert(data.message||'Payment verification failed');
+                                            }
+                                            }).catch(error => {
+                                            console.error('Error:', error);
+                                            alert('Error verifying payment');
+                                        });
+                                    }
+                                };
+                                // alert("Payment is online");
+                                const rzp = new Razorpay(options);
+                                rzp.on()
+                                rzp.open('payment.failed',(response)=>{
+                                    console.log("We are in failed payment");
+                                    alert("payment failed");
+                                });             
+                            // }
                         }
+                        else{
+                            alert("Payment is COD");
+                            const response = await fetch('/user/checkout/placeorder', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body:JSON.stringify(orderType),
+                            });
+
+                            const details = await response.json();
+                            
+                            if (details.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Order Placed Successfully!',
+                                    text: details.message || 'Your order has been placed successfully.',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => {
+                                    window.location.href = '/user/orders';
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: details.message || 'Failed to place the order'
+                                });
+                            }
+                        }
+
+                        
                     } catch (error) {
+                        console.log("Error in online payment",error)
                         Swal.fire({
                             icon: 'error',
                             title: 'Error!',
-                            text: 'An unexpected error occurred while placing your order'
+                            text: error||'An unexpected error occurred while placing your order'
                         });
                     }
                 }

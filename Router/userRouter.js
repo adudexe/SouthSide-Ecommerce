@@ -68,7 +68,8 @@ router.post("/checkout/address/add",productAvailability.quantity,checkoutControl
 router.get("/chekcout/address/set/:id",productAvailability.quantity,checkoutController.setAddress);
 router.put("/checkout/address/update/:id",productAvailability.quantity,checkoutController.updateAddress);
 router.post("/checkout/placeorder",productAvailability.quantity,checkoutController.placeOrder);
-
+router.post("/create-order",checkoutController.createOrder)
+router.post('/verify-payment',checkoutController.onlinePayment );
 
 //Order Controller
 router.get("/myAccount/orders/:id",orderController.loadOrderDetails);

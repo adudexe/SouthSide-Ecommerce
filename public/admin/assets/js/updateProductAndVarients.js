@@ -163,7 +163,7 @@ function renderVariants() {
     variantsPreview.querySelectorAll(".editBtn").forEach((btn)=>{
         btn.addEventListener("click",(e)=>{
             e.preventDefault();
-            console.log("click")
+            // console.log("click")
         })
     })
 
@@ -301,8 +301,8 @@ function showAddVariantModal() {
     variantModal.show();
 
     // Attach event listener for adding the new variant
-    document.getElementById("updateVariantBtn").textContent = "Add Variant";
-    document.getElementById("updateVariantBtn").onclick = function () {
+    // document.getElementById("updateVariantBtn").textContent = "Add Variant";
+    document.getElementById("saveVariantBtn").onclick = function () {
         addVariant(variantModal);
     };
 }
@@ -326,6 +326,10 @@ function addVariant(variantModal) {
     // Close the modal
     variantModal.hide();
 }
+
+// document.getElementById("saveVariantBtn").addEventListener("click",(e)=>{
+//     console.log(e)
+// })
 
     
     

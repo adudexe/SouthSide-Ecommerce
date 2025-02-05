@@ -12,6 +12,7 @@ const morgan = require("morgan");
 const flash = require("flash");
 const path = require("path"); //importing path module
 const passport = require('./config/passport');
+
 // const addtolocals = require("./middleware/authmiddleware");
 
 //To establish connection with the database
@@ -38,6 +39,11 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+// const razorpay = new Razorpay({
+//     key_id:process.env.RAZORPAY_CLIENT_KEY,
+//     key_secret:process.env.RAZORPAY_CLIENT_SECRET
+// });
 
 
 // passport.use
