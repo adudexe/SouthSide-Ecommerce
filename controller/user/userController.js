@@ -17,18 +17,20 @@ const userController = {};
 //To Load Home Page
 userController.loadHomePage = async (req,res)=>{
     try{
-        // console.log("Home Page")
-        // req.session.user = {
-        //     id:req.user.id,
-        //     name:req.user.name,
-        //     email:req.user.email
-        // }
-        // console.log("User Session",req.session.user);
-        // console.log("Google User Session",req.user);
+        
         const sessionUser = req.session.user
+        // console.log(sessionUser)
         const product = await Product.find().populate('category');
-        // console.log(req.session.user);
-        res.render("./user/landingPage",{products:product,user:sessionUser,});
+        if(sessionUser)
+        {
+            return res.render("./user/landingPage",{products:product,user:sessionUser});
+        }
+        else
+        {
+            return res.render("./user/landingPage",{products:product});
+        }
+    
+        
     }
     catch(err)
     {

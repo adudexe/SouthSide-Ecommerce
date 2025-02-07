@@ -10,13 +10,14 @@ const forgetController = require("../controller/forgetController");
 const checkoutController = require("../controller/checkoutController");
 const productAvailability = require("../middleware/productAvailability");
 const orderController = require("../controller/orderController");
+const wishlistController = require("../controller/wishlistController");
 const passport = require("passport");
 const errorHandling = require("../middleware/errorHandling");
 
 // userController
 router.get("/login",userController.loadLoginPage); // Remove userAuth.isLogged From here since it for just constant user....
 router.post("/login", userController.userLogin);
-router.get("/home",userAuth.isLogged,userAuth.isBlocked,userController.loadHomePage);
+router.get("/home",userController.loadHomePage);
 router.post("/resentOTP", userController.resendOTP);
 router.get("/signup", userController.loadSignUpPage);
 router.post("/signup", userController.registerUser);
@@ -32,7 +33,7 @@ router.post("/forgetPassword/newPassword",forgetController.newPassword);
 //addressController
 router.get("/myAccount",userAuth.isLogged,userAuth.isBlocked,addressController.loadMyAccount);
 router.post("/myAccount/Address",userAuth.isLogged,userAuth.isBlocked,addressController.addAddress);
-router.get("/myAccount/editAddress/:id",addressController.getAddressById)
+router.get("/myAccount/editAddress/:id",userAuth.isLogged,userAuth.isBlocked,addressController.getAddressById)
 router.patch("/myAccount/editAddress/:id",userAuth.isLogged,addressController.updateAddresById);
 router.delete("/myAccount/editAddress/:id",userAuth.isLogged,addressController.deleteAddressById);
 
@@ -49,38 +50,40 @@ router.get("/auth/google/callback",passport.authenticate('google', {failureRedir
 router.get("/product/:id",productController.loadProductPage);
 
 //ShopList Controller
-router.get("/shop",shopController.loadShopPage);
-router.get("/shop/search",shopController.searchItem);
-router.get("/shop/sort",shopController.sortProduct);
-router.get("/shop/category",shopController.categorySort);
+router.get("/shop",userAuth.isLogged,userAuth.isBlocked,shopController.loadShopPage);
+router.get("/shop/search",userAuth.isLogged,userAuth.isBlocked,shopController.searchItem);
+router.get("/shop/sort",userAuth.isLogged,userAuth.isBlocked,shopController.sortProduct);
+router.get("/shop/category",userAuth.isLogged,userAuth.isBlocked,shopController.categorySort);
 
 //Cart Controller 
-router.get("/cart",cartController.loadCartPage);
-router.post("/cart/add",productAvailability.quantity,cartController.addProductToCart);
-router.patch("/cart/quantityinc",productAvailability.quantity,cartController.cartQuantityIncrementer);
-router.patch("/cart/quantitydec",productAvailability.quantity,cartController.cartQuantityDecrementer);
-router.delete("/cart/delete/",productAvailability.quantity,cartController.deleteProductFromCart);
+router.get("/cart",userAuth.isLogged,userAuth.isBlocked,cartController.loadCartPage);
+router.post("/cart/add",userAuth.isLogged,userAuth.isBlocked,productAvailability.quantity,cartController.addProductToCart);
+router.patch("/cart/quantityinc",userAuth.isLogged,userAuth.isBlocked,productAvailability.quantity,cartController.cartQuantityIncrementer);
+router.patch("/cart/quantitydec",userAuth.isLogged,userAuth.isBlocked,productAvailability.quantity,cartController.cartQuantityDecrementer);
+router.delete("/cart/delete/",userAuth.isLogged,userAuth.isBlocked,productAvailability.quantity,cartController.deleteProductFromCart);
 
 
 //Checkout Controller
-router.get("/checkout",checkoutController.loadCheckout);
-router.post("/checkout/address/add",productAvailability.quantity,checkoutController.addNewAddress);
-router.get("/chekcout/address/set/:id",productAvailability.quantity,checkoutController.setAddress);
-router.put("/checkout/address/update/:id",productAvailability.quantity,checkoutController.updateAddress);
-router.post("/checkout/placeorder",productAvailability.quantity,checkoutController.placeOrder);
-router.post("/create-order",checkoutController.createOrder)
-router.post('/verify-payment',checkoutController.onlinePayment );
+router.get("/checkout",userAuth.isLogged,userAuth.isBlocked,checkoutController.loadCheckout);
+router.post("/checkout/address/add",userAuth.isLogged,userAuth.isBlocked,productAvailability.quantity,checkoutController.addNewAddress);
+router.get("/chekcout/address/set/:id",userAuth.isLogged,userAuth.isBlocked,productAvailability.quantity,checkoutController.setAddress);
+router.put("/checkout/address/update/:id",userAuth.isLogged,userAuth.isBlocked,productAvailability.quantity,checkoutController.updateAddress);
+router.post("/checkout/placeorder",userAuth.isLogged,userAuth.isBlocked,productAvailability.quantity,checkoutController.placeOrder);
+router.post("/create-order",userAuth.isLogged,userAuth.isBlocked,checkoutController.createOrder)
+router.post('/verify-payment',userAuth.isLogged,userAuth.isBlocked,checkoutController.onlinePayment );
+
 
 //Order Controller
 router.get("/myAccount/order/:id",orderController.loadOrderDetails);
 router.get("/myAccount/order/cancel/:id",orderController.cancelOrder);
+router.get("/order/success",orderController.orderSuccess);
 
 
 
 //Wishlist Controller
-// router.get("/wishtlist",);
-// router.post("/wishlist",);
-// router.delete("/wishlist",);
+router.get("/wishlist",wishlistController.loadWishlist);
+router.post("/wishlist/add/:id",wishlistController.addToWishList);
+router.delete("/wishlist/delete/:id",wishlistController.deleteItem);
 
 //Wallet Controller
 

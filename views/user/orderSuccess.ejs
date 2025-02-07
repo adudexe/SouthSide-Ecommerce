@@ -1,4 +1,4 @@
-<%- include('../layouts/header') %>
+<%- include('../partials/user/header') %>
 
 <div class="container mt-5 mb-5">
     <div class="row justify-content-center">
@@ -21,11 +21,11 @@
                                         <h4 class="card-title mb-4">
                                             <i class="fas fa-info-circle me-2"></i>Order Information
                                         </h4>
-                                        <p class="mb-2"><strong>Order ID:</strong> #<%= orderId %></p>
-                                        <p class="mb-2"><strong>Order Date:</strong> <%= orderDate %></p>
-                                        <p class="mb-2"><strong>Payment Method:</strong> <%= paymentMethod %></p>
+                                        <p class="mb-2"><strong>Order ID:</strong> #<%= //orderId %></p>
+                                        <p class="mb-2"><strong>Order Date:</strong> <%= //orderDate %></p>
+                                        <p class="mb-2"><strong>Payment Method:</strong> <%= //paymentMethod %></p>
                                         <p class="mb-0"><strong>Order Status:</strong> 
-                                            <span class="badge bg-success">Confirmed</span>
+                                            <span class="badge bg-info">Pending</span>
                                         </p>
                                     </div>
                                 </div>
@@ -37,11 +37,11 @@
                                         <h4 class="card-title mb-4">
                                             <i class="fas fa-shipping-fast me-2"></i>Shipping Details
                                         </h4>
-                                        <p class="mb-2"><strong>Shipping To:</strong> <%= shippingAddress.name %></p>
-                                        <p class="mb-2"><%= shippingAddress.street %></p>
-                                        <p class="mb-2"><%= shippingAddress.city %>, <%= shippingAddress.state %></p>
-                                        <p class="mb-2"><%= shippingAddress.country %> - <%= shippingAddress.zipCode %></p>
-                                        <p class="mb-0"><strong>Phone:</strong> <%= shippingAddress.phone %></p>
+                                        <p class="mb-2"><strong>Shipping To:</strong> <%= //shippingAddress.name %></p>
+                                        <p class="mb-2"><%= //shippingAddress.street %></p>
+                                        <p class="mb-2"><%= //shippingAddress.city %>, <%= //shippingAddress.state %></p>
+                                        <p class="mb-2"><%= //shippingAddress.country %> - <%= //shippingAddress.zipCode %></p>
+                                        <p class="mb-0"><strong>Phone:</strong> <%= //shippingAddress.phone %></p>
                                     </div>
                                 </div>
                             </div>
@@ -63,41 +63,41 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <% orderItems.forEach(item => { %>
+                                            <% //orderItems.forEach(item => { %>
                                             <tr>
                                                 <td>
                                                     <div class="d-flex align-items-center">
-                                                        <img src="<%= item.image %>" alt="<%= item.name %>" class="img-fluid rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                                        <img src="<%= //item.image %>" alt="<%= //item.name %>" class="img-fluid rounded" style="width: 50px; height: 50px; object-fit: cover;">
                                                         <div class="ms-3">
-                                                            <h6 class="mb-0"><%= item.name %></h6>
-                                                            <small class="text-muted"><%= item.sku %></small>
+                                                            <h6 class="mb-0"><%= //item.name %></h6>
+                                                            <small class="text-muted"><%= //item.sku %></small>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td class="text-center"><%= item.quantity %></td>
-                                                <td class="text-end">$<%= item.price.toFixed(2) %></td>
-                                                <td class="text-end">$<%= (item.price * item.quantity).toFixed(2) %></td>
+                                                <td class="text-center"><%= //item.quantity %></td>
+                                                <td class="text-end">$<%= //item.price.toFixed(2) %></td>
+                                                <td class="text-end">$<%= //(item.price * item.quantity).toFixed(2) %></td>
                                             </tr>
-                                            <% }); %>
+                                            <% //}); %>
                                         </tbody>
                                         <tfoot class="table-light">
                                             <tr>
                                                 <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
-                                                <td class="text-end">$<%= subtotal.toFixed(2) %></td>
+                                                <td class="text-end">$<%= //subtotal.toFixed(2) %></td>
                                             </tr>
                                             <tr>
                                                 <td colspan="3" class="text-end"><strong>Shipping:</strong></td>
-                                                <td class="text-end">$<%= shipping.toFixed(2) %></td>
+                                                <td class="text-end">$<%= //shipping.toFixed(2) %></td>
                                             </tr>
-                                            <% if (discount) { %>
+                                            <% //if (discount) { %>
                                             <tr>
                                                 <td colspan="3" class="text-end"><strong>Discount:</strong></td>
-                                                <td class="text-end">-$<%= discount.toFixed(2) %></td>
+                                                <td class="text-end">-$<%=// discount.toFixed(2) %></td>
                                             </tr>
-                                            <% } %>
+                                            <%// } %>
                                             <tr>
                                                 <td colspan="3" class="text-end"><strong>Total:</strong></td>
-                                                <td class="text-end"><strong>$<%= total.toFixed(2) %></strong></td>
+                                                <td class="text-end"><strong>$<%= //total.toFixed(2) %></strong></td>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -132,4 +132,3 @@
     </div>
 </div>
 
-<%- include('../layouts/footer') %>

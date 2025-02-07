@@ -49,5 +49,15 @@ orderController.cancelOrder = async (req, res) => {
     }
 };
 
+orderController.orderSuccess = async (req,res) =>{
+    try
+    {
+        res.render("./user/orderSuccess");
+    }
+    catch(err)
+    {
+        console.log("Error in Order Success Page",err);
+    }
+}
 
 module.exports = orderController;

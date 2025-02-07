@@ -63,7 +63,7 @@ app.use("/admin",adminRouter);
 //To rerout all the unused routes to used routes...
 app.use("*",(req,res)=>{
     console.log("It should redirect...");
-    res.redirect("/user/login")
+    res.redirect("/user/login");
 })
 
 

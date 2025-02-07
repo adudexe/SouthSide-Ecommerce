@@ -378,7 +378,7 @@
                         <div class="header-action-right">
                             <div class="header-action-2">
                                 <div class="header-action-icon-2">
-                                    <a href="shop-wishlist.html">
+                                    <a href="/user/wishlist">
                                         <img class="svgInject" alt="Evara" src="/user/assets/imgs/theme/icons/icon-heart.svg">
                                         <span class="pro-count blue">4</span>
                                     </a>
@@ -433,12 +433,15 @@
                                         </div>
                                     </div> -->
                                 </div>
-                               
                                 <div class="dropdown">
                                     <a class="user-icon" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <!-- Online User Avatar Image -->
                                         <img src="https://www.w3schools.com/w3images/avatar2.png" alt="User Avatar" class="user-avatar">
-                                        <span class="user-name"><%= user.name %></span>
+                                        <% if (user) { %>
+                                            <span class="user-name"><%= user.name %></span>
+                                        <% } else { %>
+                                            <span class="user-name">Guest</span>
+                                        <% } %>
                                     </a>
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" href="/user/myAccount">Profile</a></li>
@@ -463,7 +466,7 @@
                     <div class="header-action-right d-block d-lg-none">
                         <div class="header-action-2">
                             <div class="header-action-icon-2">
-                                <a href="shop-wishlist.html">
+                                <a href="/user/wishlist">
                                     <img alt="Evara" src="assets/imgs/theme/icons/icon-heart.svg">
                                     <span class="pro-count white">4</span>
                                 </a>

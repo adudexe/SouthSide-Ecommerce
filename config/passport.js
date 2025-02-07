@@ -13,56 +13,61 @@ passport.use(new GoogleStrategy({
 },
 async (accessToken, refreshToken, profile, done) => {
     try {
-        // console.log(profile); // Log the profile information for debugging
+        console.log(profile); // Log the profile information for debugging
         
         // Check if the user already exists in the database by their Google ID
         let user = await User.findOne({ googleId: profile.id });
-        // console.log("User 1 ",user);
-        // If user exits
-        if(user)
-        {
-        //    req.session.user = user;
-           return done(null,user);
-        }
-        else{
-            console.log(profile.email)
-            //if user present with the email and no google id is present 
-            user = await User.findOne({email:profile.email[0].value})
-            // console.log()
-            // console.log("hi2")
-            if(user)
-            {
+        console.log("user", user);
+
+        if (user) {
+            // User found by Google ID
+            return done(null, user);
+        } else {
+            // If no user is found, check if the user exists by email
+            user = await User.findOne({ email: profile.emails[0].value });
+            console.log("Found user by email:", user);
+
+            if (user) {
+                // User found by email but no Google ID, update with Google ID
                 user.googleId = profile.id;
                 await user.save();
-                const newUserCart = await new Cart({
-                userId:savedUser._id
-                })
+
+                // Create and save related data (Cart, Wallet, Wishlist)
+                const newUserCart = new Cart({ userId: user._id });
                 await newUserCart.save();
-                const newUserWallet = await new Wallet({
-                userId:savedUser._id
-                })
+
+                const newUserWallet = new Wallet({ userId: user._id });
                 await newUserWallet.save();
-                const newUserWishList = await new Wishlist({
-                userId:savedUser._id
-                })
+
+                const newUserWishList = new Wishlist({ userId: user._id });
                 await newUserWishList.save();
-                req.session.user = user;
-            }
-            else
-            {
+
+                return done(null, user); // Return user after updating
+            } else {
+                // If no user found, create a new one
                 user = new User({
                     googleId: profile.id,
                     name: profile.displayName,
                     email: profile.emails[0].value,
-                    // profilePic: profile.photos ? profile.photos[0].value : null,
+                    // profilePic: profile.photos ? profile.photos[0].value : null, // Optional: Handle profile picture if needed
                 });
+
                 await user.save();
-                // req.session.user = user;
-                return done(null, user);
+
+                // Create associated data (Cart, Wallet, Wishlist)
+                const newUserCart = new Cart({ userId: user._id });
+                await newUserCart.save();
+
+                const newUserWallet = new Wallet({ userId: user._id });
+                await newUserWallet.save();
+
+                const newUserWishList = new Wishlist({ userId: user._id });
+                await newUserWishList.save();
+
+                return done(null, user); // Return newly created user
             }
         }
-    } 
-    catch (err) {
+    } catch (err) {
         console.error("Error during authentication: ", err);
         return done(err, null); // Pass the error to done
     }
