@@ -334,16 +334,22 @@
     <script src="/javascript/sortProduct.js"></script>
     <script src="/javascript/categorySort.js"></script>
     <script>
-        // Add product to wishlist 
-        document.querySelectorAll(".add-to-wishlist").forEach((button) => {
-            button.addEventListener("click", async (e) => {
-                e.preventDefault();
-
-                let productId = button.getAttribute("data-id").trim();
-                let variantId = button.getAttribute("data-variantId").trim();
-
+    document.addEventListener("DOMContentLoaded", () => {
+        // Delegate the event to the parent container
+        const productsContainer = document.getElementById("shop-products");
+    
+        productsContainer.addEventListener("click", async (e) => {
+            // Check if the clicked element is the "Add to Wishlist" button
+            if (e.target && e.target.classList.contains("add-to-wishlist")) {
+                e.preventDefault();  // Prevent the default behavior (page refresh)
+                console.log(e.target);
+                let productId = e.target.getAttribute("data-id");
+                let variantId = e.target.getAttribute("data-variantId");
+                // querySelectorAll(".add-to-wishlist")
+                console.log("Product Id",productId);
+                console.log("Variant Id",variantId);
                 try {
-                    // Step 1: Show Confirmation Alert (Optional)
+                    // Show confirmation alert
                     const confirmation = await Swal.fire({
                         title: "Add to Wishlist?",
                         text: "Do you want to save this product in your wishlist?",
@@ -353,21 +359,20 @@
                         cancelButtonColor: "#d33",
                         confirmButtonText: "Yes, add it!"
                     });
-
-                    if (!confirmation.isConfirmed) return; // If user cancels, exit function
-
-                    // Step 2: Send Add-to-Wishlist Request
+    
+                    if (!confirmation.isConfirmed) return;
+    
+                    // Send Add-to-Wishlist request
                     const response = await fetch(`/user/wishlist/add/${productId}`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ variantId }),
                     });
-
+    
                     const data = await response.json();
                     console.log(data);
-
+    
                     if (response.ok) {
-                        // Step 3: Show Success Message
                         Swal.fire({
                             title: "Added!",
                             text: "Product has been added to your wishlist.",
@@ -376,7 +381,6 @@
                             showConfirmButton: false
                         });
                     } else {
-                        // Step 4: Show Error Message if Server Fails
                         Swal.fire({
                             title: "Error!",
                             text: data.message || "Failed to add product to wishlist.",
@@ -384,11 +388,8 @@
                             confirmButtonColor: "#d33"
                         });
                     }
-
                 } catch (err) {
                     console.log("Error in adding data to wishlist", err);
-
-                    // Step 5: Show Network Error Alert
                     Swal.fire({
                         title: "Oops!",
                         text: "Something went wrong. Please try again.",
@@ -396,12 +397,10 @@
                         confirmButtonColor: "#d33"
                     });
                 }
-            });
+            }
         });
-
-
-       
-    </script>
+    });
+</script>    
 </body>
 
-</html>
+</html> 

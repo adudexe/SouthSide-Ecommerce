@@ -54,14 +54,8 @@ document.addEventListener("DOMContentLoaded", () => {
                                                 </a>
                                             </div>
                                             <div class="product-action-1">
-                                                <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal">
-                                                    <i class="fi-rs-search"></i>
-                                                </a>
-                                                <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html">
-                                                    <i class="fi-rs-heart"></i>
-                                                </a>
-                                                <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html">
-                                                    <i class="fi-rs-shuffle"></i>
+                                                <a aria-label="Add To Wishlist" class="action-btn hover-up">
+                                                    <i class="fi-rs-heart add-to-wishlist" data-id="${product._id}" data-variantId="${product.variants[0]._id}"></i>
                                                 </a>
                                             </div>
                                         </div>
@@ -72,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                                 <span class="old-price">$${product.variants[0].price}</span>
                                             </div>
                                             <div class="product-action-1 show">
-                                                <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html">
+                                                <a aria-label="Add To Cart" class="action-btn hover-up add-to-wishlist" onClick="(event)=>{event.preventDefault()}>
                                                     <i class="fi-rs-shopping-bag-add"></i>
                                                 </a>
                                             </div>

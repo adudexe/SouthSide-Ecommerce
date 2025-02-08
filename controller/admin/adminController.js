@@ -6,8 +6,8 @@ const User =  require("../../model/userModel");
 const Product = require("../../model/productScheme");
 const statusCodes = require("../../public/javascript/statusCodes");
 const bcrypt = require("bcrypt");
+const fs = require('fs');
 const adminController = {};
-
 
 adminController.loadDashboard =  (req,res) => { 
     try{
@@ -422,16 +422,131 @@ adminController.listCategory = async (req,res) => {
 }
 
 
-adminController.updateProduct = async () => {
-    try
-    {
-        console.log(req.body);
+adminController.updateProduct = async (req, res) => {
+    try {
+        const { id, name, description, category, productOffer, variants } = req.body;
+        
+        // Validate required fields
+        if (!id || !name || !category) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Missing required fields" 
+            });
+        }
+
+        // Parse variants if it's a string
+        let parsedVariants = variants;
+        if (typeof variants === 'string') {
+            try {
+                parsedVariants = JSON.parse(variants);
+            } catch (error) {
+                console.error("Error parsing variants:", error);
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid variants data"
+                });
+            }
+        }
+
+        // Prepare update object
+        const updateData = {
+            productName: name,
+            description,
+            category,
+            productOffer: productOffer || 0,
+            variants: parsedVariants,
+            updatedAt: new Date()
+        };
+
+        // Handle image uploads
+        const images = [];
+        let hasNewImages = false;
+
+        // Handle existing images
+        for (let i = 1; i <= 10; i++) {
+            const existingImage = req.body[`existingImage_${i}`];
+            if (existingImage) {
+                images.push(existingImage);
+            }
+        }
+
+        // Handle new images
+        if (req.files) {
+            for (let i = 1; i <= 10; i++) {
+                const imageField = `image_${i}`;
+                if (req.files[imageField] && req.files[imageField][0]) {
+                    const file = req.files[imageField][0];
+                    
+                    // Validate file type
+                    if (!file.mimetype.startsWith('image/')) {
+                        return res.status(400).json({
+                            success: false,
+                            message: `Invalid file type for ${imageField}`
+                        });
+                    }
+                    
+                    // Validate file size (5MB limit)
+                    const maxSize = 5 * 1024 * 1024;
+                    if (file.size > maxSize) {
+                        return res.status(400).json({
+                            success: false,
+                            message: `File ${imageField} is too large. Maximum size is 5MB`
+                        });
+                    }
+                    
+                    images.push(file.path);
+                    hasNewImages = true;
+                }
+            }
+        }
+
+        // Add images to update data if there are any
+        if (images.length > 0) {
+            updateData.productImages = images;
+        }
+
+        // Update the product
+        const updatedProduct = await Product.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedProduct) {
+            // Clean up uploaded files if product update fails
+            if (hasNewImages) {
+                images.forEach(imagePath => {
+                    if (imagePath.startsWith('uploads/')) {
+                        try {
+                            fs.unlinkSync(imagePath);
+                        } catch (err) {
+                            console.error("Error deleting file:", err);
+                        }
+                    }
+                });
+            }
+            
+            return res.status(404).json({ 
+                success: false, 
+                message: "Product not found" 
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Product updated successfully",
+            product: updatedProduct
+        });
     }
-    catch(err)
-    {
-        console.log("Error in updating Product..",err);
+    catch(err) {
+        console.log("Error in updating Product: ", err);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to update product",
+            error: err.message 
+        });
     }
-}
+};
 
 
 adminController.logout = (req,res) =>

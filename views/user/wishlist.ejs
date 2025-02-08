@@ -212,9 +212,9 @@
                                                 </td>
                                                 <td class="text-right" data-title="Cart">
                                                     <% if (element.productsId.variants.find((item)=>{return item._id.toString() === element.variantId.toString() }).quantity > 0) { %>
-                                                        <a class="btn btn-sm"><i class="fi-rs-shopping-bag mr-5"></i>Add to cart</a>
+                                                        <a class="btn btn-sm add-to-cart"  data-productId="<%= element.productsId._id %>" data-variantId="<%= element.variantId %>"><i class="fi-rs-shopping-bag mr-5 "></i>Add to cart</a>
                                                     <% } else { %>
-                                                        <a class="btn btn-sm"><i class="fi-rs-shopping-bag mr-5 disabled"></i>Add to cart</a>
+                                                        <a class="btn btn-sm" ><i class="fi-rs-shopping-bag mr-5 disabled"></i>Add to cart</a>
                                                     <% } %>
                                                     
                                                 </td>
@@ -362,6 +362,73 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+         const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+            });
+        //Add to cart Logic
+        document.querySelectorAll(".add-to-cart").forEach((button)=>{
+            button.addEventListener("click",async (e)=>{
+                const data = {};
+                console.log();
+                
+            data.productId = e.target.getAttribute("data-productId") 
+            data.variantId = e.target.getAttribute("data-variantId");
+            data.quantity = 1;
+
+            const response = await fetch(`/user/cart/add`,{
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json",
+                },
+                body:JSON.stringify(data),
+                })
+                console.log(response);
+                
+                const details = await response.json();
+
+                if(response.ok)
+                {
+                    let response = await fetch(`/user/wishlist/delete/${data.variantId}`, {
+                        method: "DELETE",
+                        headers: { "Content-Type": "application/json" },
+                    });
+                    if(response.ok)
+                    {
+                        window.location.reload();
+                    }
+                }
+
+                console.log(details);
+
+                if(details.success)
+                {
+                    Toast.fire({
+                    icon: "success",
+                    title: details.message || "Success"
+                    });
+                }
+                else
+                {
+                    Toast.fire({
+                    icon: "error",
+                    title:  details.message || "Sever Side Error"
+                    });
+                }
+
+
+
+            })
+        })
+
+
         async function deleteItem(e) {
         e.preventDefault(); // Prevent default link behavior
 

@@ -48,11 +48,9 @@ document.addEventListener("DOMContentLoaded", () => {
                                             </a>
                                         </div>
                                         <div class="product-action-1">
-                                            
-                                            <a aria-label="Add To Wishlist" class="action-btn hover-up add-to-wishlist" href="shop-wishlist.html" >
-                                                <i class="fi-rs-heart"></i>
+                                            <a aria-label="Add To Wishlist" class="action-btn hover-up " >
+                                                <i class="fi-rs-heart add-to-wishlist" data-id="${product._id}" data-variantId="${product.variants[0]._id}"></i>
                                             </a>
-                                            
                                         </div>
                                     </div>
                                     <div class="product-content-wrap">
@@ -62,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <span class="old-price">$${product.variants[0].price}</span>
                                         </div>
                                         <div class="product-action-1 show">
-                                            <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html">
+                                            <a aria-label="Add To Cart" class="action-btn hover-up" onClick="(event)=>{event.preventDefault()}">
                                                 <i class="fi-rs-shopping-bag-add"></i>
                                             </a>
                                         </div>
