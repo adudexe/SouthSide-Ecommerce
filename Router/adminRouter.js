@@ -3,6 +3,7 @@ const adminAuth = require("../middleware/adminAuth")
 const admin =  express.Router();
 const adminController = require("../controller/admin/adminController");
 const orderController = require("../controller/admin/adminOrderController");
+const couponController = require("../controller/admin/couponController")
 
 
 admin.get("/login",adminController.loadLoginPage);
@@ -37,6 +38,9 @@ admin.put("/orderManagement/details/singleStatus",orderController.changeSingleSt
 admin.put("/orderManagement/details/bukStatus",orderController.changeBulkStatus);
 
 
+admin.get("/coupons",couponController.loadPage);
+admin.post("/coupons/add",couponController.addCoupon);
+admin.delete("/coupons/delete/:id",couponController.deleteCoupon)
 
 
 // admin.get("/productManagement",adminController.loadUserManagement)

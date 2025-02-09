@@ -2,6 +2,7 @@ const Cart = require("../model/cartSchema");
 const Product = require("../model/productScheme");
 const Address = require("../model/userAddress");
 const Order = require("../model/orderSchema");
+const Coupon = require("../model/couponSchema");
 const Razorpay = require('razorpay');
 var { validatePaymentVerification, validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils'); 
 const checkoutController = {};
@@ -18,75 +19,53 @@ const razorpay = new Razorpay({
 checkoutController.loadCheckout = async (req, res) => {
     try {
         const userId = req.session.user._id;
-        // console.log("User Id", userId);
         let address = [];
         let variants = [];
         let quantity = [];
         let shipping = 0;
-        //find the product details and varients and send it to the front end...
-        const products = await Product.find
-
-
+        let total = 0;
 
         // Fetch the cart and address data
         const cart = await Cart.findOne({ userId: userId }).populate('items.productId');
-        // console.log("Cart Items",cart);
-
+        const userAddress = await Address.find({ userId: userId });
         
+        // Fetch available coupons
+        const coupons = await Coupon.find({});
 
-        (cart.items).find((item)=>{
-            // console.log("Items",item);
-            if(!(item.productId.isDeleted) && !(item.productId.isBlocked) )
-            {
-                return (item.productId.variants).find((variant)=>{
-                    if(variant._id.toString() === (item.variantId).toString())
-                    {   
-                        // console.log("item",item);
-                        // console.log("item quantity",item.quantity);
-                        // total = total*item.quantity
-                        variants.push(variant);
-                        quantity.push(item.quantity);
-                    }
-                })
-            }
-            // console.log("Variant Id",item.variantId);
-        })
-        // console.log("Cart Product Variants",variants);
-        address = await Address.find({ userId: userId });
-
-        let total = variants.reduce((acc, product,i) => {
-            return acc + (product.salePrice * quantity[i]);
-        }, 0);        
-        req.session.total = total;
-        console.log("Total",total);
-
-        // console.log(total);
-        // console.log("Addresss",address);
-
-        // console.log("Cart Details",cart);
-
-        // Total Price =
-
-        if (!cart) {
-            console.log("Cart not found for user", userId);
-            return res.redirect('/cart'); // Optionally redirect to the cart page if no cart is found
+        if (cart && cart.items) {
+            cart.items.forEach((item) => {
+                if (!item.productId.isDeleted && !item.productId.isBlocked) {
+                    item.productId.variants.forEach((variant) => {
+                        if (variant._id.toString() === item.variantId.toString()) {
+                            variants.push(variant);
+                            quantity.push(item.quantity);
+                            total += variant.salePrice * item.quantity;
+                        }
+                    });
+                }
+            });
         }
 
-        if (!address) {
-            console.log("No address found for user", userId);
+        if (total >= 1000) {
+            shipping = 0;
+        } else {
+            shipping = 40;
         }
 
-        // Render the checkout page with cart and address data
-        res.render("./user/checkout", {
+        total += shipping;
+
+        res.render('user/checkout', {
             cart,
+            variants,
+            userAddress,
             total,
             shipping,
-            variants,
-            userAddress: address || null, // Pass the address (or null if not found) as 'userAddress' for clarity
+            coupons // Pass coupons to the view
         });
-    } catch (err) {
-        console.log("Error in loading the Checkout Page", err);
-        res.status(500).send("An error occurred while loading the checkout page.");
+
+    } catch (error) {
+        console.error('Error in loadCheckout:', error);
+        res.status(500).send('Internal Server Error');
     }
 };
 
