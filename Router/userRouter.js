@@ -79,6 +79,9 @@ router.get("/myAccount/order/cancel/:id",orderController.cancelOrder);
 router.get("/order/success",orderController.orderSuccess);
 
 
+//Coupon Controller
+router.put('/coupon/apply/:id',cartController.applyCoupon)
+
 
 //Wishlist Controller
 router.get("/wishlist",wishlistController.loadWishlist);

@@ -1,4 +1,5 @@
 const products = require("../model/productScheme");
+const coupon = require("../model/couponSchema");
 const cart = require("../model/cartSchema");
 const statusCode = require("../public/javascript/statusCodes");
 const cartController = {};
@@ -9,7 +10,15 @@ cartController.loadCartPage = async (req, res) => {
         const userId = req.session.user._id;
         const cartDetails = await cart.findOne({ userId: userId }).populate('items.productId');
         const productDetails = await products.find();
-        
+        //If coupon is applied then remove the coupon 
+        if(cartDetails && cartDetails.couponApplied.code)
+        {
+            cartDetails.couponApplied = null;
+        }
+        if(!cartDetails.couponApplied)
+        {
+            console.log("coupon Nullified")
+        }
         // Calculate total price of cart items
         const totalPrice = cartDetails.items.reduce((total, element) => {
             const product = element.productId; // Get the product details
@@ -20,6 +29,9 @@ cartController.loadCartPage = async (req, res) => {
         }, 0); // Initial value is 0
 
         console.log("TotalPrice is ", totalPrice); // Logs total price
+
+        //adding the total price to session
+        req.session.totalPrice = totalPrice;
 
         console.log(cartDetails);
         res.render("./user/cartPage", { cartItems: cartDetails, products: productDetails, totalPrice: totalPrice });
@@ -330,6 +342,81 @@ cartController.deleteProductFromCart = async (req,res) => {
     catch(err)
     {
         console.log("Error in deleting products from cart",err);
+    }
+}
+
+//When emptying the cart also empty the appliedcoupon also...
+
+cartController.applyCoupon = async (req,res) => {
+    try
+    {
+        //When applying the coupon the total price should need to be reduced...
+        const couponId = req.params.id;
+        const userId = req.session.user._id;
+        const totalPrice = req.session.totalPrice;
+
+        const couponDetails = await coupon.findById(couponId);
+
+        if(totalPrice<couponDetails.minmumAmount)
+        {
+            return res.status(403).json({success:false,message:"Please Add product till minimum amount is reached..."});
+        }
+
+
+        // console.log("Coupon Detail",couponDetails);
+        // console.log("Total Price from Apply Coupon",totalPrice);
+        
+
+        //Check if Coupon is applied on the product...
+        const existingCart = await cart.findOne({ userId: userId }).populate('items.productId');
+        
+        // console.log("Cart Details",existingCart);
+
+        // Calculate total price of cart items
+        const discountPrice = existingCart.items.reduce((total, element) => {
+            console.log(element)
+            const product = element.productId; // Get the product details
+            const variant = product.variants.find(variant => variant._id.toString() === element.variantId.toString()); // Find the selected variant
+            
+            element.price = variant.salePrice  - ((variant.salePrice/totalPrice)*couponDetails.discount);
+            // Add the price of the variant * quantity to the total
+            return total + (element.price * element.quantity);
+        }, 0); // Initial value is 0
+
+        if(existingCart  &&  existingCart.couponApplied)
+        {
+            const updateCart = await cart.findOneAndUpdate(
+            {userId:userId},
+            {$set:{couponApplied:null}},
+            {new:true});
+        }
+        // console.log("Update Cart")
+        
+        const applyCoupon = await cart.findOneAndUpdate(
+            {userId:userId},
+            {$set:{couponApplied:couponId}}
+        )
+        await existingCart.save();
+
+        req.session.totalPrice = discountPrice;
+        console.log("totalprice changed")
+
+        // console.log("Discount Price ",discountPrice);
+        // console.log("Existing Cart Price",existingCart);
+
+
+        if(!applyCoupon)
+        {
+            //After applying the coupon then then price should need to be reduced;
+
+            return res.status(500).json({success:true,message:"Failed to Apply Coupon"});
+        }
+        return res.status(200).json({success:true,message:"Coupon Applied Successfully...",newPrice:discountPrice,oldPrice:totalPrice});
+        
+    }
+    catch(err)
+    {
+        console.log("Error in Applying Coupon",err);
     }
 }
 

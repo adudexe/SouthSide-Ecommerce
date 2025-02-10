@@ -38,7 +38,7 @@ const orderSchema = mongoose.Schema({
                         required: true,
                     },
                     salePrice: {
-                        type: Number,
+                        type: Number,  //If discount is appled then the discount applied price should be added here..
                         default: null,
                     },
                     quantity: {
@@ -133,8 +133,16 @@ const orderSchema = mongoose.Schema({
         required:true
     },
     couponApplied:{
-        type:Boolean,
-        default:false
+        code:{
+            type:String,
+            required:true,
+            unique:true
+        },
+        discount:{
+            type:Number,
+            required:true,
+            min:0
+        },
     },
     paymentMethod:{
         type:String,
@@ -145,6 +153,10 @@ const orderSchema = mongoose.Schema({
     //     required:true,
     //     enum:['Pending','Processed','Shipped','Delivered','Cancelled','Return Request','Returned','Refunded']
     // } 
+    // couponApplied:{
+    //     type:mongoose.Schema.Types.ObjectId,
+    //     ref:"",
+    // }
 
 })
 

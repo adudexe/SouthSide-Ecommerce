@@ -74,14 +74,14 @@
                         </div>
 
 
-                        <div class="order-totals">
+                        <div class="order-totals" id="order-totals">
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Subtotal</span>
                                 <span class="fw-bold total-amount"><%= total %> </span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Shipping</span>
-                                <span class="fw-bold">₹<%= shipping %></span>
+                                <span class="fw-bold">₹ 0</span>
                             </div>
                             <div class="d-flex justify-content-between border-top pt-3 mt-3">
                                 <span class="h5 mb-0">Total</span>
@@ -169,7 +169,7 @@
                                                 </p>
                                             </div>
                                             <button class="btn btn-sm btn-outline-primary" 
-                                                    onclick="applyCoupon('<%= coupon.code %>', '<%= coupon.discount %>', '<%= coupon.minAmount %>')">
+                                                    onclick="applyCoupon('<%= coupon.code %>', '<%= coupon.discount %>', '<%= coupon.minAmount %>','<%= coupon._id%>')">
                                                 Apply
                                             </button>
                                         </div>
@@ -376,6 +376,7 @@
 </div>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
+    let totalAmount=null
     //Place Order
         function placeOrder() {
             //The Payment Mehod the address details and the product details should be sent to the backend for placing the order.
@@ -419,7 +420,7 @@
                         if(orderType.OrderType ==="online")
                         {
 
-                            const amount = document.querySelector(".total-amount").innerText
+                            const amount = totalAmount || document.querySelector(".total-amount").innerText
                             // payNow();
                             // async function payNow() {
                                 // Create order by calling the server endpoint
@@ -432,16 +433,20 @@
                                     body: JSON.stringify({ amount, currency: 'INR', receipt: 'receipt#1', notes: {} })
                                 });
 
-                                // console.log("Responce is",response)
+                                console.log("Responce is",response)
 
                                 const order = await response.json();
+                                console.log("Order Response",order);
                                 // console.log("Order is ",order.order.phone);
                                 // console.log("Order is ",order.order.email);
+                                // paymentid = 
+
+                                // console.log(paymentid)
 
                                 // Open Razorpay Checkout
                                 const options = {
                                     key: order.order.payment_id, // Replace with your Razorpay key_id
-                                    amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                                    amount: amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
                                     currency: 'INR',
                                     name:order.order.userName,
                                     contact:order.order.phone,
@@ -503,7 +508,7 @@
                             // }
                         }
                         else{
-                            alert("Payment is COD");
+                            // alert("Payment is COD");
                             const response = await fetch('/user/checkout/placeorder', {
                                 method: 'POST',
                                 headers: {
@@ -535,7 +540,8 @@
 
                         
                     } catch (error) {
-                        console.log("Error in online payment",error)
+                        console.log("Error in online payment");
+                        console.log(error);
                         Swal.fire({
                             icon: 'error',
                             title: 'Error!',
@@ -545,12 +551,12 @@
                 }
             });
         }
-</script>
 
-<script>
-function applyCoupon(code, discount, minAmount) {
+async function applyCoupon(code, discount, minAmount, id) {
+
+    // console.log(paymentid)
     const subtotal = parseFloat(document.querySelector('.total-amount').innerText);
-    
+    const orderTotal = document.getElementById("order-totals");
     if (minAmount && subtotal < minAmount) {
         Swal.fire({
             icon: 'error',
@@ -569,41 +575,134 @@ function applyCoupon(code, discount, minAmount) {
         cancelButtonColor: '#d33',
         confirmButtonText: 'Apply',
         cancelButtonText: 'Cancel'
-    }).then((result) => {
+    }).then(async (result) => {
         if (result.isConfirmed) {
-            // Disable all coupon buttons
-            const couponButtons = document.querySelectorAll('#couponList button');
-            couponButtons.forEach(button => {
-                button.disabled = true;
-                button.classList.remove('btn-outline-primary');
-                button.classList.add('btn-secondary');
-            });
+            const response = await fetch(`/user/coupon/apply/${id}`,{
+                method:"PUT",
+            })
+            console.log(response);
+
+            const data = await response.json();
+
+            console.log(data);
             
-            // Update the applied button
-            const appliedButton = Array.from(couponButtons).find(button => 
-                button.parentElement.parentElement.querySelector('h6').textContent === code
-            );
-            if (appliedButton) {
-                appliedButton.textContent = 'Applied';
-                appliedButton.classList.remove('btn-secondary');
-                appliedButton.classList.add('btn-success');
+            totalAmount = data.newPrice || 0;
+
+            if(data.success)
+            {
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Coupon Applied!',
+                    text: data.message ||`₹${discount} discount has been applied to your order`,
+                    timer: 1500
+                });
+
+                //To change the price
+                // orderTotal.innerHTML = "";
+                orderTotal.innerHTML = `
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span class="fw-bold total-amount">₹${data.oldPrice}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping</span>
+                        <span class="fw-bold">Free</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Discount</span>
+                        <span class="fw-bold">-₹ ${data.oldPrice-data.newPrice}</span>
+                    </div>
+                    <div class="d-flex justify-content-between border-top pt-3 mt-3">
+                        <span class="h5 mb-0">Total</span>
+                        <span class="h5 mb-0 text-brand">₹${data.newPrice}</span>
+                    </div>
+                `
+
+                // Disable all coupon buttons
+                const couponButtons = document.querySelectorAll('#couponList button');
+                couponButtons.forEach(button => {
+                    button.disabled = true;
+                    button.classList.remove('btn-outline-primary');
+                    button.classList.add('btn-secondary');
+                });
+                // Update the applied button
+                const appliedButton = Array.from(couponButtons).find(button =>
+                    button.parentElement.parentElement.querySelector('h6').textContent === code
+                );
+                if (appliedButton) {
+                    appliedButton.textContent = 'Applied';
+                    appliedButton.classList.remove('btn-secondary');
+                    appliedButton.classList.add('btn-success');
+
+                    // Add remove button next to applied coupon
+                    const removeButton = document.createElement('button');
+                    removeButton.classList.add('btn', 'btn-sm', 'btn-danger', 'ms-2');
+                    removeButton.textContent = 'Remove';
+                    removeButton.onclick = () => removeCoupon(code, id);
+
+                    appliedButton.parentElement.appendChild(removeButton);
+                }
+
+                // Update total
+                const shipping = parseFloat(document.querySelector('.order-totals .fw-bold:nth-child(2)').innerText.replace('₹', ''));
+                const newTotal = subtotal - discount;
+                document.querySelector('.text-brand').innerHTML = `₹${newTotal}`;
             }
-
-            // Update total
-            const shipping = parseFloat(document.querySelector('.order-totals .fw-bold:nth-child(2)').innerText.replace('₹', ''));
-            const newTotal = subtotal + shipping - discount;
-            document.querySelector('.text-brand').innerHTML = `₹${newTotal}`;
-
-            // Show success message
-            Swal.fire({
-                icon: 'success',
-                title: 'Coupon Applied!',
-                text: `₹${discount} discount has been applied to your order`,
-                timer: 1500
-            });
+            else
+            {
+                // Show success message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || `Failed to apply coupon..`,
+                    timer: 1500
+                });
+            }
         }
     });
 }
+
+function removeCoupon(code, id) {
+    // Re-enable all coupon buttons
+    const couponButtons = document.querySelectorAll('#couponList button');
+    couponButtons.forEach(button => {
+        button.disabled = false;
+        button.classList.remove('btn-secondary');
+        button.classList.add('btn-outline-primary');
+    });
+
+    // Find the applied coupon button and remove "Applied" text and remove button
+    const appliedButton = Array.from(couponButtons).find(button =>
+        button.parentElement.parentElement.querySelector('h6').textContent === code
+    );
+    if (appliedButton) {
+        appliedButton.textContent = 'Apply';
+        appliedButton.classList.remove('btn-success');
+        appliedButton.classList.add('btn-outline-primary');
+    }
+
+    // Remove the remove button from the applied coupon
+    const removeButton = appliedButton.parentElement.querySelector('.btn-danger');
+    if (removeButton) {
+        removeButton.remove();
+    }
+
+    // Update total by removing the discount (you may need to recalculate the total dynamically from the server)
+    const subtotal = parseFloat(document.querySelector('.total-amount').innerText);
+    const shipping = parseFloat(document.querySelector('.order-totals .fw-bold:nth-child(2)').innerText.replace('₹', ''));
+    const newTotal = subtotal + shipping;
+    document.querySelector('.text-brand').innerHTML = `₹${newTotal}`;
+
+    // Show removal confirmation message
+    Swal.fire({
+        icon: 'success',
+        title: 'Coupon Removed',
+        text: `The coupon has been removed from your order`,
+        timer: 1500
+    });
+}
+
 </script>
 
 <script src="/javascript/checkoutAddressManagement.js"></script>

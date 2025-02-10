@@ -32,6 +32,8 @@ checkoutController.loadCheckout = async (req, res) => {
         // Fetch available coupons
         const coupons = await Coupon.find({});
 
+        //If cart.coupoon applied is true then apply the discount percent to each product other then add find the total 
+
         if (cart && cart.items) {
             cart.items.forEach((item) => {
                 if (!item.productId.isDeleted && !item.productId.isBlocked) {
@@ -46,13 +48,7 @@ checkoutController.loadCheckout = async (req, res) => {
             });
         }
 
-        if (total >= 1000) {
-            shipping = 0;
-        } else {
-            shipping = 40;
-        }
-
-        total += shipping;
+        console.log("Total Price from cart",total);
 
         res.render('user/checkout', {
             cart,
@@ -188,8 +184,10 @@ checkoutController.placeOrder = async (req, res) => {
 
         // Get the primary address for the user
         const userId = req.session.user._id;
+        const totalprice = req.session.totalPrice;
         const primaryAddress = await Address.findOne({ userId: userId, isPrimary: true });
         
+        console.log("Total Price",totalprice);
 
         if (!primaryAddress) {
             return res.status(404).json({ success: false, message: "Address Not Found.." });
@@ -198,6 +196,11 @@ checkoutController.placeOrder = async (req, res) => {
         // Get the user Cart Details
         const cartItems = await Cart.findOne({ userId: userId }).populate("items.productId");
         // console.log("Cart Items", cartItems.items);
+        const coupon = await Coupon.findById(cartItems.couponApplied);
+        const appliedCoupon = {};
+          appliedCoupon.code = coupon.code;
+          appliedCoupon.discount = coupon.discount;
+
 
         if (!cartItems) {
             return res.status(404).json({ success: false, message: "User Cart Not Found..." });
@@ -243,19 +246,19 @@ checkoutController.placeOrder = async (req, res) => {
         }
 
         // Apply any discounts (if needed)
-        let discount = cartItems.discount || 0;
-        let finalAmount = req.session.total - discount;
+        let discount = (totalAmount-totalprice) || 0
+        // let finalAmount = req.session.total - discount;
 
         // Create new order document
         const newOrder = new Order({
             userId: userId,
             orderItems: orderItems,
-            totalPrice: req.session.total,
+            totalPrice: totalprice,
             discount: discount,
-            finalAmount: finalAmount,
+            finalAmount: totalprice,
             addres: primaryAddress,  // Use the primary address for shipping
             invoiceDate: new Date(),
-            couponApplied: cartItems.couponApplied || false,
+            couponApplied: appliedCoupon || false,
             paymentMethod: OrderType
         });
 
@@ -282,7 +285,7 @@ checkoutController.createOrder = async (req,res)=>{
         let order = {};
         const { amount, currency, receipt, notes } = req.body;
         const phoneNumber  = await Address.findOne({userId:req.session.user._id, isPrimary:true},{phone:1});
-        console.log("Phone Number",phoneNumber);
+        console.log("Key ",process.env.RAZORPAY_KEY_ID);
     
         const options = {
           amount: amount * 100, // Convert amount to paise
@@ -294,14 +297,14 @@ checkoutController.createOrder = async (req,res)=>{
         const orders = await razorpay.orders.create(options);
         
 
-        // console.log(orders);
+        console.log(orders);
 
         order = {
           order_id: orders.id,
           userName:req.session.user.name,
           email:req.session.user.email,
           phone:phoneNumber.phone,
-          payment_id:process.env.RAZORPAY_CLIENT_KEY,
+          payment_id:process.env.RAZORPAY_KEY_ID,
           amount: orders.amount,
           currency: orders.currency,
           receipt: orders.receipt,
@@ -354,8 +357,13 @@ checkoutController.onlinePayment = async (req, res) => {
           }
   
           // Get the user Cart Details
-          const cartItems = await Cart.findOne({ userId: userId }).populate("items.productId");
-          // console.log("Cart Items", cartItems.items);
+          const cartItems = await Cart.findOne({ userId: userId })
+            .populate("items.productId"); 
+
+            const coupons = await Coupon.findById(cartItems.couponApplied);
+          console.log("Coupons",coupons);
+          const {code,discount} = coupons;
+          console.log("Cart Items", cartItems);
   
           if (!cartItems) {
               return res.status(404).json({ success: false, message: "User Cart Not Found..." });
@@ -388,7 +396,7 @@ checkoutController.onlinePayment = async (req, res) => {
                   });
   
                   // Add to total price
-                  totalAmount += variant.salePrice * item.quantity;
+                  totalAmount += item.price;
   
                   // Decrement the quantity of the variant in the product
                   if (variant.quantity >= item.quantity) {
@@ -399,21 +407,26 @@ checkoutController.onlinePayment = async (req, res) => {
                   }
               }
           }
+        //   console.log("Total Amount",totalAmount);
+          console.log("Session Total",req.session.totalPrice);
+          const appliedCoupon = {};
+          appliedCoupon.code = code;
+          appliedCoupon.discount = discount;
   
           // Apply any discounts (if needed)
-          let discount = cartItems.discount || 0;
-          let finalAmount = req.session.total - discount;
+        //   let discount = cartItems.discount || 0;
+        //   let finalAmount = req.session.total - discount;
   
           // Create new order document
           const newOrder = new Order({
               userId: userId,
               orderItems: orderItems,
-              totalPrice: totalAmount ,
-              discount: discount,
-              finalAmount: totalAmount - discount,
+              totalPrice: totalAmount || req.session.totalPrice,
+              discount: totalAmount ? totalAmount - req.session.totalPrice : 0,
+              finalAmount: totalAmount || req.session.totalPrice,
               addres: primaryAddress,  // Use the primary address for shipping
               invoiceDate: new Date(),
-              couponApplied: cartItems.couponApplied || false,
+              couponApplied: appliedCoupon || false,
               paymentMethod: 'online'
           });
   

@@ -39,7 +39,11 @@ const cartSchema = new mongoose.Schema({
             type:String,
             default:"none"
         }
-    }]
+    }],
+    couponApplied:{
+        type:mongoose.Types.ObjectId,
+        ref:"Coupon"
+    }
 });
 
 module.exports = mongoose.model("Cart",cartSchema);
