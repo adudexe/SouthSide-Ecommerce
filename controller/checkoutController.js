@@ -10,8 +10,8 @@ const checkoutController = {};
 
 
 const razorpay = new Razorpay({
-    key_id:process.env.RAZORPAY_CLIENT_KEY,
-    key_secret:process.env.RAZORPAY_CLIENT_SECRET
+    key_id:process.env.RAZORPAY_KEY_ID,
+    key_secret:process.env.RAZORPAY_KEY_SECRET
 });
 
 
@@ -408,9 +408,9 @@ checkoutController.onlinePayment = async (req, res) => {
           const newOrder = new Order({
               userId: userId,
               orderItems: orderItems,
-              totalPrice: req.session.total,
+              totalPrice: totalAmount ,
               discount: discount,
-              finalAmount: finalAmount,
+              finalAmount: totalAmount - discount,
               addres: primaryAddress,  // Use the primary address for shipping
               invoiceDate: new Date(),
               couponApplied: cartItems.couponApplied || false,
