@@ -74,7 +74,51 @@
             margin-top: 1rem;
         }
     }
-</style>
+    /* <style> */
+    /* General card styling */
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+        background-color: #ffffff;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Custom styling for buttons */
+    .btn-lg {
+        font-size: 1.1rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+    }
+
+    /* Make the wallet balance stand out */
+    .balance-display {
+        font-size: 2.5rem;
+        font-weight: 600;
+        color: #2C742F;
+    }
+
+    /* Transaction History styling */
+    .transaction-card {
+        border-radius: 12px;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Modal styling */
+    .modal-content {
+        border-radius: 15px;
+    }
+
+    /* Hover effect for buttons */
+    .btn:hover {
+        transform: translateY(-5px);
+        transition: all 0.3s ease;
+    }
+
+    .modal-header .btn-close {
+        border: none;
+        background: transparent;
+    }
+    </style>
     <div class="mobile-header-active mobile-header-wrapper-style">
         <div class="mobile-header-wrapper-inner">
             <div class="mobile-header-top">
@@ -260,6 +304,9 @@
                                             <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#orders" role="tab" aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>Orders</a>
                                         </li>
                                         <li class="nav-item">
+                                            <a class="nav-link" id="orders-tab" data-bs-toggle="tab" href="#wallet-detail" role="tab" aria-controls="orders" aria-selected="false"><i class="fi-rs-shopping-bag mr-10"></i>Wallet</a>
+                                        </li>
+                                        <li class="nav-item">
                                             <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#track-orders" role="tab" aria-controls="track-orders" aria-selected="false"><i class="fi-rs-shopping-cart-check mr-10"></i>Track Your Order</a>
                                         </li>
                                         <li class="nav-item">
@@ -274,6 +321,8 @@
                                     </ul>
                                 </div>
                             </div>
+                            
+                            
                             <div class="col-md-8">
                                 <div class="tab-content dashboard-content">
                                     <div class="tab-pane fade active show" id="dashboard" role="tabpanel" aria-labelledby="dashboard-tab">
@@ -653,6 +702,162 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="tab-pane fade" id="wallet-detail" role="tabpanel" aria-labelledby="wallet-detail-tab">
+                                        <section class="ps-100 pb-150">
+                                            <div class="container">
+                                                <div class="row">
+                                                    <div class="col-lg-10 m-auto">
+                                                        <div class="row">
+                                                            <!-- Wallet Content -->
+                                                            <% if (wallet) { %>
+                                                                <div class="col-md-8 m-auto">
+                                                                    <div class="wallet-content">
+                                                                        <!-- <p><%= //wallet %></p> -->
+                                                                        <!-- Wallet Balance Card -->
+                                                                        <div class="card wallet-card mb-4 shadow-lg rounded-lg">
+                                                                            <div class="card-body text-center p-4">
+                                                                                <h4 class="mb-3 text-primary font-weight-bold">Wallet Balance</h4>
+                                                                                <div class="balance-display mb-3 text-success font-weight-bold" style="font-size: 2rem;">
+                                                                                    ₹ <%= wallet.totalAmount %>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        
+                                                                            <!-- <p><%= wallet.transactions %></p> -->
+                                                                        <!-- Transaction History -->
+                                                                        <div class="card shadow-lg rounded-lg">
+                                                                            <div class="card-header bg-white">
+                                                                                <h5 class="mb-0 text-primary">Transaction History</h5>
+                                                                            </div>
+                                                                            <div class="card-body p-4">
+                                                                                <% if (!wallet.transactions.length) { %>
+                                                                                    <div class="text-center py-5">
+                                                                                        <i class="fi-rs-wallet text-muted mb-4" style="font-size: 3rem;"></i>
+                                                                                        <h5 class="text-muted">No transactions yet</h5>
+                                                                                        <p class="mb-0">Your transaction history will appear here</p>
+                                                                                    </div>
+                                                                                <% } else { %>
+                                                                                    <div class="table-responsive">
+                                                                                        <table class="table table-bordered table-striped table-hover">
+                                                                                            <thead class="thead-light">
+                                                                                                <tr>
+                                                                                                    <th>Transaction Type</th>
+                                                                                                    <th>Amount</th>
+                                                                                                    <th>Date</th>
+                                                                                                    <th>Status</th>
+                                                                                                </tr>
+                                                                                            </thead>
+                                                                                            <tbody>
+                                                                                                <% wallet.transactions.forEach(element => { %>
+                                                                                                    <tr>
+                                                                                                        <td><%= element.transactionType %></td>
+                                                                                                        <td><%= element.amount.toFixed(2) %> USD</td>
+                                                                                                        <td><%= new Date(element.date).toLocaleDateString() %></td>
+                                                                                                        <td>
+                                                                                                            <% if (element.transactionType === 'credit') { %>
+                                                                                                                <span class="badge badge-success">Credit</span>
+                                                                                                            <% } else if (element.transactionType === 'debit') { %>
+                                                                                                                <span class="badge badge-danger">Debit</span>
+                                                                                                            <% } else { %>
+                                                                                                                <span class="badge badge-secondary">Pending</span>
+                                                                                                            <% } %>
+                                                                                                        </td>
+                                                                                                    </tr>
+                                                                                                <% }) %>
+                                                                                            </tbody>
+                                                                                        </table>
+                                                                                    </div>
+                                                                                    <% } %>
+                                                                            <% } else { %>
+                                                                                <div class="col-md-8 m-auto">
+                                                                                    <div class="wallet-content">
+                                                                                        <!-- <p><%= //wallet %></p> -->
+                                                                                        <!-- Wallet Balance Card -->
+                                                                                        <div class="card wallet-card mb-4 shadow-lg rounded-lg">
+                                                                                            <div class="card-body text-center p-4">
+                                                                                                <h4 class="mb-3 text-primary font-weight-bold">Wallet Balance</h4>
+                                                                                                <div class="balance-display mb-3 text-success font-weight-bold" style="font-size: 2rem;">
+                                                                                                    ₹0
+                                                                                                </div>
+                                                                                                
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <!-- Transaction History -->
+                                                                                        <div class="card shadow-lg rounded-lg">
+                                                                                            <div class="card-header bg-white">
+                                                                                                <h5 class="mb-0 text-primary">Transaction History</h5>
+                                                                                            </div>
+                                                                                            <div class="card-body p-4">
+                                                                                                    <div class="text-center py-5">
+                                                                                                        <i class="fi-rs-wallet text-muted mb-4" style="font-size: 3rem;"></i>
+                                                                                                        <h5 class="text-muted">No transactions yet</h5>
+                                                                                                        <p class="mb-0">Your transaction history will appear here</p>
+                                                                                                    </div>
+                                                                                                
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        
+                                                                                    </div>
+                                                                                </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <% } %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                    
+                                    <!-- Add Money Modal -->
+                                    <div class="modal fade" id="addMoneyModal" tabindex="-1" aria-labelledby="addMoneyModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content rounded-lg">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title text-primary" id="addMoneyModalLabel">Add Money to Wallet</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form id="addMoneyForm">
+                                                        <div class="mb-3">
+                                                            <label for="amount" class="form-label">Amount (₹)</label>
+                                                            <input type="number" class="form-control" id="amount" min="1" step="1" required>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-primary w-100 btn-lg">Proceed to Add Money</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Withdraw Modal -->
+                                    <div class="modal fade" id="withdrawModal" tabindex="-1" aria-labelledby="withdrawModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content rounded-lg">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title text-primary" id="withdrawModalLabel">Withdraw Money</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form id="withdrawForm">
+                                                        <div class="mb-3">
+                                                            <label for="withdrawAmount" class="form-label">Amount (₹)</label>
+                                                            <input type="number" class="form-control" id="withdrawAmount" min="1" max="10000" step="1" required>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-danger w-100 btn-lg">Withdraw</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Styles to Enhance UI -->
+                                    
+                                    
+                                    
                                 </div>
                             </div>
                         </div>

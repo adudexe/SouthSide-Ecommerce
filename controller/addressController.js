@@ -1,18 +1,24 @@
 const addressController = {};
 const Address =  require("../model/userAddress");
 const Order = require("../model/orderSchema");
+const Wallet = require("../model/walletSchema");
 const statusCode = require("../public/javascript/statusCodes");
 
 
 addressController.loadMyAccount = async (req,res) => {
     try{
+        const userId = req.session.user._id
         let address = [];
         address =  await Address.find({userId:req.session.user._id});
         const orders = await Order.find({userId:req.session.user._id}).sort({createdOn:-1});
-
-        console.log(orders);
+        const wallet =  await Wallet.findOne({userId:userId});
+        if(!wallet)
+        {
+            await Wallet.create({userId:userId});
+        }
+        // console.log("Wallet Is",wallet);
         //To Check Wheather if any address is present for this User
-        res.render("./user/accountPage",{address,orders});
+        res.render("./user/accountPage",{address,orders,wallet});
         //Render the account page with the userAddress
         
         //{Address:address.address}

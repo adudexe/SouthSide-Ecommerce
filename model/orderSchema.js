@@ -69,6 +69,18 @@ const orderSchema = mongoose.Schema({
             type:String,
             required:true,
             enum:['Pending','Processing','Shipped','Delivered','Cancelled','Returned','Refunded']
+        },
+        cancelReason:{
+            type:String,
+        },
+        returnReson:{
+            type:String,
+        },
+        productId:{
+            type:mongoose.Schema.Types.ObjectId
+        },
+        variantId:{
+            type:mongoose.Schema.Types.ObjectId
         }
     }],
     totalPrice:{
@@ -135,12 +147,12 @@ const orderSchema = mongoose.Schema({
     couponApplied:{
         code:{
             type:String,
-            required:true,
-            unique:true
+            // required:true,
+            // unique:true
         },
         discount:{
             type:Number,
-            required:true,
+            // required:true,
             min:0
         },
     },
@@ -148,6 +160,8 @@ const orderSchema = mongoose.Schema({
         type:String,
         required:true,
     },
+    
+
     // status:{
     //     type:String,
     //     required:true,

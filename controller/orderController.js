@@ -1,4 +1,7 @@
+
 const Orders = require("../model/orderSchema");
+const Wallet = require("../model/walletSchema");
+const Products = require("../model/productScheme");
 const orderController = {};
 
 orderController.loadOrderDetails = async (req,res) => {
@@ -20,34 +23,99 @@ orderController.loadOrderDetails = async (req,res) => {
 
 orderController.cancelOrder = async (req, res) => {
     try {
+        const { reason } = req.body;
         const orderId = req.params.id;
         const userId = req.session.user._id;
+        let refundToWallet = null;
+        let wallet = null;
 
-        // Update the order's product status to 'Cancelled' based on the orderId, userId, and product ID
+        // Find the order and wallet for the user
+        const orderDetails = await Orders.findOne({ userId: userId, "orderItems._id": orderId });
+        wallet = await Wallet.findOne({ userId: userId });
+
+        console.log("Order Details",orderDetails);
+        console.log("Order Product Details",orderDetails.orderItems);
+
+        // Create wallet if it doesn't exist
+        if (!wallet) {
+            wallet = await Wallet.create({ userId: userId, totalAmount: 0, transactions: [] });
+        }
+
+        // console.log("Wallet before refund:", wallet);
+        
+        // Update the order's product status to 'Cancelled'
         const cancelOrder = await Orders.findOneAndUpdate(
             {
-                userId: userId, // Make sure this is the correct user
+                userId: userId, // Ensure this is the correct user
                 "orderItems._id": orderId // Find the correct product in the orderItems array
             },
             {
                 $set: {
+                    "orderItems.$.cancelReason": reason,
                     "orderItems.$.status": "Cancelled" // Update the product's status to 'Cancelled'
                 }
             },
-            { new: true } // Optionally return the updated order document
+            { new: true } // Return the updated order document
         );
-        console.log(cancelOrder);
+
+        // Find the cancelled item from the order
+        const cancelledItem = cancelOrder.orderItems.find(item => item.status === "Cancelled");
+        if (!cancelledItem) {
+            return res.status(400).json({ message: "Cancelled item not found" });
+        }
+
+        let totalAmount = Number(wallet.totalAmount || 0) + Number(cancelledItem.price);
+
+        console.log("Refund amount:", cancelledItem.price);
+        console.log("New total wallet amount:", totalAmount);
+
+        // If the payment method is 'online', add refund to wallet
+        if (orderDetails.paymentMethod === "online") {
+            refundToWallet = await Wallet.findOneAndUpdate(
+                { userId: userId },
+                {
+                    $push: {
+                        transactions: {
+                            transactionType: "credit",  // Refund transaction
+                            amount: cancelledItem.price,
+                            date: Date.now() // Set the transaction date
+                        }
+                    },
+                    $set: {
+                        totalAmount: totalAmount // Update the total amount in the wallet
+                    }
+                },
+                { new: true }
+            );
+        }
+
+        console.log("Refund DB:", refundToWallet);
+
+        //Find which product is cancelled 
+        const productVariant =  cancelOrder.orderItems.find(item => item.status === "Cancelled");
+
+
+        const updateProduct = await Products.findOneAndUpdate(
+            { "variants._id": productVariant.variantId },
+            { $inc: { "variants.$.quantity": productVariant.quantity } }
+        );
+        
+        //add the order quantity with the product quantity...
+
+        console.log("Update Product",updateProduct);
+
         if (!cancelOrder) {
             return res.status(404).json({ message: "Order or product not found" });
         }
 
-        // If successful, return the updated order
+        // Return the updated order if everything is successful
         res.status(200).json({ message: "Product status updated to 'Cancelled'", order: cancelOrder });
     } catch (err) {
         console.log("Error in canceling the product:", err);
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
 
 orderController.orderSuccess = async (req,res) =>{
     try

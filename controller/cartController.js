@@ -10,8 +10,9 @@ cartController.loadCartPage = async (req, res) => {
         const userId = req.session.user._id;
         const cartDetails = await cart.findOne({ userId: userId }).populate('items.productId');
         const productDetails = await products.find();
+        console.log("Applied Coupon",cartDetails.couponApplied);
         //If coupon is applied then remove the coupon 
-        if(cartDetails && cartDetails.couponApplied.code)
+        if(cartDetails && cartDetails.couponApplied)
         {
             cartDetails.couponApplied = null;
         }
@@ -33,7 +34,7 @@ cartController.loadCartPage = async (req, res) => {
         //adding the total price to session
         req.session.totalPrice = totalPrice;
 
-        console.log(cartDetails);
+        // console.log(cartDetails);
         res.render("./user/cartPage", { cartItems: cartDetails, products: productDetails, totalPrice: totalPrice });
     } catch (error) {
         console.log("Error in Loading Cart", error);

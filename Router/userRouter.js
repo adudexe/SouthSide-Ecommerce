@@ -11,6 +11,7 @@ const checkoutController = require("../controller/checkoutController");
 const productAvailability = require("../middleware/productAvailability");
 const orderController = require("../controller/orderController");
 const wishlistController = require("../controller/wishlistController");
+const walletController = require("../controller/walletController");
 const passport = require("passport");
 const errorHandling = require("../middleware/errorHandling");
 
@@ -75,7 +76,7 @@ router.post('/verify-payment',userAuth.isLogged,userAuth.isBlocked,checkoutContr
 
 //Order Controller
 router.get("/myAccount/order/:id",orderController.loadOrderDetails);
-router.get("/myAccount/order/cancel/:id",orderController.cancelOrder);
+router.post("/myAccount/order/cancel/:id",orderController.cancelOrder);
 router.get("/order/success",orderController.orderSuccess);
 
 
@@ -89,7 +90,7 @@ router.post("/wishlist/add/:id",wishlistController.addToWishList);
 router.delete("/wishlist/delete/:id",wishlistController.deleteItem);
 
 //Wallet Controller
-
+// router.get("/wallet",walletController.loadWallet);
 
 
 
