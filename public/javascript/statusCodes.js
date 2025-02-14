@@ -6,7 +6,7 @@ const statusCodes = {
     FORBIDDEN : 403,
     NOT_FOUND : 404,
     INTERNAL_SERVER_ERROR : 500,
-    COFLICT : 409
+    CONFLICT : 409
 };
 
 module.exports = statusCodes;

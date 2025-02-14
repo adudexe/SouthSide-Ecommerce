@@ -15,10 +15,12 @@ const walletController = require("../controller/walletController");
 const passport = require("passport");
 const errorHandling = require("../middleware/errorHandling");
 
+router.all("*",userAuth.isLogged); // To help keep is logged in 
+
 // userController
-router.get("/login",userController.loadLoginPage); // Remove userAuth.isLogged From here since it for just constant user....
-router.post("/login", userController.userLogin);
-router.get("/home",userController.loadHomePage);
+router.get("/login",userAuth.isLogged,userController.loadLoginPage); // Remove userAuth.isLogged From here since it for just constant user....
+router.post("/login",userAuth.isLogged,userController.userLogin);
+router.get("/home",userController.loadHomePage); //Remove userAuth.isLogged
 router.post("/resentOTP", userController.resendOTP);
 router.get("/signup", userController.loadSignUpPage);
 router.post("/signup", userController.registerUser);
@@ -54,7 +56,8 @@ router.get("/product/:id",productController.loadProductPage);
 router.get("/shop",userAuth.isLogged,userAuth.isBlocked,shopController.loadShopPage);
 router.get("/shop/search",userAuth.isLogged,userAuth.isBlocked,shopController.searchItem);
 router.get("/shop/sort",userAuth.isLogged,userAuth.isBlocked,shopController.sortProduct);
-router.get("/shop/category",userAuth.isLogged,userAuth.isBlocked,shopController.categorySort);
+// router.get("/shop/category",userAuth.isLogged,userAuth.isBlocked,shopController.categorySort);
+router.post("/shop/filter",shopController.filter);
 
 //Cart Controller 
 router.get("/cart",userAuth.isLogged,userAuth.isBlocked,cartController.loadCartPage);
@@ -81,7 +84,8 @@ router.get("/order/success",orderController.orderSuccess);
 
 
 //Coupon Controller
-router.put('/coupon/apply/:id',cartController.applyCoupon)
+router.put('/coupon/apply/:id',cartController.applyCoupon);
+router.get('/coupon/remove',cartController.removeCoupon);
 
 
 //Wishlist Controller

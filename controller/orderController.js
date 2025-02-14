@@ -89,7 +89,7 @@ orderController.cancelOrder = async (req, res) => {
             );
         }
 
-        console.log("Refund DB:", refundToWallet);
+        // console.log("Refund DB:", refundToWallet);
 
         //Find which product is cancelled 
         const productVariant =  cancelOrder.orderItems.find(item => item.status === "Cancelled");
@@ -120,7 +120,12 @@ orderController.cancelOrder = async (req, res) => {
 orderController.orderSuccess = async (req,res) =>{
     try
     {
-        res.render("./user/orderSuccess");
+        const userId = req.session.user._id;
+        const orderDetails = await Orders.findOne({ userId: userId })
+        .populate("orderItems.product")
+        .sort({ createdOn: -1 });
+        console.log("Order Details",orderDetails);
+        res.render("./user/orderSuccess",{orderDetails});
     }
     catch(err)
     {

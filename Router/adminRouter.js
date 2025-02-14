@@ -32,16 +32,18 @@ admin.get('/category/updateList',adminAuth.requireAuth,adminController.updateLis
 admin.get('/logout',adminAuth.requireAuth,adminController.logout);
 
 //Order Management
-admin.get("/orderManagement",orderController.loadManagementPage);
-admin.get("/orderManagement/details/:id",orderController.loadeOrderDetails);
-admin.put("/orderManagement/details/singleStatus",orderController.changeSingleStatus);
-admin.put("/orderManagement/details/bukStatus",orderController.changeBulkStatus);
+admin.get("/orderManagement",adminAuth.requireAuth,orderController.loadManagementPage);
+admin.get("/orderManagement/details/:id",adminAuth.requireAuth,orderController.loadeOrderDetails);
+admin.put("/orderManagement/details/singleStatus",adminAuth.requireAuth,orderController.changeSingleStatus);
+admin.put("/orderManagement/details/bukStatus",adminAuth.requireAuth,orderController.changeBulkStatus);
 
 
-admin.get("/coupons",couponController.loadPage);
-admin.post("/coupons/add",couponController.addCoupon);
-admin.delete("/coupons/delete/:id",couponController.deleteCoupon)
+admin.get("/coupons",adminAuth.requireAuth,couponController.loadPage);
+admin.post("/coupons/add",adminAuth.requireAuth,couponController.addCoupon);
+admin.delete("/coupons/delete/:id",adminAuth.requireAuth,couponController.deleteCoupon)
 
+
+admin.get('/sales-report',adminAuth.requireAuth,adminController.generateSalesReport);
 
 // admin.get("/productManagement",adminController.loadUserManagement)
 

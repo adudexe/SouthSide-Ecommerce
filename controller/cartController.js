@@ -8,9 +8,10 @@ const cartController = {};
 cartController.loadCartPage = async (req, res) => {
     try {
         const userId = req.session.user._id;
+        console.log("User id",userId);
         const cartDetails = await cart.findOne({ userId: userId }).populate('items.productId');
         const productDetails = await products.find();
-        console.log("Applied Coupon",cartDetails.couponApplied);
+        console.log("Applied Coupon",cartDetails);
         //If coupon is applied then remove the coupon 
         if(cartDetails && cartDetails.couponApplied)
         {
@@ -351,12 +352,14 @@ cartController.deleteProductFromCart = async (req,res) => {
 cartController.applyCoupon = async (req,res) => {
     try
     {
+        console.log("We are inside apply coupon");
         //When applying the coupon the total price should need to be reduced...
         const couponId = req.params.id;
         const userId = req.session.user._id;
         const totalPrice = req.session.totalPrice;
 
         const couponDetails = await coupon.findById(couponId);
+        console.log("Coupon Details",couponDetails);
 
         if(totalPrice<couponDetails.minmumAmount)
         {
@@ -375,7 +378,7 @@ cartController.applyCoupon = async (req,res) => {
 
         // Calculate total price of cart items
         const discountPrice = existingCart.items.reduce((total, element) => {
-            console.log(element)
+            // console.log(element)
             const product = element.productId; // Get the product details
             const variant = product.variants.find(variant => variant._id.toString() === element.variantId.toString()); // Find the selected variant
             
@@ -418,6 +421,42 @@ cartController.applyCoupon = async (req,res) => {
     catch(err)
     {
         console.log("Error in Applying Coupon",err);
+    }
+}
+
+
+cartController.removeCoupon = async (req,res) => {
+    try{
+        console.log("We are inside Remove Coupon")
+        const userId = req.session.user._id;
+        const cartDetailsUpdate = await cart.findOneAndUpdate(
+            {userId:userId},
+            {$set:{couponApplied:null}},
+            {new:true}
+        );
+
+        console.log("Update Cart Details",cartDetailsUpdate);
+
+        const cartDetails = await cart.findOne({ userId: userId }).populate('items.productId');
+        const totalPrice = cartDetails.items.reduce((total, element) => {
+            const product = element.productId; // Get the product details
+            const variant = product.variants.find(variant => variant._id.toString() === element.variantId.toString()); // Find the selected variant
+            
+            // Add the price of the variant * quantity to the total
+            return total + (variant.salePrice * element.quantity);
+        }, 0); // Initial value is 0
+
+        req.session.totalPrice = totalPrice
+
+        if(!cartDetailsUpdate)
+        {
+            return res.status(400).json({success:false,message:"Failed to remove the coupon"});
+        }
+        return res.status(200).json({success:true,message:"Coupon Successfully Removed",totalPrice});
+    }
+    catch(err)
+    {
+        console.log("Error in remove Coupon",err);
     }
 }
 

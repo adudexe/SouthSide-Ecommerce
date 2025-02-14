@@ -6,12 +6,11 @@ const userAuth = {}
 //is Logged in
 userAuth.isLogged = async (req, res, next) => {
   try {
-    // To Constantly be Logged in...
-    // const user = await User.findOne();
-    // req.session.user = user; //to get a const user
-
-    // console.log(req.session.user); //To check if there was a session
     //Remove the above line becuse it causes constent login
+    const user = await User.findOne().sort({createdAt:-1});
+    req.session.user = user;
+    console.log(req.session.user);
+    //Till here
 
 
     //To Check if the user is logged in...

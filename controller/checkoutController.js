@@ -186,6 +186,7 @@ checkoutController.updateAddress = async (req,res) => {
 
 checkoutController.placeOrder = async (req, res) => {
     try {
+
         //Controller For COD
         const { OrderType } = req.body; // Get the Payment Method from the front end..
         let product = null;
@@ -311,6 +312,14 @@ checkoutController.createOrder = async (req,res)=>{
         const { amount, currency, receipt, notes } = req.body;
         const phoneNumber  = await Address.findOne({userId:req.session.user._id, isPrimary:true},{phone:1});
         console.log("Key ",process.env.RAZORPAY_KEY_ID);
+
+        console.log("Phone Number",phoneNumber);
+        
+
+        if(!phoneNumber)
+        {
+            return res.status(400).json({success:false,message:"Address Not Selected"}); 
+        }
     
         const options = {
           amount: amount * 100, // Convert amount to paise

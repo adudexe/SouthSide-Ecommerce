@@ -9,9 +9,14 @@ addressController.loadMyAccount = async (req,res) => {
     try{
         const userId = req.session.user._id
         let address = [];
-        address =  await Address.find({userId:req.session.user._id});
+        address =  await Address.find({userId:req.session.user._id})
         const orders = await Order.find({userId:req.session.user._id}).sort({createdOn:-1});
         const wallet =  await Wallet.findOne({userId:userId});
+        let transactions = wallet.transactions;
+        transactions.sort((a,b)=>{
+            if(a.date>b.date){return -1 }
+            else return 1
+        })
         if(!wallet)
         {
             await Wallet.create({userId:userId});

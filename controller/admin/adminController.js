@@ -4,14 +4,212 @@ const multer = require("multer");
 const Category = require("../../model/categorySchema");
 const User =  require("../../model/userModel");
 const Product = require("../../model/productScheme");
+const Order = require("../../model/orderSchema");
 const statusCodes = require("../../public/javascript/statusCodes");
 const bcrypt = require("bcrypt");
 const fs = require('fs');
+const moment = require('moment'); // For formatting dates
+// const fs = require('fs');
+const path = require('path');
+const PDFDocument = require('pdfkit');
 const adminController = {};
 
-adminController.loadDashboard =  (req,res) => { 
+
+adminController.generateSalesReport = async (req, res) => {
+    try {
+      // Fetch all orders from the database
+      const orders = await Order.find();
+  
+      if (orders.length === 0) {
+        return res.status(404).send({ message: 'No orders found to generate sales report.' });
+      }
+  
+      // Create a new PDF document
+      const doc = new PDFDocument();
+      
+      // Set response headers
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=southside_sales_report.pdf');
+      
+      // Pipe the PDF document to the response
+      doc.pipe(res);
+  
+      // Add company header
+      doc.fontSize(24)
+         .font('Helvetica-Bold')
+         .text('SOUTHSIDE', { align: 'center' });
+      
+      doc.moveDown(0.5);
+      
+      // Add report title and date
+      doc.fontSize(18)
+         .font('Helvetica')
+         .text('Sales Report', { align: 'center' });
+      
+      doc.fontSize(12)
+         .text(`Generated on: ${moment().format('MMMM DD, YYYY HH:mm:ss')}`, { align: 'center' });
+      
+      doc.moveDown(2);
+  
+      // Define table layout
+      const tableTop = 200;
+      const columnSpacing = 15;
+      const columns = {
+        orderId: { x: 50, width: 80 },
+        userId: { x: 130, width: 70 },
+        date: { x: 200, width: 100 },
+        price: { x: 300, width: 70 },
+        discount: { x: 370, width: 70 },
+        final: { x: 440, width: 70 },
+        payment: { x: 510, width: 80 }
+      };
+  
+      // Draw table header
+      doc.font('Helvetica-Bold')
+         .fontSize(10);
+      
+      // Add background for header
+      doc.rect(40, tableTop - 15, 530, 20)
+         .fill('#f0f0f0');
+      
+      // Add header text
+      doc.fillColor('#000000')
+         .text('Order ID', columns.orderId.x, tableTop - 10)
+         .text('User ID', columns.userId.x, tableTop - 10)
+         .text('Date', columns.date.x, tableTop - 10)
+         .text('Price', columns.price.x, tableTop - 10)
+         .text('Discount', columns.discount.x, tableTop - 10)
+         .text('Final', columns.final.x, tableTop - 10)
+         .text('Payment', columns.payment.x, tableTop - 10);
+  
+      // Draw table content
+      let rowY = tableTop + 10;
+      doc.font('Helvetica')
+         .fontSize(9);
+  
+      orders.forEach((order, i) => {
+        // Add zebra striping
+        if (i % 2 === 0) {
+          doc.rect(40, rowY - 5, 530, 20)
+             .fill('#f9f9f9');
+        }
+  
+        doc.fillColor('#000000')
+           .text(order._id.toString().slice(-8), columns.orderId.x, rowY)
+           .text(order.userId.toString().slice(-6), columns.userId.x, rowY)
+           .text(moment(order.invoiceDate).format('DD/MM/YY'), columns.date.x, rowY)
+           .text(`$${order.totalPrice.toFixed(2)}`, columns.price.x, rowY)
+           .text(`$${order.discount.toFixed(2)}`, columns.discount.x, rowY)
+           .text(`$${order.finalAmount.toFixed(2)}`, columns.final.x, rowY)
+           .text(order.paymentMethod, columns.payment.x, rowY);
+  
+        rowY += 20;
+  
+        // Add new page if needed
+        if (rowY > 700) {
+          doc.addPage();
+          rowY = 50;
+          // Repeat header on new page
+          doc.font('Helvetica-Bold')
+             .fontSize(10);
+          
+          doc.rect(40, rowY - 15, 530, 20)
+             .fill('#f0f0f0');
+          
+          doc.fillColor('#000000')
+             .text('Order ID', columns.orderId.x, rowY - 10)
+             .text('User ID', columns.userId.x, rowY - 10)
+             .text('Date', columns.date.x, rowY - 10)
+             .text('Price', columns.price.x, rowY - 10)
+             .text('Discount', columns.discount.x, rowY - 10)
+             .text('Final', columns.final.x, rowY - 10)
+             .text('Payment', columns.payment.x, rowY - 10);
+  
+          doc.font('Helvetica')
+             .fontSize(9);
+          rowY += 10;
+        }
+      });
+  
+      // Calculate detailed summary statistics
+      const totalSales = orders.reduce((sum, order) => sum + order.finalAmount, 0);
+      const totalDiscounts = orders.reduce((sum, order) => sum + order.discount, 0);
+      const totalGrossSales = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+      const totalOrders = orders.length;
+      const averageOrderValue = totalSales / totalOrders;
+  
+      // Group orders by payment method
+      const paymentMethodStats = orders.reduce((acc, order) => {
+        acc[order.paymentMethod] = (acc[order.paymentMethod] || 0) + 1;
+        return acc;
+      }, {});
+  
+      // Add detailed summary section
+      doc.addPage();
+      doc.fontSize(16)
+         .font('Helvetica-Bold')
+         .text('Sales Summary Report', { align: 'center' });
+      
+      doc.moveDown(2);
+      
+      // Financial Summary
+      doc.fontSize(14)
+         .text('Financial Overview');
+      
+      doc.fontSize(10)
+         .font('Helvetica')
+         .moveDown(0.5)
+         .text(`Total Number of Orders: ${totalOrders}`)
+         .text(`Gross Sales (Before Discounts): $${totalGrossSales.toFixed(2)}`)
+         .text(`Total Discounts Applied: $${totalDiscounts.toFixed(2)}`)
+         .text(`Net Sales (After Discounts): $${totalSales.toFixed(2)}`)
+         .text(`Average Order Value: $${averageOrderValue.toFixed(2)}`);
+  
+      doc.moveDown(1.5);
+  
+      // Payment Methods Breakdown
+      doc.fontSize(14)
+         .font('Helvetica-Bold')
+         .text('Payment Methods Breakdown');
+      
+      doc.fontSize(10)
+         .font('Helvetica')
+         .moveDown(0.5);
+  
+      Object.entries(paymentMethodStats).forEach(([method, count]) => {
+        const percentage = ((count / totalOrders) * 100).toFixed(1);
+        doc.text(`${method}: ${count} orders (${percentage}%)`);
+      });
+  
+      // Add report footer
+      doc.fontSize(8)
+         .text(`Report generated by Southside on ${moment().format('MMMM DD, YYYY HH:mm:ss')}`, {
+           align: 'center',
+           y: doc.page.height - 50
+         });
+  
+      // Finalize the PDF file
+      doc.end();
+  
+    } catch (error) {
+      console.error('Error generating sales report:', error);
+      return res.status(500).send({ message: 'Internal Server Error' });
+    }
+  };
+
+adminController.loadDashboard = async  (req,res) => { 
     try{
-        res.render('./admin/index');
+        let total=null;
+        let count = null;
+        const orders = await Order.find();
+        console.log("Orders",orders);
+        for(let i of orders)
+        {
+            count++;
+            total = total+i.totalPrice;
+        }
+        
+        res.render('./admin/index',{orders,total,count});
     }
     catch(err)
     {
@@ -348,14 +546,18 @@ adminController.loadCategory = async (req,res) =>{
 
 adminController.manageCategory = async (req,res) => {
     try{
-        const {categoryName , categoryDescription } = req.body
+        let {categoryName , categoryDescription } = req.body
+        categoryName = categoryName.toLowerCase();
         // console.log(typeof(categoryName));
         const desc = categoryDescription || "";
         // console.log(desc);
-        const cata = await Category.findOne({categoryName});
+        const cata = await Category.findOne({name:categoryName});
+
+        console.log("cateogryfound",cata)
+
         if(cata)
         {
-            return res.status(statusCodes.COFLICT).json({success:false, message:"Category Already Present"})
+            return res.status(409).json({success:false, message:"Category Already Present"})
         }
         const newCategory = await new Category({ 
             name:categoryName,

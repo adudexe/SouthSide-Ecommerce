@@ -1,8 +1,108 @@
 const products = require("../model/productScheme");
 const category = require("../model/categorySchema");
+const { default: mongoose } = require("mongoose");
 const shopController = {};
 
 
+
+shopController.filter = async (req, res) => {
+    try {
+      let product = null;
+      console.log(req.body.filter);
+      let filter = req.body.filter
+
+    //   let semifilter = []
+    //   semifilter = req.query.filters; // Filters as a string
+      const sortType = req.query.sortType.split("-"); // Sort type as an array
+      console.log("Destructured", filter, sortType);
+  
+      let sortValue = sortType[0];
+      let sortIndex = (sortType[1] == null || sortType[1] === undefined) ? 1 : (sortType[1] === '0' ? -1 : 1);
+  
+      console.log("Sort Index", sortIndex);
+      console.log("Sort Value", sortValue);
+      console.log(filter);
+  
+      // If semifilter exists and has length, split it into an array
+    //   if (semifilter && semifilter.length > 0) {
+    //      semifilter.split(",").forEach(item=>filter.push(item)) // Convert filter string into an array
+    //   }
+  
+      // Apply sorting and filtering based on the sort value
+      if (filter.length > 0) {
+        // If filters are applied, query with categories filter
+        switch (sortValue) {
+          case 'productName':
+            console.log('call')
+            product = await products.find({ category: { $in: filter } }).sort({ 'productName': sortIndex });
+            break;
+          case 'price':
+            const updatedFilters = filter.map((el)=> new mongoose.Types.ObjectId(String(el)) )
+            product = await products.aggregate([
+                {
+                  $match: {
+                    category:{$in: updatedFilters}  // Filter products by category
+                  }
+                },
+                {
+                  $addFields: {
+                    firstVariantPrice: { $arrayElemAt: ["$variants.salePrice", 0] }  // Extract the price of the first variant
+                  }
+                },
+                {
+                  $sort: { firstVariantPrice: -sortIndex }  // Sort based on the extracted first variant's price
+                }
+              ]);              
+            break;
+          case 'createdAt':
+            product = await products.find({ category: { $in: filter } }).sort({ 'createdAt': sortIndex });
+            break;
+          default:
+            // Default sorting by productName
+            product = await products.find({ category: { $in: filter } }).sort({ 'productName': sortIndex });
+            break;
+        }
+      } else {
+        // If no filters, just sort all products
+        switch (sortValue) {
+          case 'productName':
+            product = await products.find().sort({ 'productName': sortIndex });
+            break;
+          case 'price':
+             product = await products.aggregate([
+                {
+                  $addFields: {
+                    firstVariantPrice: { $arrayElemAt: ["$variants.salePrice", 0] }  // Extract the price of the first variant
+                  }
+                },
+                {
+                  $sort: { firstVariantPrice: -sortIndex }  // Sort based on the extracted first variant's price
+                }
+              ]);              
+            break;
+          case 'createdAt':
+            product = await products.find().sort({ 'createdAt': sortIndex });
+            break;
+          default:
+            // Default sorting by productName
+            product = await products.find().sort({ 'productName': sortIndex });
+            break;
+        }
+      }
+  
+      console.log("Filtered Product", product);
+  
+      if (!product || product.length === 0) {
+        return res.status(400).json({ success: false, message: "No Products found..." });
+      }
+      return res.status(200).json({ success: true, products: product });
+  
+    } catch (err) {
+      console.log("Error in filter:", err);
+      return res.status(500).json({ success: false, message: "Internal server error." });
+    }
+  };
+  
 
 
 shopController.loadShopPage = async (req,res) =>{
