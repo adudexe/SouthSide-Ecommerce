@@ -1,135 +1,261 @@
-<%- include('../partials/user/header') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #28a745;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            color: white;
+            font-size: 40px;
+        }
+        
+        .order-card {
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            border: none;
+        }
+        
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .product-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .table th {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .support-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .action-btn {
+            padding: 10px 25px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .detail-card {
+            height: 100%;
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
 
-<div class="container mt-5 mb-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-5">
-                    <div class="text-center mb-5">
-                        <div class="mb-4">
-                            <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+        .detail-info {
+            padding: 20px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            margin: 15px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .detail-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .detail-content {
+            padding: 20px;
+        }
+        
+        .order-items {
+            background: #fff;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-weight: 500;
+            text-align: right;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <!-- Success Message -->
+                <div class="order-card card mb-4 p-4 text-center">
+                    <div class="success-icon mb-3">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h2 class="mb-2">Order Successfully Placed!</h2>
+                    <p class="text-muted">Thank you for your purchase. Your order has been confirmed.</p>
+                </div>
+
+                <!-- Order Details Grid -->
+                <div class="row mb-4">
+                    <!-- Order Information -->
+                    <div class="col-md-6 mb-4">
+                        <div class="detail-card">
+                            <div class="detail-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>Order Information
+                                </h5>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-info">
+                                    <div class="info-row">
+                                        <span class="info-label">Order ID</span>
+                                        <span class="info-value">#<%= orderDetails._id %></span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Order Date</span>
+                                        <span class="info-value"><%= orderDetails.createdOn.toISOString().split('T')[0] %></span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Payment Method</span>
+                                        <span class="info-value"><%= orderDetails.paymentMethod === 'cod' ? "Cash On Delivery" : "Online Payment"%></span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Status</span>
+                                        <span class="status-badge bg-info text-white">Pending</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <p><%= orderDetails %></p>
-                        <h1 class="display-4 mb-3">Order Successful!</h1>
-                        <p class="lead text-muted">Thank you for your purchase. Your order has been successfully placed.</p>
                     </div>
 
-                    <div class="order-details">
-                        <div class="row">
-                            <div class="col-md-6 mb-4">
-                                <div class="card h-100 border-0 bg-light">
-                                    <div class="card-body">
-                                        <h4 class="card-title mb-4">
-                                            <i class="fas fa-info-circle me-2"></i>Order Information
-                                        </h4>
-                                        <p class="mb-2"><strong>Order ID:</strong> #<%= //orderId %></p>
-                                        <p class="mb-2"><strong>Order Date:</strong> <%= //orderDate %></p>
-                                        <p class="mb-2"><strong>Payment Method:</strong> <%= //paymentMethod %></p>
-                                        <p class="mb-0"><strong>Order Status:</strong> 
-                                            <span class="badge bg-info">Pending</span>
-                                        </p>
+                    <!-- Shipping Details -->
+                    <div class="col-md-6 mb-4">
+                        <div class="detail-card">
+                            <div class="detail-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-shipping-fast me-2"></i>Shipping Details
+                                </h5>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-info">
+                                    <div class="info-row">
+                                        <span class="info-label">Name</span>
+                                        <span class="info-value"><%= orderDetails.addres.name %></span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Address</span>
+                                        <span class="info-value"><%= orderDetails.addres.street %></span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">City/State</span>
+                                        <span class="info-value"><%= orderDetails.addres.city %>, <%= orderDetails.addres.state %></span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Country/Postal</span>
+                                        <span class="info-value"><%= orderDetails.addres.country %> - <%= orderDetails.addres.postalCode %></span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Phone</span>
+                                        <span class="info-value"><%= orderDetails.addres.phone %></span>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-md-6 mb-4">
-                                <div class="card h-100 border-0 bg-light">
-                                    <div class="card-body">
-                                        <h4 class="card-title mb-4">
-                                            <i class="fas fa-shipping-fast me-2"></i>Shipping Details
-                                        </h4>
-                                        <p class="mb-2"><strong>Shipping To:</strong> <%= //shippingAddress.name %></p>
-                                        <p class="mb-2"><%= //shippingAddress.street %></p>
-                                        <p class="mb-2"><%= //shippingAddress.city %>, <%= //shippingAddress.state %></p>
-                                        <p class="mb-2"><%= //shippingAddress.country %> - <%= //shippingAddress.zipCode %></p>
-                                        <p class="mb-0"><strong>Phone:</strong> <%= //shippingAddress.phone %></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="order-items card border-0 bg-light mb-4">
-                            <div class="card-body">
-                                <h4 class="card-title mb-4">
-                                    <i class="fas fa-shopping-cart me-2"></i>Order Items
-                                </h4>
-                                <div class="table-responsive">
-                                    <table class="table table-borderless">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th>Product</th>
-                                                <th class="text-center">Quantity</th>
-                                                <th class="text-end">Price</th>
-                                                <th class="text-end">Total</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <% //orderItems.forEach(item => { %>
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <img src="<%= //item.image %>" alt="<%= //item.name %>" class="img-fluid rounded" style="width: 50px; height: 50px; object-fit: cover;">
-                                                        <div class="ms-3">
-                                                            <h6 class="mb-0"><%= //item.name %></h6>
-                                                            <small class="text-muted"><%= //item.sku %></small>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="text-center"><%= //item.quantity %></td>
-                                                <td class="text-end">$<%= //item.price.toFixed(2) %></td>
-                                                <td class="text-end">$<%= //(item.price * item.quantity).toFixed(2) %></td>
-                                            </tr>
-                                            <% //}); %>
-                                        </tbody>
-                                        <tfoot class="table-light">
-                                            <tr>
-                                                <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
-                                                <td class="text-end">$<%= //subtotal.toFixed(2) %></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="3" class="text-end"><strong>Shipping:</strong></td>
-                                                <td class="text-end">$<%= //shipping.toFixed(2) %></td>
-                                            </tr>
-                                            <% //if (discount) { %>
-                                            <tr>
-                                                <td colspan="3" class="text-end"><strong>Discount:</strong></td>
-                                                <td class="text-end">-$<%=// discount.toFixed(2) %></td>
-                                            </tr>
-                                            <%// } %>
-                                            <tr>
-                                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
-                                                <td class="text-end"><strong>$<%= //total.toFixed(2) %></strong></td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="next-steps text-center mb-4">
-                            <h5 class="mb-3">What's Next?</h5>
-                            <div class="row justify-content-center">
-                                <div class="col-auto">
-                                    <a href="/orders" class="btn btn-outline-primary me-3">
-                                        <i class="fas fa-shopping-bag me-2"></i>View Your Orders
-                                    </a>
-                                    <a href="/shop" class="btn btn-primary">
-                                        <i class="fas fa-store me-2"></i>Continue Shopping
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="support-info text-center">
-                            <p class="small text-muted mb-0">
-                                Need help? Contact our support team at 
-                                <a href="mailto:support@southside.com" class="text-decoration-none">support@southside.com</a>
-                            </p>
                         </div>
                     </div>
                 </div>
+
+                <!-- Order Items -->
+                <div class="order-card card p-4 mb-4">
+                    <h5 class="mb-4">
+                        <i class="fas fa-shopping-cart me-2"></i>Order Items
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-center">Quantity</th>
+                                    <th class="text-end">Price</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% orderDetails.orderItems.forEach(element => { %>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="/<%= element.product.productImages[0] %>" class="product-img me-3">
+                                            <div>
+                                                <h6 class="mb-0"><%= element.product.name %></h6>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center"><%= element.quantity %></td>
+                                    <td class="text-end">$<%= (element.price/element.quantity).toFixed(2) %></td>
+                                    <td class="text-end">$<%= element.price.toFixed(2) %></td>
+                                </tr>
+                                <% }); %>
+                            </tbody>
+                            <tfoot class="border-top">
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                    <td class="text-end"><strong>$<%= orderDetails.totalPrice.toFixed(2) %></strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="text-center mb-4">
+                    <a href="/user/myAccount" class="action-btn btn btn-outline-primary me-3">
+                        <i class="fas fa-shopping-bag me-2"></i>View Your Orders
+                    </a>
+                    <a href="/user/home" class="action-btn btn btn-primary">
+                        <i class="fas fa-store me-2"></i>Continue Shopping
+                    </a>
+                </div>
+
+                <!-- Support Section -->
+                <!-- <div class="support-section text-center">
+                    <p class="mb-0">
+                        Need help? Contact our support team at 
+                        <a href="mailto:support@southside.com" class="text-decoration-none">support@southside.com</a>
+                    </p>
+                </div> -->
             </div>
         </div>
     </div>
-</div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

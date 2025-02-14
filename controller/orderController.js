@@ -120,11 +120,21 @@ orderController.cancelOrder = async (req, res) => {
 orderController.orderSuccess = async (req,res) =>{
     try
     {
+        let images = [];
+        console.log("We are in order details...");
         const userId = req.session.user._id;
-        const orderDetails = await Orders.findOne({ userId: userId })
-        .populate("orderItems.product")
-        .sort({ createdOn: -1 });
-        console.log("Order Details",orderDetails);
+        const orderDetails = await Orders.findOne({ 
+            userId: userId 
+        }).sort({ 
+            createdOn: -1
+        });
+        console.log("Order Details")
+        console.log(orderDetails);
+        console.log("Product Details");
+        orderDetails.orderItems.forEach(element => {
+            
+        });
+        console.log("Images",images);
         res.render("./user/orderSuccess",{orderDetails});
     }
     catch(err)

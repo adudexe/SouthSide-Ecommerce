@@ -1,4 +1,261 @@
 <%- include('../partials/user/header') %>
+<style>
+    /* General Container Styles */
+.mt-50 {
+    margin-top: 50px;
+}
+
+.mb-50 {
+    margin-bottom: 50px;
+}
+
+/* Shopping Cart Table Styles */
+.shopping-summery {
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.shopping-summery thead {
+    background: #f8f9fa;
+}
+
+.main-heading th {
+    padding: 20px;
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+    font-size: 14px;
+    border: none;
+    letter-spacing: 0.5px;
+}
+
+.cartDetails tr {
+    border-bottom: 1px solid #eee;
+}
+
+.cartDetails tr:last-child {
+    border-bottom: none;
+}
+
+.product-thumbnail img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.product-des {
+    text-align: left;
+    padding: 20px;
+}
+
+.product-name a {
+    color: #333;
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.product-name a:hover {
+    color: #007bff;
+}
+
+.product-des p {
+    color: #666;
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.price span {
+    font-weight: 600;
+    color: #333;
+    font-size: 16px;
+}
+
+/* Quantity Controls */
+.detail-qty {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 25px;
+    padding: 5px 15px;
+    background: #f8f9fa;
+}
+
+.qty-up, .qty-down {
+    color: #666;
+    text-decoration: none;
+    padding: 0 10px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.qty-up:hover, .qty-down:hover {
+    color: #007bff;
+}
+
+.qty-val {
+    width: 30px;
+    text-align: center;
+    font-weight: 500;
+    margin: 0 10px;
+}
+
+/* Remove Button */
+.cart-remove a {
+    color: #dc3545;
+    font-size: 18px;
+    transition: color 0.3s ease;
+}
+
+.cart-remove a:hover {
+    color: #c82333;
+}
+
+/* Cart Actions */
+.cart-action {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.cart-action .btn {
+    background: #28a745;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.cart-action .btn:hover {
+    background: #218838;
+    transform: translateY(-2px);
+}
+
+/* Empty Cart Style */
+.empty-cart {
+    text-align: center;
+    padding: 50px 20px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+}
+
+/* Newsletter Section Styles */
+.newsletter {
+    background: linear-gradient(135deg, #2193b0, #6dd5ed);
+    border-radius: 15px;
+    margin: 30px 0;
+    padding: 40px !important;
+}
+
+.icon-email {
+    width: 40px;
+    height: 40px;
+    filter: brightness(0) invert(1);
+}
+
+.newsletter h4 {
+    color: white;
+    margin-left: 15px;
+    font-weight: 600;
+}
+
+.newsletter h5 {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.newsletter strong {
+    color: white;
+}
+
+.form-subcriber {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px;
+    border-radius: 30px;
+    display: flex;
+    gap: 10px;
+}
+
+.form-subcriber input {
+    flex: 1;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+}
+
+.form-subcriber input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.form-subcriber button {
+    background: #333;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.form-subcriber button:hover {
+    background: #000;
+    transform: translateY(-2px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .product-thumbnail img {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .main-heading th {
+        padding: 15px 10px;
+        font-size: 13px;
+    }
+    
+    .product-des {
+        padding: 15px 10px;
+    }
+    
+    .product-name a {
+        font-size: 14px;
+    }
+    
+    .price span {
+        font-size: 14px;
+    }
+    
+    .newsletter {
+        padding: 30px !important;
+    }
+    
+    .form-subcriber {
+        flex-direction: column;
+        background: transparent;
+        padding: 0;
+    }
+    
+    .form-subcriber input,
+    .form-subcriber button {
+        width: 100%;
+        margin: 5px 0;
+    }
+}
+</style>
     <div class="mobile-header-active mobile-header-wrapper-style">
         <div class="mobile-header-wrapper-inner">
             <div class="mobile-header-top">
@@ -172,9 +429,10 @@
         <section class="mt-50 mb-50">
             <div class="container">
                 <div class="row">
-                    <% if (true) { %>
-                        <p> Price: $<%= totalPrice %></p>
-                    <% } %>
+                    
+                    <!-- <% if (true) { %>
+                        <p class="price"> Price: $<%= totalPrice %></p>
+                    <% } %> -->
                     <div class="col-12">
                         
                         <!-- (cartItems.items).length -->
@@ -229,10 +487,32 @@
                                     <% }) %>
                                 </table>
                             </div>
-                            <div class="cart-action text-end">
+                            <div class="">
+                                <div class="row">
+                                    <div class="col-md-5 offset-md-7">
+                                        <div class="cart-totals bg-white p-30 border-radius-10 mb-50">
+                                            <h4 class="mb-30">Cart Totals</h4>
+                                            <div class="d-flex justify-content-between price">
+                                                <h6>Subtotal</h6>
+                                                <h6 class="text-brand">₹ <%= totalPrice %></h6>
+                                            </div>
+                                            <div class="divider-2 mt-10 mb-20"></div>
+                                            <div class="d-flex justify-content-between">
+                                                <h6>Shipping</h6>
+                                                <h6 class="text-brand">Free </h6>
+                                            </div>
+                                            <div class="divider-2 mt-10 mb-20"></div>
+                                            <div class="d-flex justify-content-between price">
+                                                <h5 class="font-lg">Total</h5>
+                                                <h5 class="font-lg text-brand">₹ <%= totalPrice  %></h5>
+                                            </div>
+                                            <a class="btn mt-20" href="/user/checkout"><i class="fi-rs-shopping-bag mr-10"></i>Proceed To Checkout</a>
+                                        </div>
+                                    </div>
+                                </div>
                               
                                 <!-- <a class="btn  mr-10 mb-sm-15"><i class="fi-rs-shuffle mr-10"></i>Update Cart</a> -->
-                                <a class="btn" href="/user/checkout"><i class="fi-rs-shopping-bag mr-10"></i>Checkout</a>
+                                <!-- <a class="btn" href="/user/checkout"><i class="fi-rs-shopping-bag mr-10"></i>Checkout</a> -->
                             </div>
                         <% } else { %>
                             <div> Empty Cart </div>

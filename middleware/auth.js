@@ -9,7 +9,7 @@ userAuth.isLogged = async (req, res, next) => {
     //Remove the above line becuse it causes constent login
     const user = await User.findOne().sort({createdAt:-1});
     req.session.user = user;
-    console.log(req.session.user);
+    // console.log(req.session.user);
     //Till here
 
 
