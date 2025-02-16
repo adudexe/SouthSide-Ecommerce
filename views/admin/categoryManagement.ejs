@@ -21,10 +21,15 @@
                 <!-- col.// -->
                     <div class="col-xl-2 col-lg-3 col-md-4 col-6">
                         <figure class="card border-1">
-                            
+                            <!-- <p><%= element %></p> -->
                                 <div class="card-header bg-white text-center">
                                     <h6 class="card-title m-0"><%= element.name %></h6>
                                 </div>
+                                <% if (element.discount) { %>
+                                    <div class="card-header bg-white text-center">
+                                        <h6 class="card-title m-0">discount <%= element.discount %>%</h6>
+                                    </div>
+                                <% } %>
                                 <figcaption class="card-body text-center ">
                                     <% if (element.isListed) { %>
                                         <a type="button" class="btn btn-danger" href="/admin/category/unlist/<%= element._id %>">Unlist</a>
@@ -53,6 +58,11 @@
                                     <label for="categoryName" class="form-label">Category Name</label>
                                     <input type="text" class="form-control" id="categoryName" name="categoryName"  placeholder="Enter category name">
                                     <div id="categoryNameError" class="text-danger"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="categoryOffer" class="form-label">Discount %</label>
+                                    <input type="number" class="form-control" id="categoryOffer" name="categoryOffer"  placeholder="Enter a discount %">
+                                    <div id="categoryOfferError" class="text-danger"></div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="categoryDescription" class="form-label">Category Description</label>
@@ -96,6 +106,9 @@
         clearErrors();
         event.preventDefault();
 
+        const categoryOffer = document.getElementById("categoryOffer");
+       
+
         // Get form data
         const categoryName = document.getElementById('categoryName').value.trim();
         const categoryDescription = document.getElementById('categoryDescription').value.trim();
@@ -108,14 +121,26 @@
             isValid = false;
         }
 
+        if(categoryOffer)
+        {
+            if (isNaN(categoryOffer.value) || Number(categoryOffer.value) > 90)
+            {
+                const categoryOfferError = document.getElementById("categoryOfferError");  
+                categoryOfferError.textContent = "Provide a valid discount"
+                isValid = false;
+            }
+        }
+
         if (!isValid) {
             event.preventDefault();
             return;
         }
+        const catDiscount = categoryOffer.value
 
         // Prepare form data to send
         const formData = {
             categoryName,
+            catDiscount,
             categoryDescription
         };
 
@@ -140,7 +165,7 @@
             alert('Error: ' + data.message);
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.log('Error:', error);
         alert('An error occurred while adding the category.');
     }
 });
@@ -188,7 +213,7 @@ async function refreshCategoryList() {
             alert('Error fetching categories');
         }
     } catch (error) {
-        console.error('Error refreshing category list:', error);
+        console.log('Error refreshing category list:', error);
     }
 }
 

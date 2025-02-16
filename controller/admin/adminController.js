@@ -565,6 +565,12 @@ adminController.addProducts = async (req, res) => {
             return res.status(400).json({ success: false, message: "At least one variant must be provided" });
         }
 
+        const category = await Category.findById(productCategory);
+        console.log(category)
+
+
+        const offer = productOffer > category.discount ? category.discount : productOffer;
+
         // Process images (check if files were uploaded or base64 data was provided)
         const productImages = [];
         // console.log(Object.entries(req.files));
@@ -586,7 +592,7 @@ adminController.addProducts = async (req, res) => {
             color: variant.color,
             status: variant.status,
             price: variant.price,
-            salePrice:(variant.price - ((variant.price * productOffer) / 100)),
+            salePrice:(variant.price - ((variant.price * offer) / 100)),
             quantity: variant.quantity,
         }));
 
@@ -661,10 +667,12 @@ adminController.loadCategory = async (req,res) =>{
 
 adminController.manageCategory = async (req,res) => {
     try{
-        let {categoryName , categoryDescription } = req.body
+        let {categoryName , categoryDescription ,  catDiscount } = req.body
         categoryName = categoryName.toLowerCase();
         // console.log(typeof(categoryName));
+        console.log(req.body)
         const desc = categoryDescription || "";
+        const discount =  catDiscount  || 0;
         // console.log(desc);
         const cata = await Category.findOne({name:categoryName});
 
@@ -676,6 +684,7 @@ adminController.manageCategory = async (req,res) => {
         }
         const newCategory = await new Category({ 
             name:categoryName,
+            discount: discount,
             description:desc,
         })
 
