@@ -199,21 +199,136 @@ adminController.generateSalesReport = async (req, res) => {
 
 adminController.loadDashboard = async  (req,res) => { 
     try{
+        // console.log("Load dashboard")
+        let currentDate = new Date();
         let total=null;
         let count = null;
-        const orders = await Order.find();
-        console.log("Orders",orders);
+        const orders = await Order.find().sort({createdOn:-1});
+        const products = await Product.find().countDocuments();
+        const categories = await Category.find({isListed:true}).countDocuments();
+        const currentMonth = currentDate.getMonth()+1;
+
+        // console.log("Current Date",currentDate);
+        // console.log("Current Mouth",currentMonth);
+
+        const currentMonthTotal = await Order.aggregate([
+            {
+              $project: {
+                month: { $month: "$createdOn" },  
+                totalPrice: 1  
+              }
+            },
+            {
+              $match: {
+                month: new Date().getMonth() + 1  
+              }
+            },
+            {
+              $group: {
+                _id: null, 
+                totalAmount: { $sum: "$totalPrice" }  
+              }
+            }
+          ]);
+
+          const yearsAndMonths = await Order.aggregate([
+            // Get all distinct years
+            {
+              $project: {
+                year: { $year: "$createdOn" },  
+                month: { $month: "$createdOn" } 
+              }
+            },
+            {
+              $group: {
+                _id: null, 
+                years: { $addToSet: "$year" },  
+                months: { $addToSet: "$month" } 
+              }
+            },
+            {
+              $project: {
+                _id: 0, 
+                years: 1,  
+                months: 1  
+              }
+            }
+          ]);
+          
+        //   console.log(yearsAndMonths);
+          
+          
+          
+        //   console.log(currentMonthTotal)
+        
+        // console.log("Orders",orders);
         for(let i of orders)
         {
             count++;
             total = total+i.totalPrice;
         }
         
-        res.render('./admin/index',{orders,total,count});
+        res.render('./admin/index',{orders,total,count,products,categories,currentMonthTotal,yearsAndMonths});
     }
     catch(err)
     {
         console.log("Error Loading Admin" + err);
+    }
+}
+
+adminController.dashboardFiltering = async (req,res) =>{
+    try
+    {
+        console.log()
+        const date = new Date();
+        // let orders = null;
+        const { endDate, startDate, category } = req.body;
+
+// Build the query object
+let query = {};
+
+// 1. Match the date range if startDate and endDate are provided
+if (startDate && endDate) {
+  query.createdOn = { 
+    $gte: new Date(startDate), // Greater than or equal to startDate
+    $lte: new Date(endDate)    // Less than or equal to endDate
+  };
+}
+
+// 2. Filter by category (specific year) if category is provided
+if (category) {
+  const year = new Date(category).getFullYear(); // Extract the year from the category
+
+  if (query.createdOn) {
+    // If the date range is already defined, update it to match the full year range
+    query.createdOn.$gte = new Date(year, 0, 1); // Start of the year (January 1st)
+    query.createdOn.$lte = new Date(year, 11, 31); // End of the year (December 31st)
+  } else {
+    // If no date range is defined, just filter by the year
+    query.createdOn = {
+      $gte: new Date(year, 0, 1), // Start of the year
+      $lte: new Date(year, 11, 31) // End of the year
+    };
+  }
+}
+
+// Now find the orders based on the built query
+const orders = await Order.find(query).sort({ createdOn: -1 }); // Sort by createdOn in descending order
+
+console.log(orders);
+
+
+        if(!orders.length)
+        {
+            return res.status(404).json({success:false,message:'No Data Found in datebase'});
+        }
+        return res.status(200).json({success:true,orders})
+    
+
+    }
+    catch(err)
+    {
+        console.log("There is an error in dashboardFiltering",err);
     }
 }
 

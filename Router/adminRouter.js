@@ -10,6 +10,7 @@ admin.get("/login",adminController.loadLoginPage);
 admin.post("/login",adminController.Login);
 //add admin.use
 admin.get("/",adminAuth.requireAuth,adminController.loadDashboard);
+admin.put("/filter",adminAuth.requireAuth,adminController.dashboardFiltering);
 admin.get("/userManagement",adminAuth.requireAuth,adminController.loadUserManagement);
 admin.get("/block/:id",adminController.blockUser);
 admin.get("/unblock/:id",adminController.UnblockUser); 

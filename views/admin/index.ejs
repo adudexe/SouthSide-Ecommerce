@@ -43,9 +43,9 @@
                         <article class="icontext">
                             <span class="icon icon-sm rounded-circle bg-warning-light"><i class="text-warning material-icons md-qr_code"></i></span>
                             <div class="text">
-                                <h6 class="mb-1 card-title">Products</h6> <span>9.856</span>
+                                <h6 class="mb-1 card-title">Products</h6> <span><%= products %></span>
                                 <span class="text-sm">
-                                    In 19 Categories
+                                    In <%= categories %> Categories
                                 </span>
                             </div>
                         </article>
@@ -56,7 +56,7 @@
                         <article class="icontext">
                             <span class="icon icon-sm rounded-circle bg-info-light"><i class="text-info material-icons md-shopping_basket"></i></span>
                             <div class="text">
-                                <h6 class="mb-1 card-title">Monthly Earning</h6> <span>$6,982</span>
+                                <h6 class="mb-1 card-title">Monthly Earning</h6> <span>$<%= currentMonthTotal[0].totalAmount %></span>
                                 <span class="text-sm">
                                     Based in your local time.
                                 </span>
@@ -239,98 +239,113 @@
                     </div>
                 </div>
             </div> -->
-            <div class="card mb-4">
-                <header class="card-header">
-                    <h4 class="card-title">Latest orders</h4>
-                    <div class="row align-items-center">
-                        <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
-                            <!-- <div class="custom_select">
-                                <select class="form-select select-nice">
-                                    <option selected>All Categories</option>
-                                    <option>Women's Clothing</option>
-                                    <option>Men's Clothing</option>
-                                    <option>Cellphones</option>
-                                    <option>Computer & Office</option>
-                                    <option>Consumer Electronics</option>
-                                    <option>Jewelry & Accessories</option>
-                                    <option>Home & Garden</option>
-                                    <option>Luggage & Bags</option>
-                                    <option>Shoes</option>
-                                    <option>Mother & Kids</option>
-                                </select>
-                            </div> -->
+            <div class="card mb-4 shadow-lg border-0 rounded-3">
+                <header class="card-header p-4 d-flex justify-content-between align-items-center bg-light rounded-top">
+                    <h4 class="card-title mb-0 text-primary">Latest Orders</h4>
+                    <div class="d-flex gap-3 align-items-center">
+                        <!-- Category Dropdown -->
+                        <div class="custom_select">
+                            <select class="form-select shadow-sm" id="sort-by">
+                                <option value="" selected>All Categories</option>
+                                <% yearsAndMonths[0].years.forEach(element => { %>
+                                    <option value="<%= element %>"><%= element %></option>
+                                <% }) %>
+                            </select>
                         </div>
-                        <div class="col-md-2 col-6">
-                            <!-- <input type="date" value="02.05.2022" class="form-control"> -->
-                        </div>
-                        <div class="col-md-2 col-6">
-                            <!-- <div class="custom_select">
-                                <select class="form-select select-nice">
-                                    <option selected>Status</option>
-                                    <option>All</option>
-                                    <option>Paid</option>
-                                    <option>Chargeback</option>
-                                    <option>Refund</option>
-                                </select>
-                            </div> -->
-                        </div>
+                        <!-- Date Range Inputs -->
+                        <div class="d-flex gap-3">
+                            <div>
+                                <!-- <label for="start-date" class="form-label small">Start Date</label> -->
+                                <input type="date" id="start-date" class="form-control form-control-sm shadow-sm" onchange="validateDates()" placeholder="Start-Date">
+                                <small id="start-date-error" class="text-danger d-none">End date cannot be earlier than the start date.</small>
+                            </div>
+                            <div>
+                                <!-- <label for="end-date" class="form-label small">End Date</label> -->
+                                <input type="date" id="end-date" class="form-control form-control-sm shadow-sm" onchange="validateDates()" placeholder="End-Date">
+                                <small id="end-date-error" class="text-danger d-none">End date cannot be earlier than the start date.</small>
+                            </div>
+                        <!-- Apply Button -->
                     </div>
-                </header>
-                <div class="card-body">
+                </div>
+                <button class="btn btn-sm btn-primary shadow-sm" id="apply-filter" onclick="applyFilter()">Apply</button>
+            </header>
+            
+                <div class="card-body p-4">
                     <div class="table-responsive">
-                        <div class="table-responsive">
-                            <table class="table align-middle table-nowrap mb-0">
-                                <thead class="table-light">
+                        <table class="table table-striped table-hover table-bordered mb-0">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <!-- <th scope="col" class="text-center"> -->
+                                        <!-- <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="transactionCheck01">
+                                            <label class="form-check-label" for="transactionCheck01"></label>
+                                        </div> -->
+                                    <!-- </th> -->
+                                    <th class="align-middle" scope="col">Order ID</th>
+                                    <th class="align-middle" scope="col">Billing Name</th>
+                                    <th class="align-middle" scope="col">Date</th>
+                                    <th class="align-middle" scope="col">Total</th>
+                                    <th class="align-middle" scope="col">Payment Method</th>
+                                    <th class="align-middle" scope="col">View Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders">
+                                <% orders.forEach(element => { %>
                                     <tr>
-                                        <th scope="col" class="text-center">
-                                            <div class="form-check align-middle">
-                                                <input class="form-check-input" type="checkbox" id="transactionCheck01">
-                                                <label class="form-check-label" for="transactionCheck01"></label>
+                                        <!-- <td class="text-center">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="transactionCheck02">
+                                                <label class="form-check-label" for="transactionCheck02"></label>
                                             </div>
-                                        </th>
-                                        <th class="align-middle" scope="col">Order ID</th>
-                                        <th class="align-middle" scope="col">Billing Name</th>
-                                        <th class="align-middle" scope="col">Date</th>
-                                        <th class="align-middle" scope="col">Total</th>
-                                        <!-- <th class="align-middle" scope="col">Payment Status</th> -->
-                                        <th class="align-middle" scope="col">Payment Method</th>
-                                        <th class="align-middle" scope="col">View Details</th>
+                                        </td> -->
+                                        <td><a href="#" class="fw-bold text-primary"><%= element._id %></a></td>
+                                        <td><%= element.addres.name %></td>
+                                        <td>
+                                            <%= element.createdOn.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' }) %>
+                                        </td>
+                                        <td>
+                                            <%= element.totalPrice %>
+                                        </td>
+                                        <td>
+                                            <i class="material-icons md-payment font-xxl text-muted"></i> <%= element.paymentMethod %>
+                                        </td>
+                                        <td>
+                                            <a href="/admin/orderManagement/details/<%= element._id %>" class="btn btn-sm btn-outline-primary">View Details</a>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <% orders.forEach(element => { %>
-                                        <tr>
-                                            <td class="text-center">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="transactionCheck02">
-                                                    <label class="form-check-label" for="transactionCheck02"></label>
-                                                </div>
-                                            </td>
-                                            <td><a href="#" class="fw-bold"><%= element._id %></a> </td>
-                                            <td><%= element.addres.name %></td>
-                                            <td>
-                                                <%= element.createdOn.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' }) %>
-                                            </td>
-                                            <td>
-                                                <%= element.totalPrice %>
-                                            </td>
-                                            <!-- <td>
-                                                <span class="badge badge-pill badge-soft-success"></span>
-                                            </td> -->
-                                            <td>
-                                                <i class="material-icons md-payment font-xxl text-muted mr-5"></i> <%= element.paymentMethod %>
-                                            </td>
-                                            <td>
-                                                <a href="#" class="btn btn-xs"> View details</a>
-                                            </td>
-                                        </tr>
-                                    <% }) %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div> <!-- table-responsive end// -->
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+            
+            
+            
+            
+            <!-- <script>
+                function validateDates() {
+                    const startDate = document.getElementById("start-date").value;
+                    const endDate = document.getElementById("end-date").value;
+                    const errorElement = document.getElementById("end-date-error");
+            
+                    // Check if both start and end dates are selected
+                    if (startDate && endDate) {
+                        if (new Date(endDate) < new Date(startDate)) {
+                            errorElement.classList.remove("d-none");
+                            document.getElementById("end-date").classList.add("is-invalid");
+                        } else {
+                            errorElement.classList.add("d-none");
+                            document.getElementById("end-date").classList.remove("is-invalid");
+                        }
+                    } else {
+                        errorElement.classList.add("d-none");
+                        document.getElementById("end-date").classList.remove("is-invalid");
+                    }
+                }
+            </script> -->
+             
+            
             <div class="pagination-area mt-30 mb-50">
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-start">
@@ -344,4 +359,196 @@
                 </nav>
             </div>
         </section> <!-- content-main end// -->
+        <script>
+            // Date validation configuration
+            const DATE_VALIDATION_CONFIG = {
+                errorClasses: {
+                    invalid: 'is-invalid',
+                    hidden: 'd-none'
+                },
+                elements: {
+                    startDate: 'start-date',
+                    endDate: 'end-date',
+                    startError: 'start-date-error',
+                    endError: 'end-date-error'
+                },
+                messages: {
+                    endBeforeStart: 'End date cannot be earlier than the start date.',
+                    futureStartDate: 'Start date cannot be in the future.',
+                    futureEndDate: 'End date cannot be in the future.',
+                    // requiredStart: 'Start date is required.',
+                    // requiredEnd: 'End date is required.',
+                    invalidFormat: 'Invalid date format.'
+                }
+            };
+
+            class DateValidator {
+                constructor(config = DATE_VALIDATION_CONFIG) {
+                    this.config = config;
+                    this.elements = this.initializeElements();
+                }
+
+                initializeElements() {
+                    return {
+                        startDate: document.getElementById(this.config.elements.startDate),
+                        endDate: document.getElementById(this.config.elements.endDate),
+                        startError: document.getElementById(this.config.elements.startError),
+                        endError: document.getElementById(this.config.elements.endError)
+                    };
+                }
+
+                clearErrors() {
+                    const { invalid, hidden } = this.config.errorClasses;
+                    const { startDate, endDate, startError, endError } = this.elements;
+
+                    [startDate, endDate].forEach(element => {
+                        element.classList.remove(invalid);
+                    });
+
+                    [startError, endError].forEach(element => {
+                        element.classList.add(hidden);
+                        element.textContent = '';
+                    });
+                }
+
+                showError(element, errorElement, message) {
+                    const { invalid, hidden } = this.config.errorClasses;
+                    element.classList.add(invalid);
+                    errorElement.textContent = message;
+                    errorElement.classList.remove(hidden);
+                }
+
+                isValidDateFormat(dateString) {
+                    const date = new Date(dateString);
+                    return date instanceof Date && !isNaN(date);
+                }
+
+                validateDates() {
+                    const { startDate, endDate, startError, endError } = this.elements;
+                    const { messages } = this.config;
+                    
+                    this.clearErrors();
+
+                    // Get current date (midnight)
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    const startDateObj = new Date(startDate.value);
+                    const endDateObj = new Date(endDate.value);
+
+                    // Set time to midnight for proper date comparison
+                    startDateObj.setHours(0, 0, 0, 0);
+                    endDateObj.setHours(0, 0, 0, 0);
+
+                    // Logical validation
+                    if (endDateObj < startDateObj) {
+                        this.showError(endDate, endError, messages.endBeforeStart);
+                        return false;
+                    }
+
+                    if (startDateObj > today) {
+                        this.showError(startDate, startError, messages.futureStartDate);
+                        return false;
+                    }
+
+                    if (endDateObj > today) {
+                        this.showError(endDate, endError, messages.futureEndDate);
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                getDateRange() {
+                    if (this.validateDates()) {
+                        return {
+                            startDate: this.elements.startDate.value,
+                            endDate: this.elements.endDate.value
+                        };
+                    }
+                    return null;
+                }
+            }
+
+            // Usage example
+            async function applyFilter() {
+                const dateValidator = new DateValidator();
+                const dateRange = dateValidator.getDateRange();
+                
+                if (dateRange) {
+                    const category = document.getElementById("sort-by").value;
+                    const order = document.getElementById("orders")
+                    dateRange.category = category;
+                    // console.log('Filter Applied:', { 
+                    //     // category, 
+                    //     startDate: dateRange.startDate, 
+                    //     endDate: dateRange.endDate 
+                    // });
+                    console.log(dateRange);
+
+                    let response = await fetch("/admin/filter", {
+    method: "PUT",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(dateRange)
+});
+
+let details = await response.json();
+
+console.log(details);
+
+if (details.success) {
+    order.innerHTML = ""; // Clear existing content
+
+    // Use map to generate the rows and join them as a single string
+    order.innerHTML = details.orders.map(element => {
+        return `
+            <tr>
+                <td><a href="#" class="fw-bold text-primary">${element._id}</a></td>
+                <td>${element.addres.name}</td>
+                <td>
+                    ${new Date(element.createdOn).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' })}
+                </td>
+                <td>
+                    ${element.totalPrice}
+                </td>
+                <td>
+                    <i class="material-icons md-payment font-xxl text-muted"></i> ${element.paymentMethod}
+                </td>
+                <td>
+                    <a href="/admin/orderManagement/details/${element._id}" class="btn btn-sm btn-outline-primary">View Details</a>
+                </td>
+            </tr>
+        `;
+    }).join(""); // Join the array into a single string
+
+}
+
+
+                    
+
+                }
+                
+                
+
+                // return false;
+            }
+
+            // Event listeners
+            document.addEventListener('DOMContentLoaded', () => {
+                const dateValidator = new DateValidator();
+                
+                // Add input event listeners for real-time validation
+                dateValidator.elements.startDate.addEventListener('change', () => {
+                    dateValidator.validateDates();
+                });
+                
+                dateValidator.elements.endDate.addEventListener('change', () => {
+                    dateValidator.validateDates();
+                });
+            });
+        </script>
+
+
 <%- include('../partials/admin/footer') %>

@@ -106,6 +106,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
                 minContainerHeight: 500, // Minimum container height for cropping
                 minContainerWidth: 500, // Minimum container width for cropping
                 viewMode: 3, // Keep the crop box inside the canvas
+                
             });
 
             cropperModal.show();

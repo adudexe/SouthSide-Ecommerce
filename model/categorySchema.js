@@ -10,6 +10,9 @@ const categorySchema = new mongoose.Schema({
         type:String,
         // required:true
     },
+    discount:{
+        type:Number,
+    },
     isListed:{
         type:Boolean,
         default:true,
