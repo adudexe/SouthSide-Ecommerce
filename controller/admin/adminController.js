@@ -592,7 +592,7 @@ adminController.addProducts = async (req, res) => {
             color: variant.color,
             status: variant.status,
             price: variant.price,
-            salePrice:(variant.price - ((variant.price * offer) / 100)),
+            salePrice:Math.floor((variant.price - ((variant.price * offer) / 100))),
             quantity: variant.quantity,
         }));
 
@@ -750,112 +750,85 @@ adminController.listCategory = async (req,res) => {
 
 adminController.updateProduct = async (req, res) => {
     try {
-        const { id, name, description, category, productOffer, variants } = req.body;
+        let changedVariants = [];
+        let newVariants = [];
+        const { product_id, product_title, product_offer, product_category, product_description, variants } = req.body;
+        console.log("Images", req.files);
+        console.log("Request body", req.body);
         
-        // Validate required fields
-        if (!id || !name || !category) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "Missing required fields" 
+        const parsedVariants = JSON.parse(variants);
+        const productDetails = await Product.findOne({ _id: product_id });
+        const categoryDetails = await Category.findOne({ _id: product_category });
+        
+        if (!productDetails || !categoryDetails) {
+            return res.status(404).json({ success: false, message: "Product or category not found" });
+        }
+
+        const productVariants = productDetails.variants;
+      
+        const offer = Number(product_offer) > categoryDetails.discount ? categoryDetails.discount : Number(product_offer);
+        // console.log("Offer",offer);
+
+    
+        parsedVariants.forEach((variant, i) => {
+            const existingVariant = productVariants[i];
+            if (existingVariant && (
+                variant.size !== existingVariant.size ||
+                variant.color !== existingVariant.color ||
+                variant.price !== existingVariant.price ||
+                variant.quantity !== existingVariant.quantity ||
+                variant.status !== existingVariant.status
+            )) {
+                changedVariants.push(variant._id);
+            }
+        });
+        
+        console.log("Changed variants:", changedVariants);
+        
+       
+        productVariants.forEach(variant => {
+            const updatedVariant = parsedVariants.find(v => v._id.toString() === variant._id.toString());
+            console.log(updatedVariant);
+            if (updatedVariant) {
+                variant.size = updatedVariant.size;
+                variant.color = updatedVariant.color;
+                variant.price = updatedVariant.price;
+                variant.quantity = updatedVariant.quantity;
+                variant.status = updatedVariant.status;
+                variant.salePrice = Math.floor(updatedVariant.price - (updatedVariant.price * offer / 100));
+                newVariants.push(variant);
+            } else {
+                variant.salePrice = Math.floor(variant.price - (variant.price * offer / 100));
+                newVariants.push(variant);
+            }
+        });
+
+        console.log("Updated variants:", newVariants);
+
+        
+        const images = [];
+
+        if (Object.entries(req.files).length > 0) {
+            Object.entries(req.files).forEach(file => {
+                images.push(file[1][0].path);  
             });
         }
 
-        // Parse variants if it's a string
-        let parsedVariants = variants;
-        if (typeof variants === 'string') {
-            try {
-                parsedVariants = JSON.parse(variants);
-            } catch (error) {
-                console.error("Error parsing variants:", error);
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid variants data"
-                });
-            }
-        }
 
-        // Prepare update object
+        
         const updateData = {
-            productName: name,
-            description,
-            category,
-            productOffer: productOffer || 0,
-            variants: parsedVariants,
-            updatedAt: new Date()
+            productName: product_title,
+            description: product_description,
+            category: product_category,
+            productOffer: product_offer,
+            variants: newVariants,
+            productImages: images.length > 0 ? images : productDetails.productImages, // Only update images if new ones are provided
         };
 
-        // Handle image uploads
-        const images = [];
-        let hasNewImages = false;
-
-        // Handle existing images
-        for (let i = 1; i <= 10; i++) {
-            const existingImage = req.body[`existingImage_${i}`];
-            if (existingImage) {
-                images.push(existingImage);
-            }
-        }
-
-        // Handle new images
-        if (req.files) {
-            for (let i = 1; i <= 10; i++) {
-                const imageField = `image_${i}`;
-                if (req.files[imageField] && req.files[imageField][0]) {
-                    const file = req.files[imageField][0];
-                    
-                    // Validate file type
-                    if (!file.mimetype.startsWith('image/')) {
-                        return res.status(400).json({
-                            success: false,
-                            message: `Invalid file type for ${imageField}`
-                        });
-                    }
-                    
-                    // Validate file size (5MB limit)
-                    const maxSize = 5 * 1024 * 1024;
-                    if (file.size > maxSize) {
-                        return res.status(400).json({
-                            success: false,
-                            message: `File ${imageField} is too large. Maximum size is 5MB`
-                        });
-                    }
-                    
-                    images.push(file.path);
-                    hasNewImages = true;
-                }
-            }
-        }
-
-        // Add images to update data if there are any
-        if (images.length > 0) {
-            updateData.productImages = images;
-        }
-
-        // Update the product
-        const updatedProduct = await Product.findByIdAndUpdate(
-            id,
-            updateData,
-            { new: true, runValidators: true }
-        );
+        const updatedProduct = await Product.findByIdAndUpdate(product_id, updateData, { new: true });
 
         if (!updatedProduct) {
-            // Clean up uploaded files if product update fails
-            if (hasNewImages) {
-                images.forEach(imagePath => {
-                    if (imagePath.startsWith('uploads/')) {
-                        try {
-                            fs.unlinkSync(imagePath);
-                        } catch (err) {
-                            console.error("Error deleting file:", err);
-                        }
-                    }
-                });
-            }
-            
-            return res.status(404).json({ 
-                success: false, 
-                message: "Product not found" 
-            });
+            return res.status(404).json({ success: false, message: "Product update failed" , updatedProduct });
         }
 
         res.status(200).json({
@@ -863,16 +836,12 @@ adminController.updateProduct = async (req, res) => {
             message: "Product updated successfully",
             product: updatedProduct
         });
-    }
-    catch(err) {
-        console.log("Error in updating Product: ", err);
-        res.status(500).json({ 
-            success: false, 
-            message: "Failed to update product",
-            error: err.message 
-        });
+    } catch (err) {
+        console.log("Error in updating Product:", err);
+        res.status(500).json({ success: false, message: "Failed to update product", error: err.message });
     }
 };
+
 
 
 adminController.logout = (req,res) =>

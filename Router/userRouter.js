@@ -15,11 +15,11 @@ const walletController = require("../controller/walletController");
 const passport = require("passport");
 const errorHandling = require("../middleware/errorHandling");
 
-router.all("*",userAuth.isLogged); // To help keep is logged in 
+// router.all("*",userAuth.isLogged); // To help keep is logged in 
 
 // userController
-router.get("/login",userAuth.isLogged,userController.loadLoginPage); // Remove userAuth.isLogged From here since it for just constant user....
-router.post("/login",userAuth.isLogged,userController.userLogin);
+router.get("/login",userController.loadLoginPage); // Remove userAuth.isLogged From here since it for just constant user....
+router.post("/login",userController.userLogin);
 router.get("/home",userController.loadHomePage); //Remove userAuth.isLogged
 router.post("/resentOTP", userController.resendOTP);
 router.get("/signup", userController.loadSignUpPage);

@@ -83,6 +83,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
             });
         });
 
+        
         function removeImage(imgElement) {
             console.log(selectedFiles);
             const index = selectedFiles.findIndex(file => file.name === imgElement.dataset.name);
@@ -93,6 +94,8 @@ document.addEventListener("DOMContentLoaded", (e) => {
         }
 
         function openCropperModal(imgElement) {
+            // console.log(imgElement)
+            console.log("Selected Images",selectedFiles);
             cropImage.src = imgElement.src;
             cropImage.id = imgElement.id;
 
@@ -137,6 +140,10 @@ document.addEventListener("DOMContentLoaded", (e) => {
 
                 // Replace the selected image with the cropped one
                 selectedFiles[currentFileIndex] = croppedFile;
+
+                // console.log(URL.createObjectURL(croppedFile))
+                console.log(document.getElementById(cropImage.id))
+
 
                 // Update the image preview
                 document.getElementById(cropImage.id).src = URL.createObjectURL(croppedFile);
@@ -322,6 +329,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
 
             // Append selected images (either base64 or file objects)
             selectedFiles.forEach((image, index) => {
+                console.log(image);
                 formData.append(`image_${index + 1}`, image);
             });
 

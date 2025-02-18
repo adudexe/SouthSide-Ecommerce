@@ -7,8 +7,8 @@ const userAuth = {}
 userAuth.isLogged = async (req, res, next) => {
   try {
     //Remove the above line becuse it causes constent login
-    const user = await User.findOne().sort({createdAt:-1});
-    req.session.user = user;
+    // const user = await User.findOne().sort({createdAt:-1});
+    // req.session.user = user;
     // console.log(req.session.user);
     //Till here
 
@@ -23,7 +23,7 @@ userAuth.isLogged = async (req, res, next) => {
     {
       return res.redirect("/user/login");
     }
-    // res.redirect("/user/login");
+    res.redirect("/user/login");
   }
   catch (error) {
     console.log("Error in auth",error);

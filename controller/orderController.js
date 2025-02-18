@@ -28,10 +28,21 @@ orderController.cancelOrder = async (req, res) => {
         const userId = req.session.user._id;
         let refundToWallet = null;
         let wallet = null;
+        
 
         // Find the order and wallet for the user
         const orderDetails = await Orders.findOne({ userId: userId, "orderItems._id": orderId });
         wallet = await Wallet.findOne({ userId: userId });
+
+        // console.log("Order Details",orderDetails);
+
+        // console.log("Variant Id",orderDetails.orderItems[0].variantId);
+
+        // //Product Detials
+        // const prdoucts = await Products.find({"variants._id":orderDetails.orderItems[0].variantId});
+        // console.log("Product Details",prdoucts);
+
+        // // if()
 
         console.log("Order Details",orderDetails);
         console.log("Order Product Details",orderDetails.orderItems);
@@ -42,6 +53,8 @@ orderController.cancelOrder = async (req, res) => {
         }
 
         // console.log("Wallet before refund:", wallet);
+        
+        //stock  < 5 then refund should price/2
         
         // Update the order's product status to 'Cancelled'
         const cancelOrder = await Orders.findOneAndUpdate(

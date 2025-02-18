@@ -87,13 +87,13 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.min.css
                         <!-- Product Title -->
                         <div class="col-md-6">
                             <label for="product_title" class="form-label">Product Title</label>
-                            <input type="text" id="product_title" name="product_title" class="form-control" value="<%= productDetails.productName %>">
+                            <input type="text" id="product_title" name="product_title" class="form-control" value="<%= productDetails.productName %>" data-id="<%= productDetails._id %>">
                             <small id="product_title_error" class="text-danger" style="display: none;">Product title is required.</small>
                         </div>
                         <!-- Product Price -->
                         <div class="col-md-6">
                             <label for="product_price" class="form-label">Product Offer</label>
-                            <input type="number" id="product_offer" name="product_offer" class="form-control" min="0" max="100" value="<%= productDetails. productOffer%>">
+                            <input type="number" id="product_offer" name="product_offer" class="form-control" min="0" max="90" value="<%= productDetails. productOffer%>">
                             <small id="product_offer_error" class="text-danger" style="display: none;">Product Offer is required.</small>
                         </div>
                         <!-- Image -->
@@ -105,8 +105,8 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.min.css
                         <!-- Product Category -->
                         <div class="col-md-6">                            
                             <label for="product_category" class="form-label">Product Category</label>
-                            <select id="product_category" name="product_category" class="form-select" value="heheboi">
-                                <option value=""><%=  productDetails.category.name %></option>
+                            <select id="product_category" name="product_category" class="form-select" value="">
+                                <option id="test" value="<%=productDetails.category._id  %>"><%=  productDetails.category.name %></option>
                                 <% category.forEach(element => { %>
                                     <% if (element.isListed) { %>
                                         <option value="<%= element._id %>"><%= element.name %></option>
@@ -127,10 +127,12 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.min.css
                     </div>
                     <div class="row mt-2">
                         <div class="col-md-6 row">
-                             <% productDetails.productImages.forEach(element => { %>
+                            <% let count = 0 %>
+                             <% productDetails.productImages.forEach(element => {  %>
+                                <% count++ %>
                             <div id="imagePreview" class="col">
                             <!-- Images Will be displayed Here -->
-                             <div class="img-thumbnail-container "><button class="remove-btn">X</button><img src="/<%=element%>"  class="imageelm imageContainer"></div>
+                             <div class="img-thumbnail-container " data-id="<%=count %>"><button class="remove-btn" >X</button><img src="/<%=element%>"  data-id="<%= count %>" class="imageelm imageContainer" id="image_<%= count %>"></div>
                             </div>
                             <% }) %>
                         </div>
@@ -141,12 +143,12 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.min.css
                     </div>
 
                     <!-- Variants Preview Section -->
-                    <div id="variantsPreview" class="mt-4 row">
+                    <div id="variantsPreview" class="mt-4 row" data-variants="<%= JSON.stringify(productDetails.variants) %>">
                         <% productDetails.variants.forEach(element => { %>
                             <div id="variantsContainer"><div class="col-md-4 mb-3">
                                 <div class="card p-2">
                                     <h6>Variant 1</h6>
-                                    <p><strong>Size:</strong> <span id="size"><%= element.size %></span></p>
+                                    <p><strong>Size:</strong> <span id="size" data-id="<%= element._id %>"><%= element.size %></span></p>
                                     <p><strong>Color:</strong> <span id="color"><%= element.color %></span></p>
                                     <p><strong>Status:</strong> <span id="status"><%= element.status %></span></p>
                                     <p><strong>Price:</strong> $<span id="salePrice"><%= element.salePrice %></span></p>
@@ -251,7 +253,7 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.min.css
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" id="cropButton" class="btn btn-primary">Crop</button>
             </div>
-        </div>
+        </div>                                                                                                                                                                                                                                                                                                                   
     </div>
 </div>
 <footer class="main-footer font-xs">
@@ -269,6 +271,8 @@ https://cdn.jsdelivr.net/npm/sweetalert2@11.15.10/dist/sweetalert2.min.css
     </div>
 </footer>
 </main>
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="/admin/assets/js/vendors/jquery-3.6.0.min.js"></script>
 <script src="/admin/assets/js/vendors/bootstrap.bundle.min.js"></script>
