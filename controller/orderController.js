@@ -83,7 +83,7 @@ orderController.cancelOrder = async (req, res) => {
         console.log("New total wallet amount:", totalAmount);
 
         // If the payment method is 'online', add refund to wallet
-        if (orderDetails.paymentMethod === "online") {
+        if (orderDetails.paymentMethod === "online" || orderDetails.paymentMethod === "wallet") {
             refundToWallet = await Wallet.findOneAndUpdate(
                 { userId: userId },
                 {

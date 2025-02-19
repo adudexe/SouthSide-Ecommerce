@@ -3,6 +3,7 @@ const Product = require("../model/productScheme");
 const Address = require("../model/userAddress");
 const Order = require("../model/orderSchema");
 const Coupon = require("../model/couponSchema");
+const Wallet = require("../model/walletSchema");
 const Razorpay = require('razorpay');
 var { validatePaymentVerification, validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils'); 
 const checkoutController = {};
@@ -495,5 +496,168 @@ checkoutController.onlinePayment = async (req, res) => {
       res.status(500).json({ status: 'error', message: 'Error verifying payment' });
     }
   }
+
+
+
+  checkoutController.walletOrder = async (req,res) =>
+    {
+        try {
+            console.log("Wallet Order");
+            //Controller For COD
+            const { OrderType } = req.body; // Get the Payment Method from the front end..
+            let product = null;
+            let variant = null;
+            let appliedCoupon = null;
+
+            
+    
+            // Get the primary address for the user
+            const userId = req.session.user._id;
+            const totalprice = req.session.totalPrice; //calcualte the total price...
+            const primaryAddress = await Address.findOne({ userId: userId, isPrimary: true });
+            const wallet = await Wallet.findOne({userId:userId});
+
+            console.log("Wallet Details",wallet)
+            console.log("Total Price",totalprice);
+    
+            if (!primaryAddress) {
+                return res.status(404).json({ success: false, message: "Address Not Found.." });
+            }
+            
+            if(wallet.totalAmount<totalprice)
+            {
+                return res.status(403).json({success:false ,message:"Insufficient Amount in the wallet.."})
+            }
+
+            
+
+            // Get the user Cart Details
+            const cartItems = await Cart.findOne({ userId: userId }).populate("items.productId");
+            console.log("Cart Items", cartItems);
+            const coupon = await Coupon.findOne(cartItems.couponApplied);
+            console.log("Coupons",coupon);
+            
+            if(coupon)
+            {
+                
+                const {code , discount} = coupon;
+                appliedCoupon = {code,discount};
+                // appliedCoupon.code = coupon.code;
+                // appliedCoupon.discount = coupon.discount;
+            }
+            else
+            {
+                appliedCoupon = null
+            }
+            console.log("Applied Coupon",appliedCoupon);
+    
+            if (!cartItems) {
+                return res.status(404).json({ success: false, message: "User Cart Not Found..." });
+            }
+    
+            // Prepare order items and total calculation
+            const orderItems = [];
+            let totalAmount = 0;
+    
+            for (let item of cartItems.items) {
+                product = item.productId; // The populated product data
+    
+                // Find the variant based on variantId from the cart
+                variant = product.variants.find((variant) => variant._id.toString() === item.variantId.toString());
+    
+                // Add item details to orderItems
+                if (variant) {
+                    orderItems.push({
+                        product: {
+                            productName: product.productName,
+                            description: product.description,
+                            category: product.category,
+                            productOffer: product.productOffer,
+                            variants: [variant],
+                            productImages: product.productImages
+                        },
+                        quantity: item.quantity,
+                        price: variant.salePrice * item.quantity,
+                        status: 'Pending', // Default status when the order is created
+                        productId: item.productId,
+                        variantId: item.variantId,
+    
+                    });
+    
+                    // Add to total price
+                    totalAmount += variant.salePrice * item.quantity;
+    
+                    // Decrement the quantity of the variant in the product
+                    if (variant.quantity >= item.quantity) {
+                        variant.quantity -= item.quantity;  // Decrement the stock
+                    } else {
+                        // If insufficient stock, throw an error
+                        return res.status(400).json({ success: false, message: `Insufficient stock for ${product.productName}` });
+                    }
+                }
+            }
+           
+            
+    
+            // Apply any discounts (if needed)
+            let discount = (totalAmount-totalprice) || 0
+            // let finalAmount = req.session.total - discount;
+            const walletAmount = Math.floor(Number(wallet.totalAmount) - Number(totalprice));
+            console.log("New Wallet Amount",walletAmount);
+
+            const updateWallet = await Wallet.findOneAndUpdate(
+                    { userId: userId },
+                    {
+                        $push: {
+                            transactions: {
+                                transactionType: "debit",  // Refund transaction
+                                amount: totalprice,
+                                date: Date.now() // Set the transaction date
+                            }
+                        },
+                        $set: {
+                            totalAmount: walletAmount // Update the total amount in the wallet
+                        }
+                    },
+                    { new: true }
+            )
+            console.log("New wallet details",updateWallet);
+            // Create new order document
+           if(updateWallet)
+           {
+            const newOrder = new Order({
+                userId: userId,
+                orderItems: orderItems,
+                totalPrice: totalprice,
+                discount: discount,
+                finalAmount: totalprice,
+                addres: primaryAddress,  // Use the primary address for shipping
+                invoiceDate: new Date(),
+                couponApplied: appliedCoupon ||  false,
+                paymentMethod: OrderType
+            });
+    
+            // Save the order to the database
+            const savedOrder = await newOrder.save();
+
+
+    
+            // Save the updated product stock after the order
+            await product.save();  // Save the product with the updated variant quantity
+    
+            // Optionally clear the cart after the order is placed
+            await Cart.findOneAndUpdate({ userId: userId }, { $set: { items: [] } });
+    
+            // Return the saved order as a response
+           return  res.status(200).json({ success: true, message: 'Order placed successfully', order: savedOrder });
+    
+           }
+           res.status(404).json({ success: true, message: 'wallet fucked'})
+           
+        } catch (err) {
+            console.log("Error in Placing Order", err);
+            res.status(500).json({ success: false, message: "An error occurred while placing the order" });
+        }
+    }
 
 module.exports = checkoutController;

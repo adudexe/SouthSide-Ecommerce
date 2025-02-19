@@ -91,19 +91,28 @@
 
                         <!-- Payment Methods -->
                         <div class="payment-methods mt-4 pt-4 border-top" id="payment-methods">
-                            <h5 class="mb-3">Payment Method</h5>
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="radio" name="payment_option" id="cod" value="cod" checked>
-                                <label class="form-check-label" for="cod">
-                                    Cash on Delivery
-                                </label>
-                            </div>
+                            <h5 class="mb-3">Payment Method</h5>    
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="radio" name="payment_option" id="online" value="online">
                                 <label class="form-check-label" for="online">
                                     Razor Pay
                                 </label>
                             </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio" name="payment_option" id="wallet" value="wallet">
+                                <label class="form-check-label" for="walet">
+                                    Wallet
+                                </label>
+                            </div>
+
+                            <% if (total>1000) { %>
+                                <div class="form-check mb-3" id="cod">
+                                    <input class="form-check-input" type="radio" name="payment_option" id="cod" value="cod" checked>
+                                    <label class="form-check-label" for="cod">
+                                        Cash on Delivery
+                                    </label>
+                                </div>
+                            <% } %>
                             <!-- Place Order Button -->
                             <button type="button" class="btn btn-primary w-100 mt-3" onclick="placeOrder()">
                                 Place Order
@@ -512,6 +521,35 @@
                                }         
                             // }
                         }
+                        else if(orderType.OrderType === "wallet")
+                        {
+                            const response = await fetch("/user/checkout/wallet",{
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body:JSON.stringify(orderType),
+                            });
+                            const details = await response.json();
+                            
+                            if (details.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Order Placed Successfully!',
+                                    text: details.message || 'Your order has been placed successfully.',
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                }).then(() => {
+                                    window.location.href = '/user/order/success';
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: details.message || 'Failed to place the order'
+                                });
+                            }
+                        }
                         else{
                             // alert("Payment is COD");
                             const response = await fetch('/user/checkout/placeorder', {
@@ -610,6 +648,24 @@
                         </div>
                     `;
 
+                    const cod = document.getElementById("cod");
+
+                    if(data.newPrice < 1000)
+                    {
+                        cod.innerHTML = '';
+                    }
+                    else
+                    {
+                        cod.innerHTML = `
+                            <input class="form-check-input" type="radio" name="payment_option" id="cod" value="cod" checked>
+                            <label class="form-check-label" for="cod">
+                                Cash on Delivery
+                            </label>
+                        `
+                    }
+
+
+
                     // Disable all apply buttons
                     const couponButtons = document.querySelectorAll('#couponList button');
                     couponButtons.forEach(button => {
@@ -684,6 +740,22 @@ async function removeCoupon(code, id) {
                     <span class="h5 mb-0 text-brand">₹${data.totalPrice}</span>
                 </div>
             `;
+
+            const cod = document.getElementById("cod");
+
+            if(data.newPrice < 1000)
+            {
+                cod.innerHTML = '';
+            }
+            else
+            {
+                cod.innerHTML = `
+                    <input class="form-check-input" type="radio" name="payment_option" id="cod" value="cod" checked>
+                    <label class="form-check-label" for="cod">
+                        Cash on Delivery
+                    </label>
+                `
+            }
 
             // Reset total amount global variable
             totalAmount = null;

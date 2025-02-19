@@ -73,6 +73,7 @@ router.post("/checkout/address/add",userAuth.isLogged,userAuth.isBlocked,product
 router.get("/chekcout/address/set/:id",userAuth.isLogged,userAuth.isBlocked,productAvailability.quantity,checkoutController.setAddress);
 router.put("/checkout/address/update/:id",userAuth.isLogged,userAuth.isBlocked,productAvailability.quantity,checkoutController.updateAddress);
 router.post("/checkout/placeorder",userAuth.isLogged,userAuth.isBlocked,productAvailability.quantity,checkoutController.placeOrder);
+router.post("/checkout/wallet",userAuth.isLogged,userAuth.isBlocked,productAvailability.quantity,checkoutController.walletOrder);
 router.post("/create-order",userAuth.isLogged,userAuth.isBlocked,checkoutController.createOrder)
 router.post('/verify-payment',userAuth.isLogged,userAuth.isBlocked,checkoutController.onlinePayment );
 
