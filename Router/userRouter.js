@@ -82,6 +82,7 @@ router.post('/verify-payment',userAuth.isLogged,userAuth.isBlocked,checkoutContr
 router.get("/myAccount/order/:id",orderController.loadOrderDetails);
 router.post("/myAccount/order/cancel/:id",orderController.cancelOrder);
 router.get("/order/success",orderController.orderSuccess);
+router.get("/order/downloadinvoice/:id",orderController.downloadInvoice);
 
 
 //Coupon Controller

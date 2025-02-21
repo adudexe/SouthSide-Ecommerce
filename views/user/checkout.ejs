@@ -482,6 +482,96 @@
                                             .then(data => {
                                                 // console.log("data is",data)
                                             if (data.success) {
+                                                    Swal.fire({
+                                                        title: "Order Placed..!",
+                                                        text: "Paymet Succesfull..",
+                                                        icon: "success",
+                                                        // showCancelButton: true,
+                                                        confirmButtonColor: "#3085d6",
+                                                        cancelButtonColor: "#d33",
+                                                        confirmButtonText: "Ok"
+                                                        }).then((result) => {
+                                                        if (result.isConfirmed) {
+                                                            window.location.href = '/user/order/success';
+                                                        }
+                                                        });
+                                                // alert("Paymet Succesfull..");
+                                                
+                                            } else {
+                                                Swal.fire({
+                                                    title: "Failed To Place Order...",
+                                                    text: data.message||'Payment verification failed',
+                                                    icon: "error"
+                                                });
+                                                // alert(data.message||'Payment verification failed');
+                                            }
+                                            }).catch(error => {
+                                            console.error('Error:', error);
+                                            alert('Error verifying payment');
+                                        });
+                                    }
+                                };
+                                // alert("Payment is online");
+                                const rzp = new Razorpay(options);
+                                rzp.on()
+                                rzp.open('payment.failed',(response)=>{
+                                    console.log("We are in failed payment");
+                                    // alert("payment failed");
+                                }); 
+                               }   
+                               else
+                               {
+                                    // Swal.fire({
+                                    //     icon: 'error',
+                                    //     title: 'Error!',
+                                    //     text: order.order.message || 'Error in payment'
+                                    // }); 
+                                    //
+                                    
+                                    Swal.fire({
+                                    title: 'Payment Has Failed',
+                                    text: 'Would you like to retry the payment',
+                                    icon: 'question',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#3085d6',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'Yes',
+                                    cancelButtonText: 'No, cancel'
+                                }).then(async (result) => {
+                                    if (result.isConfirmed) {
+                                        const options = {
+                                    key: order.order.payment_id, // Replace with your Razorpay key_id
+                                    amount: amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                                    currency: 'INR',
+                                    name:order.order.userName,
+                                    contact:order.order.phone,
+                                    description: 'Test Transaction',
+                                    order_id: order.order.order_id, // This is the order_id created in the backend
+                                    callback_url: 'http://localhost:3000/user/order/success',// Your success URL
+                                    prefill: {
+                                    name:""+order.order.userName+"" ,
+                                    email: ""+order.order.email+"",
+                                    contact:""+order.order.phone+""
+                                    },
+                                    theme: {
+                                    color: '#F37254'
+                                    },
+                                    handler: function (response) {
+                                        fetch('/user/verify-payment', {
+                                            method: 'POST',
+                                            headers: {
+                                            'Content-Type': 'application/json'
+                                            },
+                                            body: JSON.stringify({
+                                                order:order, 
+                                                razorpay_order_id: response.razorpay_order_id,
+                                                razorpay_payment_id: response.razorpay_payment_id,
+                                                razorpay_signature: response.razorpay_signature
+                                            })
+                                        }).then(res => res.json())
+                                            .then(data => {
+                                                // console.log("data is",data)
+                                            if (data.success) {
                                                 Swal.fire({
                                                     title: "Order Placed..!",
                                                     text: "Paymet Succesfull..",
@@ -509,17 +599,10 @@
                                 rzp.open('payment.failed',(response)=>{
                                     console.log("We are in failed payment");
                                     // alert("payment failed");
-                                }); 
-                               }   
-                               else
-                               {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error!',
-                                        text: order.order.message || 'Error in payment'
-                                    });  
-                               }         
-                            // }
+                                });    
+                                        }      
+                                            })   
+                            }
                         }
                         else if(orderType.OrderType === "wallet")
                         {
