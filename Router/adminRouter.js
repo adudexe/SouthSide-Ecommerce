@@ -44,7 +44,7 @@ admin.post("/coupons/add",adminAuth.requireAuth,couponController.addCoupon);
 admin.delete("/coupons/delete/:id",adminAuth.requireAuth,couponController.deleteCoupon)
 
 
-admin.get('/sales-report',adminAuth.requireAuth,adminController.generateSalesReport);
+admin.post('/sales-report',adminAuth.requireAuth,adminController.generateSalesReport);
 
 // admin.get("/productManagement",adminController.loadUserManagement)
 

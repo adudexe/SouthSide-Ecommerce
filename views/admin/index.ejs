@@ -7,7 +7,7 @@
                     <p>Whole data about your business here</p>
                 </div>
                 <div>
-                    <a href="/admin/sales-report" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Create report</a>
+                    <a  class="btn btn-primary" onclick="generateReport()"><i class="text-muted material-icons md-post_add" ></i>Create report</a>
                 </div>
             </div>
             <div class="row">
@@ -256,17 +256,18 @@
                         <div class="d-flex gap-3">
                             <div>
                                 <!-- <label for="start-date" class="form-label small">Start Date</label> -->
-                                <input type="date" id="start-date" class="form-control form-control-sm shadow-sm" onchange="validateDates()" placeholder="Start-Date">
+                                <input type="date" id="start-date" class="form-control form-control-sm shadow-sm" placeholder="Start-Date">
                                 <small id="start-date-error" class="text-danger d-none">End date cannot be earlier than the start date.</small>
                             </div>
                             <div>
                                 <!-- <label for="end-date" class="form-label small">End Date</label> -->
-                                <input type="date" id="end-date" class="form-control form-control-sm shadow-sm" onchange="validateDates()" placeholder="End-Date">
+                                <input type="date" id="end-date" class="form-control form-control-sm shadow-sm"  placeholder="End-Date">
                                 <small id="end-date-error" class="text-danger d-none">End date cannot be earlier than the start date.</small>
                             </div>
                         <!-- Apply Button -->
                     </div>
                 </div>
+                <button id="reset-filters-btn" class="btn btn-outline-secondary">Reset Filters</button>
                 <button class="btn btn-sm btn-primary shadow-sm" id="apply-filter" onclick="applyFilter()">Apply</button>
             </header>
             
@@ -361,6 +362,7 @@
         </section> <!-- content-main end// -->
         
         <script>
+            let dateRange = {}
             // Date validation configuration
             const DATE_VALIDATION_CONFIG = {
                 errorClasses: {
@@ -474,7 +476,7 @@
             // Usage example
             async function applyFilter() {
                 const dateValidator = new DateValidator();
-                const dateRange = dateValidator.getDateRange();
+                dateRange = dateValidator.getDateRange();
                 
                 if (dateRange) {
                     const category = document.getElementById("sort-by").value;
@@ -487,7 +489,7 @@
                     // });
                     console.log(dateRange);
 
-                    let response = await fetch("/admin/filter", {
+    let response = await fetch("/admin/filter", {
     method: "PUT",
     headers: {
         "Content-Type": "application/json"
@@ -525,31 +527,98 @@ if (details.success) {
     }).join(""); // Join the array into a single string
 
 }
+    }
+    // return false;
+}
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+        const dateValidator = new DateValidator();
+        
+        // Add input event listeners for real-time validation
+        dateValidator.elements.startDate.addEventListener('change', () => {
+            dateValidator.validateDates();
+        });
+        
+        dateValidator.elements.endDate.addEventListener('change', () => {
+            dateValidator.validateDates();
+        });
+        
+
+    });
+
+    //Genrate Pdf Reprst
+    async function generateReport() {
+    try {
+        // console.log("Date Details", dateRange); // Log the date range details
+        
 
 
-                    
+        // Fetch request to the backend
+        const response = await fetch("/admin/sales-report", { // Fixed the URL to match the backend endpoint
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dateRange), // Send dateRange data to the backend
+        });
 
-                }
-                
-                
+        // Handle the response from the backend
+        if (response.ok) {
+            // Assuming the backend sends the PDF as a file in response
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            
+            // Trigger download directly via URL
+            // window.location.href = url;
+        } else {
+            // If the response is not OK, log the error
+            const errorData = await response.json();
+            console.error("Error generating the report:", errorData.message);
+            alert(`Error: ${errorData.message}`);
+        }
+    } catch (error) {
+        // Catch any errors during the fetch call
+        console.error("An error occurred while generating the report:", error);
+        alert("An error occurred while generating the report.");
+    }
+}
 
-                // return false;
-            }
 
-            // Event listeners
-            document.addEventListener('DOMContentLoaded', () => {
-                const dateValidator = new DateValidator();
-                
-                // Add input event listeners for real-time validation
-                dateValidator.elements.startDate.addEventListener('change', () => {
-                    dateValidator.validateDates();
-                });
-                
-                dateValidator.elements.endDate.addEventListener('change', () => {
-                    dateValidator.validateDates();
-                });
-            });
-        </script>
+
+    function resetFilters() {
+    const { startDate, endDate, startError, endError } = new DateValidator().elements;
+    const { invalid, hidden } = DATE_VALIDATION_CONFIG.errorClasses;
+
+    // Clear date inputs
+    startDate.value = '';
+    endDate.value = '';
+
+    // Remove error messages and invalid classes
+    startDate.classList.remove(invalid);
+    endDate.classList.remove(invalid);
+    startError.classList.add(hidden);
+    endError.classList.add(hidden);
+    startError.textContent = '';
+    endError.textContent = '';
+
+    // Reset category dropdown (if needed)
+    const categoryDropdown = document.getElementById("sort-by");
+    categoryDropdown.value = ''; // Or set a default value like categoryDropdown.value = 'all'
+
+    // Reset the global date range object
+    dateRange = {};
+    
+    // Optionally clear or reset the orders
+    const order = document.getElementById("orders");
+    order.innerHTML = ""; // Clear any displayed orders if applicable
+}
+document.getElementById("reset-filters-btn").addEventListener('click', resetFilters);
+
+
+</script>
+
+
 
 
 <%- include('../partials/admin/footer') %>
