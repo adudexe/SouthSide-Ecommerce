@@ -15,6 +15,8 @@ const PDFDocument = require('pdfkit');
 const adminController = {};
 
 
+
+
 adminController.generateSalesReport = async (req, res) => {
     try {
         // Extract startDate and endDate from the request body (if provided)
@@ -406,6 +408,7 @@ adminController.loadDashboard = async  (req,res) => {
         let count = null;
         const orders = await Order.find().sort({createdOn:-1});
         const products = await Product.find().countDocuments();
+        const category = await Category.find();
         const categories = await Category.find({isListed:true}).countDocuments();
         const currentMonth = currentDate.getMonth()+1;
 
@@ -432,30 +435,185 @@ adminController.loadDashboard = async  (req,res) => {
             }
           ]);
 
-          const yearsAndMonths = await Order.aggregate([
-            // Get all distinct years
-            {
-              $project: {
-                year: { $year: "$createdOn" },  
-                month: { $month: "$createdOn" } 
-              }
+        //   const yearsAndMonths = await Order.aggregate([
+        //     // Get all distinct years
+        //     {
+        //       $project: {
+        //         year: { $year: "$createdOn" },  
+        //         month: { $month: "$createdOn" } 
+        //       }
+        //     },
+        //     {
+        //       $group: {
+        //         _id: null, 
+        //         years: { $addToSet: "$year" },  
+        //         months: { $addToSet: "$month" } 
+        //       }
+        //     },
+        //     {
+        //       $project: {
+        //         _id: 0, 
+        //         years: 1,  
+        //         months: 1  
+        //       }
+        //     }
+        //   ]);
+        const bestSellingProduct = await Order.aggregate([
+            { 
+              $unwind: "$orderItems"  // Unwind the orderItems array to work with each product individually
             },
             {
               $group: {
-                _id: null, 
-                years: { $addToSet: "$year" },  
-                months: { $addToSet: "$month" } 
-              }
+                _id: "$orderItems.productId",  // Group by productId
+                totalQuantity: { $sum: "$orderItems.quantity" },  // Sum the quantity sold for each product
+                productName: { $first: "$orderItems.product.productName" },  // Get the product name (assuming it's stored here)
+              },
+            },
+            { 
+              $sort: { totalQuantity: -1 }  // Sort by total quantity sold in descending order
             },
             {
+              $limit: 1  // Get the top-selling product
+            }
+          ]);
+      
+          // Aggregation for Best Selling Category
+          const bestSellingCategory = await Order.aggregate([
+            { 
+              $unwind: "$orderItems"  // Unwind the orderItems array to work with each product individually
+            },
+            {
+              $group: {
+                _id: "$orderItems.product.category",  // Group by category
+                totalQuantity: { $sum: "$orderItems.quantity" },  // Sum the quantity sold for each category
+              },
+            },
+            { 
+              $sort: { totalQuantity: -1 }  // Sort by total quantity sold in descending order
+            },
+            {
+              $limit: 1  // Get the top-selling category
+            }
+          ])
+
+        const monthly = await Order.aggregate([
+            // Step 1: Project year, month, and totalPrice for sales calculation
+            {
               $project: {
-                _id: 0, 
-                years: 1,  
-                months: 1  
+                year: { $year: "$createdOn" },
+                month: { $month: "$createdOn" },
+                totalPrice: 1  // This field contains the total price for each order
+              }
+            },
+            // Step 2: Group by year and month and sum the totalPrice (total sales)
+            {
+              $group: {
+                _id: { year: "$year", month: "$month" },  // Group by year and month
+                totalSales: { $sum: "$totalPrice" },  // Sum the total price (totalPrice)
+              }
+            },
+            // Step 3: Group again to get distinct years and months, and include total sales for each month
+            {
+              $group: {
+                _id: null,
+                years: { $addToSet: "$_id.year" },  // Collect distinct years
+                months: { $push: { month: "$_id.month", totalSales: "$totalSales" } }  // Collect month and total sales
+              }
+            },
+            // Step 4: Project final output
+            {
+              $project: {
+                _id: 0,
+                years: 1,
+                months: 1
               }
             }
           ]);
           
+        const yearly = await Order.aggregate([
+          // Step 1: Project year, month, and totalPrice for sales calculation
+          {
+            $project: {
+              year: { $year: "$createdOn" },
+              month: { $month: "$createdOn" },
+              totalPrice: 1  // This field contains the total price for each order
+            }
+          },
+          // Step 2: Group by year and month, and sum the totalPrice (total sales)
+          {
+            $group: {
+              _id: { year: "$year", month: "$month" },  // Group by year and month
+              totalSales: { $sum: "$totalPrice" },  // Sum the total price (totalPrice)
+            }
+          },
+          // Step 3: Group by year and accumulate monthly sales into an array
+          {
+            $group: {
+              _id: "$_id.year",  // Group by year
+              months: { 
+                $push: {
+                  month: "$_id.month", 
+                  totalSales: "$totalSales" 
+                }
+              },
+              totalYearSales: { $sum: "$totalSales" }  // Sum sales for the entire year
+            }
+          },
+          // Step 4: Project final output
+          {
+            $project: {
+              year: "$_id",  // Return the year
+              months: 1,  // Include the months with total sales
+              totalYearSales: 1  // Include the total sales for the year
+            }
+          }
+        ]);
+        
+
+
+          console.log("product",bestSellingProduct,'category',bestSellingCategory);
+          
+          const topSellingProducts = await Order.aggregate([
+            { 
+              $unwind: "$orderItems"  // Unwind the orderItems array to get each product individually
+            },
+            {
+              $group: {
+                _id: "$orderItems.productId",  // Group by productId
+                totalQuantity: { $sum: "$orderItems.quantity" },  // Sum the quantity sold for each product
+                productName: { $first: "$orderItems.product.productName" },  // Get the product name (assuming it's stored here)
+              },
+            },
+            { 
+              $sort: { totalQuantity: -1 }  // Sort by total quantity sold in descending order
+            },
+            {
+              $limit: 10  // Limit to top 10 selling products
+            }
+          ]);
+      
+          // Aggregation for Top 10 Selling Categories
+          const topSellingCategories = await Order.aggregate([
+            { 
+              $unwind: "$orderItems"  // Unwind the orderItems array to get each product individually
+            },
+            {
+              $group: {
+                _id: "$orderItems.product.category",  // Group by product category
+                totalQuantity: { $sum: "$orderItems.quantity" },  // Sum the quantity sold for each category
+              },
+            },
+            { 
+              $sort: { totalQuantity: -1 }  // Sort by total quantity sold in descending order
+            },
+            {
+              $limit: 10  // Limit to top 10 selling categories
+            }
+          ]); 
+
+          console.log(topSellingCategories,topSellingProducts)
+
+
         //   console.log(yearsAndMonths);
           
           
@@ -469,7 +627,21 @@ adminController.loadDashboard = async  (req,res) => {
             total = total+i.totalPrice;
         }
         
-        res.render('./admin/index',{orders,total,count,products,categories,currentMonthTotal,yearsAndMonths});
+        res.render('./admin/index',{
+            category,
+            orders,
+            total,
+            count,
+            products,
+            categories,
+            currentMonthTotal,
+            monthly,
+            yearly,
+            bestSellingProduct,
+            bestSellingCategory,
+            topSellingCategories,
+            topSellingProducts
+        });
     }
     catch(err)
     {
@@ -517,6 +689,42 @@ if (category) {
 const orders = await Order.find(query).sort({ createdOn: -1 }); // Sort by createdOn in descending order
 
 console.log(orders);
+
+const yearsAndMonths = await Order.aggregate([
+    // Step 1: Project year, month, and totalPrice for sales calculation
+    {
+      $project: {
+        year: { $year: "$createdOn" },
+        month: { $month: "$createdOn" },
+        totalPrice: 1  // This field contains the total price for each order
+      }
+    },
+    // Step 2: Group by year and month and sum the totalPrice (total sales)
+    {
+      $group: {
+        _id: { year: "$year", month: "$month" },  // Group by year and month
+        totalSales: { $sum: "$totalPrice" },  // Sum the total price (totalPrice)
+      }
+    },
+    // Step 3: Group again to get distinct years and months, and include total sales for each month
+    {
+      $group: {
+        _id: null,
+        years: { $addToSet: "$_id.year" },  // Collect distinct years
+        months: { $push: { month: "$_id.month", totalSales: "$totalSales" } }  // Collect month and total sales
+      }
+    },
+    // Step 4: Project final output
+    {
+      $project: {
+        _id: 0,
+        years: 1,
+        months: 1
+      }
+    }
+  ]);
+  
+  console.log(yearsAndMonths);
 
 
         if(!orders.length)

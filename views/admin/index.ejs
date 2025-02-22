@@ -17,7 +17,7 @@
                             <span class="icon icon-sm rounded-circle bg-primary-light"><i class="text-primary material-icons md-monetization_on"></i></span>
                             <div class="text">
                                 <h6 class="mb-1 card-title">Revenue</h6>
-                                <span>$<%= total %></span>
+                                <span>$<%= Math.round(total) %></span>
                                 <span class="text-sm">
                                     Shipping fees are not included
                                 </span>
@@ -56,7 +56,7 @@
                         <article class="icontext">
                             <span class="icon icon-sm rounded-circle bg-info-light"><i class="text-info material-icons md-shopping_basket"></i></span>
                             <div class="text">
-                                <h6 class="mb-1 card-title">Monthly Earning</h6> <span>$<%= currentMonthTotal[0].totalAmount %></span>
+                                <h6 class="mb-1 card-title">Monthly Earning</h6> <span>$<%= Math.round(currentMonthTotal[0].totalAmount) %></span>
                                 <span class="text-sm">
                                     Based in your local time.
                                 </span>
@@ -65,17 +65,36 @@
                     </div>
                 </div>
             </div>
+            <p id="test2" data-id="<%= JSON.stringify({category,
+                orders,
+                total,
+                count,
+                products,
+                categories,
+                currentMonthTotal,
+                monthly,
+                yearly,
+                bestSellingProduct,
+                bestSellingCategory}) %>"></p>
+            <!-- <p><%= //yearsAndMonths[0].years %></p> -->
             <div class="row">
                 <!-- <div class="col-xl-8 col-lg-12"> -->
                     <div class="card mb-4">
+                        
                         <article class="card-body">
-                            <h5 class="card-title">Sale statistics</h5>
+                            <div class="d-flex justify-content-between">
+                                <h5 class="card-title">Sale statistics</h5>
+                                <select name="" class="form-select shadow-sm" id="sale-staticts" style="width: 120px;">
+                                    <option value="month">Month</option>
+                                    <option value="year">Year</option>
+                                </select>
+                            </div>
                             <canvas id="myChart" height="120px"></canvas>
                         </article>
                     </div>
-                    <!-- <div class="row">
-                        <div class="col-lg-5">
-                            <div class="card mb-4">
+                    <!-- <div class="row"> -->
+                        <!-- <div class="col-lg-5"> -->
+                            <!-- <div class="card mb-4">
                                 <article class="card-body">
                                     <h5 class="card-title">New Members</h5>
                                     <div class="new-member-list">
@@ -117,8 +136,8 @@
                                         </div>
                                     </div>
                                 </article>
-                            </div>
-                        </div> -->
+                            </div> -->
+                        <!-- </div> -->
                         <!-- <div class="col-lg-7">
                             <div class="card mb-4">
                                 <article class="card-body">
@@ -202,43 +221,71 @@
                                     </ul>
                                 </article>
                             </div>
+                        </div> -->
+                    <!-- </div> -->
+                </div>
+                
+                
+                <div class="row justify-content-around">
+                    <div class="col-xl-4 col-lg-12 ">
+                        <div class="card mb-4">
+                            <article class="card-body">
+                                <h5 class="card-title">Top Selling Products</h5>
+                                <!-- Product Table -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Product Name</th>
+                                                <th>Quantity Sold</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% topSellingProducts.forEach((product, index) => { %>
+                                                <tr>
+                                                    <td><%= index + 1 %></td>
+                                                    <td><%= product.productName %></td>
+                                                    <td><%= product.totalQuantity %></td>
+                                                </tr>
+                                            <% }) %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </article>
                         </div>
                     </div>
+                    <div class="col-xl-4 col-lg-12">
+                        <div class="card mb-4">
+                            <article class="card-body">
+                                <h5 class="card-title">Top Selling Categories</h5>
+                                <!-- Category Table -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Category Name</th>
+                                                <th>Quantity Sold</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% topSellingCategories.forEach((cat, index) => { %>
+                                                <tr>
+                                                    <td><%= index + 1 %></td>
+                                                    <td><%= category.find(elm => elm._id.toString() == cat._id.toString()).name %></td>
+                                                    <td><%= cat.totalQuantity %></td>
+                                                </tr>
+                                            <% }) %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                    
                 </div>
-                <div class="col-xl-4 col-lg-12">
-                    <div class="card mb-4">
-                        <article class="card-body">
-                            <h5 class="card-title">Revenue Base on Area</h5>
-                            <canvas id="myChart2" height="217"></canvas>
-                        </article>
-                    </div> -->
-                    <!-- <div class="card mb-4">
-                        <article class="card-body">
-                            <h5 class="card-title">Marketing Chanel</h5>
-                            <span class="text-muted font-xs">Facebook</span>
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: 15%">15%</div>
-                            </div>
-                            <span class="text-muted font-xs">Instagram</span>
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: 65%">65% </div>
-                            </div>
-                            <span class="text-muted font-xs">Google</span>
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: 51%"> 51% </div>
-                            </div>
-                            <span class="text-muted font-xs">Twitter</span>
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: 80%"> 80%</div>
-                            </div>
-                            <span class="text-muted font-xs">Other</span>
-                            <div class="progress mb-3">
-                                <div class="progress-bar" role="progressbar" style="width: 80%"> 80%</div>
-                            </div>
-                        </article>
-                    </div> -->
-                <!-- </div> -->
-            </div>
+                </div>
             <div class="card mb-4 shadow-lg border-0 rounded-3">
                 <header class="card-header p-4 d-flex justify-content-between align-items-center bg-light rounded-top">
                     <h4 class="card-title mb-0 text-primary">Latest Orders</h4>
@@ -247,8 +294,8 @@
                         <div class="custom_select">
                             <select class="form-select shadow-sm" id="sort-by">
                                 <option value="" selected>All Categories</option>
-                                <% yearsAndMonths[0].years.forEach(element => { %>
-                                    <option value="<%= element %>"><%= element %></option>
+                                <% yearly.forEach(element => { %>
+                                    <option value="<%= element._id %>"><%= element._id %></option>
                                 <% }) %>
                             </select>
                         </div>
@@ -360,263 +407,128 @@
                 </nav>
             </div>
         </section> <!-- content-main end// -->
-        
-        <script>
-            let dateRange = {}
-            // Date validation configuration
-            const DATE_VALIDATION_CONFIG = {
-                errorClasses: {
-                    invalid: 'is-invalid',
-                    hidden: 'd-none'
-                },
-                elements: {
-                    startDate: 'start-date',
-                    endDate: 'end-date',
-                    startError: 'start-date-error',
-                    endError: 'end-date-error'
-                },
-                messages: {
-                    endBeforeStart: 'End date cannot be earlier than the start date.',
-                    futureStartDate: 'Start date cannot be in the future.',
-                    futureEndDate: 'End date cannot be in the future.',
-                    // requiredStart: 'Start date is required.',
-                    // requiredEnd: 'End date is required.',
-                    invalidFormat: 'Invalid date format.'
-                }
-            };
 
-            class DateValidator {
-                constructor(config = DATE_VALIDATION_CONFIG) {
-                    this.config = config;
-                    this.elements = this.initializeElements();
-                }
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="/admin/assets/js/index.js"></script>
 
-                initializeElements() {
-                    return {
-                        startDate: document.getElementById(this.config.elements.startDate),
-                        endDate: document.getElementById(this.config.elements.endDate),
-                        startError: document.getElementById(this.config.elements.startError),
-                        endError: document.getElementById(this.config.elements.endError)
-                    };
-                }
+            <!-- <script>
 
-                clearErrors() {
-                    const { invalid, hidden } = this.config.errorClasses;
-                    const { startDate, endDate, startError, endError } = this.elements;
+                console.log()
+                const {orders,total,count,products,categories,currentMonthTotal,yearsAndMonths} = JSON.parse(document.getElementById("test2").getAttribute("data-id"))
+                let months = ['January', 'February', 'March', 'April', 'May','June','July','Augest','September','November','December']
+                let newMonts = yearsAndMonths[0].months  //[2,12,11]
+            // Wait until the document is fully loaded
+            document.addEventListener("DOMContentLoaded", function() {
+                var ctx = document.getElementById('myChart').getContext('2d');
 
-                    [startDate, endDate].forEach(element => {
-                        element.classList.remove(invalid);
-                    });
-
-                    [startError, endError].forEach(element => {
-                        element.classList.add(hidden);
-                        element.textContent = '';
-                    });
-                }
-
-                showError(element, errorElement, message) {
-                    const { invalid, hidden } = this.config.errorClasses;
-                    element.classList.add(invalid);
-                    errorElement.textContent = message;
-                    errorElement.classList.remove(hidden);
-                }
-
-                isValidDateFormat(dateString) {
-                    const date = new Date(dateString);
-                    return date instanceof Date && !isNaN(date);
-                }
-
-                validateDates() {
-                    const { startDate, endDate, startError, endError } = this.elements;
-                    const { messages } = this.config;
+                var myChart = new Chart(ctx, {
+                    type: 'bar', // You can change this to other types like 'line', 'pie', etc.
+                    data: {
+                        labels: yearsAndMonths[0].months , // X-axis labels
+                        datasets: [{
+                            label: 'Sales Amount ($)', // Label for the dataset
+                            data: [1000, 2000, 1500, 3000, 2500], // Y-axis values
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)', // Bar color
+                            borderColor: 'rgba(75, 192, 192, 1)', // Border color of the bars
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true, // Makes the chart responsive
+                        scales: {
+                            y: {
+                                beginAtZero: true // Start Y-axis from zero
+                            }
+                        }
+                    }
+                });
+            });
+            </script> -->
+            <script>
+                // Wait until the document is fully loaded
+                document.addEventListener("DOMContentLoaded", function() {
+                    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                    let data = [];
+                    let labels = [];
+                    let salesData = [];
+                    let years = [];
+                    let yearlyPrice = [];
                     
-                    this.clearErrors();
-
-                    // Get current date (midnight)
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-
-                    const startDateObj = new Date(startDate.value);
-                    const endDateObj = new Date(endDate.value);
-
-                    // Set time to midnight for proper date comparison
-                    startDateObj.setHours(0, 0, 0, 0);
-                    endDateObj.setHours(0, 0, 0, 0);
-
-                    // Logical validation
-                    if (endDateObj < startDateObj) {
-                        this.showError(endDate, endError, messages.endBeforeStart);
-                        return false;
-                    }
-
-                    if (startDateObj > today) {
-                        this.showError(startDate, startError, messages.futureStartDate);
-                        return false;
-                    }
-
-                    if (endDateObj > today) {
-                        this.showError(endDate, endError, messages.futureEndDate);
-                        return false;
-                    }
-
-                    return true;
-                }
-
-                getDateRange() {
-                    if (this.validateDates()) {
-                        return {
-                            startDate: this.elements.startDate.value,
-                            endDate: this.elements.endDate.value
-                        };
-                    }
-                    return null;
-                }
-            }
-
-            // Usage example
-            async function applyFilter() {
-                const dateValidator = new DateValidator();
-                dateRange = dateValidator.getDateRange();
-                
-                if (dateRange) {
-                    const category = document.getElementById("sort-by").value;
-                    const order = document.getElementById("orders")
-                    dateRange.category = category;
-                    // console.log('Filter Applied:', { 
-                    //     // category, 
-                    //     startDate: dateRange.startDate, 
-                    //     endDate: dateRange.endDate 
-                    // });
-                    console.log(dateRange);
-
-    let response = await fetch("/admin/filter", {
-    method: "PUT",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify(dateRange)
-});
-
-let details = await response.json();
-
-console.log(details);
-
-if (details.success) {
-    order.innerHTML = ""; // Clear existing content
-
-    // Use map to generate the rows and join them as a single string
-    order.innerHTML = details.orders.map(element => {
-        return `
-            <tr>
-                <td><a href="#" class="fw-bold text-primary">${element._id}</a></td>
-                <td>${element.addres.name}</td>
-                <td>
-                    ${new Date(element.createdOn).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' })}
-                </td>
-                <td>
-                    ${element.totalPrice}
-                </td>
-                <td>
-                    <i class="material-icons md-payment font-xxl text-muted"></i> ${element.paymentMethod}
-                </td>
-                <td>
-                    <a href="/admin/orderManagement/details/${element._id}" class="btn btn-sm btn-outline-primary">View Details</a>
-                </td>
-            </tr>
-        `;
-    }).join(""); // Join the array into a single string
-
-}
-    }
-    // return false;
-}
-
-    // Event listeners
-    document.addEventListener('DOMContentLoaded', () => {
-        const dateValidator = new DateValidator();
-        
-        // Add input event listeners for real-time validation
-        dateValidator.elements.startDate.addEventListener('change', () => {
-            dateValidator.validateDates();
-        });
-        
-        dateValidator.elements.endDate.addEventListener('change', () => {
-            dateValidator.validateDates();
-        });
-        
-
-    });
-
-    //Genrate Pdf Reprst
-    async function generateReport() {
-    try {
-        // console.log("Date Details", dateRange); // Log the date range details
-        
-
-
-        // Fetch request to the backend
-        const response = await fetch("/admin/sales-report", { // Fixed the URL to match the backend endpoint
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dateRange), // Send dateRange data to the backend
-        });
-
-        // Handle the response from the backend
-        if (response.ok) {
-            // Assuming the backend sends the PDF as a file in response
-            const blob = await response.blob();
-            const url = URL.createObjectURL(blob);
+                    // Get the data from the HTML element with id "test2"
+                    const { category, orders, total, count, products, categories, currentMonthTotal, monthly, yearly, bestSellingProduct, bestSellingCategory } = JSON.parse(document.getElementById("test2").getAttribute("data-id"));
+                    
+                    // Function to update chart data
+                    function updateChart(staticsSort) {
+                        // Map the monthly sales data if it's available
+                        if (monthly && monthly.length > 0) {
+                            salesData = monthly[0].months.map(monthIndex => Math.round(monthIndex.totalSales));
+                        }
             
-            // Trigger download directly via URL
-            // window.location.href = url;
-        } else {
-            // If the response is not OK, log the error
-            const errorData = await response.json();
-            console.error("Error generating the report:", errorData.message);
-            alert(`Error: ${errorData.message}`);
-        }
-    } catch (error) {
-        // Catch any errors during the fetch call
-        console.error("An error occurred while generating the report:", error);
-        alert("An error occurred while generating the report.");
-    }
-}
+                        // Map the yearly data if it's available
+                        if (yearly && yearly.length > 0) {
+                            years = yearly.map(data => data.year);
+                            yearlyPrice = yearly.map(data => data.totalYearSales);
+                        }
+            
+                        if (staticsSort === "month") {
+                            console.log("We are in month");
+                            labels = months;
+                            data = salesData;
+                        }
+            
+                        if (staticsSort === "year") {
+                            console.log("We are in years");
+                            labels = years;
+                            data = yearlyPrice;
+                        }
+            
+                        // Get the chart context
+                        var ctx = document.getElementById('myChart').getContext('2d');
+            
+                        // Destroy the previous chart if it exists
+                        if (window.myChart instanceof Chart) {
+                            window.myChart.destroy();
+                        }
+            
+                        // Create the Chart.js bar chart
+                        window.myChart = new Chart(ctx, {
+                            type: 'bar', // Type of chart
+                            data: {
+                                labels: labels, // X-axis labels (Months or Years)
+                                datasets: [{
+                                    label: 'Sales Amount ($)', // Label for the dataset
+                                    data: data, // Y-axis values (Sales per month or year)
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // Bar color
+                                    borderColor: 'rgba(75, 192, 192, 1)', // Border color of the bars
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true, // Makes the chart responsive
+                                scales: {
+                                    y: {
+                                        beginAtZero: true // Start Y-axis from zero
+                                    }
+                                }
+                            }
+                        });
+                    }
+            
+                    // Get the staticsSort value (month or year)
+                    const staticsSort = document.getElementById("sale-staticts");
+            
+                    // Initially render the chart with the default value
+                    updateChart(staticsSort.value);
+            
+                    // Add an event listener to handle changes
+                    staticsSort.addEventListener("change", function() {
+                        updateChart(staticsSort.value);
+                    });
+                });
+            </script>
+            
+            
 
-
-
-    function resetFilters() {
-    const { startDate, endDate, startError, endError } = new DateValidator().elements;
-    const { invalid, hidden } = DATE_VALIDATION_CONFIG.errorClasses;
-
-    // Clear date inputs
-    startDate.value = '';
-    endDate.value = '';
-
-    // Remove error messages and invalid classes
-    startDate.classList.remove(invalid);
-    endDate.classList.remove(invalid);
-    startError.classList.add(hidden);
-    endError.classList.add(hidden);
-    startError.textContent = '';
-    endError.textContent = '';
-
-    // Reset category dropdown (if needed)
-    const categoryDropdown = document.getElementById("sort-by");
-    categoryDropdown.value = ''; // Or set a default value like categoryDropdown.value = 'all'
-
-    // Reset the global date range object
-    dateRange = {};
-    
-    // Optionally clear or reset the orders
-    const order = document.getElementById("orders");
-    order.innerHTML = ""; // Clear any displayed orders if applicable
-}
-document.getElementById("reset-filters-btn").addEventListener('click', resetFilters);
-
-
-</script>
 
 
 
