@@ -56,7 +56,11 @@
                         <strong><%= element.code %></strong>
                     </div>
                     <div class="col-md-3">
-                        ₹ <%= element.discount %>
+                        <% if (element.type == "fixed") { %>
+                            ₹ <%= element.discount %>
+                        <% } else { %>
+                            % <%= element.discount %>
+                        <% } %>
                     </div>
                     <!-- <div class="col-md-3">
                         <span class="badge rounded-pill 'bg-success' ">
@@ -86,6 +90,13 @@
                 </div>
                 <form action="/admin/coupons/add" method="POST" id="addCouponForm">
                     <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Discount Type</label>
+                            <select class="form-select" name="discountType" id="discountType">
+                                <option value="fixed" selected>Fixed Amount</option>
+                                <option value="percentage">Percentage</option>
+                            </select>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label">Coupon Code</label>
                             <input type="text" class="form-control" name="code" id="couponCode" 
@@ -141,6 +152,122 @@ function clearAllErrors() {
     });
 }
 
+// async function validateAndSubmit(e) {
+//     clearAllErrors();
+    
+//     let isValid = true;
+    
+//     // Get form elements
+//     const form = document.getElementById('addCouponForm');
+//     const codeInput = document.getElementById('couponCode');
+//     const discountInput = document.getElementById('discountAmount');
+//     const minPurchaseInput = document.getElementById('minPurchase');
+    
+//     const codeError = document.getElementById('codeError');
+//     const discountError = document.getElementById('discountError');
+//     const minPurchaseError = document.getElementById('minPurchaseError');
+
+//     // Validate Coupon Code
+//     const codePattern = /^[A-Za-z0-9]{6,12}$/;
+//     if (!codeInput.value) {
+//         showError(codeInput, codeError, 'Coupon code is required');
+//         isValid = false;
+//     } else if (!codePattern.test(codeInput.value)) {
+//         showError(codeInput, codeError, 'Coupon code must be 6-12 characters long and can only contain letters and numbers');
+//         isValid = false;
+//     }
+    
+//     // Validate Discount Amount
+//     const discountAmount = parseFloat(discountInput.value);
+//     if (!discountInput.value) {
+//         showError(discountInput, discountError, 'Discount amount is required');
+//         isValid = false;
+//     } else if (isNaN(discountAmount) || discountAmount < 1 || discountAmount > 10000) {
+//         showError(discountInput, discountError, 'Discount amount must be between ₹1 and ₹10,000');
+//         isValid = false;
+//     }
+    
+//     // Validate Minimum Purchase Amount
+//     const minPurchase = parseFloat(minPurchaseInput.value);
+//     if (!minPurchaseInput.value) {
+//         showError(minPurchaseInput, minPurchaseError, 'Minimum purchase amount is required');
+//         isValid = false;
+//     } else if (isNaN(minPurchase) || minPurchase < 1 || minPurchase > 100000) {
+//         showError(minPurchaseInput, minPurchaseError, 'Minimum purchase amount must be between ₹1 and ₹100,000');
+//         isValid = false;
+//     }
+    
+//     // Check if discount is less than minimum purchase
+//     if (isValid && discountAmount >= minPurchase) {
+//         showError(discountInput, discountError, 'Discount amount must be less than minimum purchase amount');
+//         isValid = false;
+//     }
+    
+//     if (isValid) {
+//         try {
+//             const data = {
+//                 type:[],
+//                 code: codeInput.value,
+//                 discount: discountInput.value,
+//                 minAmount: minPurchaseInput.value
+//             };
+
+//             // Show loading state
+//             Swal.fire({
+//                 title: 'Adding Coupon...',
+//                 text: 'Please wait',
+//                 allowOutsideClick: false,
+//                 showConfirmButton: false,
+//                 willOpen: () => {
+//                     Swal.showLoading();
+//                 }
+//             });
+
+//             const response = await fetch("/admin/coupons/add", {
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                 },
+//                 body: JSON.stringify(data)
+//             });
+            
+//             const responseData = await response.json();
+            
+//             if (responseData.success) {
+//                 // Close modal
+//                 const modal = bootstrap.Modal.getInstance(document.getElementById('addCouponModal'));
+//                 modal.hide();
+                
+//                 // Reset form
+//                 form.reset();
+                
+//                 // Show success message
+//                 await Swal.fire({
+//                     icon: 'success',
+//                     title: 'Success!',
+//                     text: 'Coupon added successfully',
+//                     timer: 1500
+//                 });
+                
+//                 // Reload page to show new coupon
+//                 window.location.reload();
+//             } else {
+//                 Swal.fire({
+//                     icon: 'error',
+//                     title: 'Error!',
+//                     text: responseData.message || 'Failed to add coupon'
+//                 });
+//             }
+//         } catch (error) {
+//             console.error("Error:", error);
+//             Swal.fire({
+//                 icon: 'error',
+//                 title: 'Error!',
+//                 text: 'Failed to add coupon. Please try again.'
+//             });
+//         }
+//     }
+// }
 async function validateAndSubmit(e) {
     clearAllErrors();
     
@@ -151,6 +278,11 @@ async function validateAndSubmit(e) {
     const codeInput = document.getElementById('couponCode');
     const discountInput = document.getElementById('discountAmount');
     const minPurchaseInput = document.getElementById('minPurchase');
+    const discountTypeInput = document.getElementById('discountType');
+    //     const form = document.getElementById('addCouponForm');
+//     const codeInput = document.getElementById('couponCode');
+//     const discountInput = document.getElementById('discountAmount');
+//     const minPurchaseInput = document.getElementById('minPurchase');
     
     const codeError = document.getElementById('codeError');
     const discountError = document.getElementById('discountError');
@@ -168,11 +300,16 @@ async function validateAndSubmit(e) {
     
     // Validate Discount Amount
     const discountAmount = parseFloat(discountInput.value);
+    const discountType = discountTypeInput.value;
+    
     if (!discountInput.value) {
         showError(discountInput, discountError, 'Discount amount is required');
         isValid = false;
-    } else if (isNaN(discountAmount) || discountAmount < 1 || discountAmount > 10000) {
-        showError(discountInput, discountError, 'Discount amount must be between ₹1 and ₹10,000');
+    } else if (isNaN(discountAmount) || (discountType === 'fixed' && (discountAmount < 1 || discountAmount > 10000)) || (discountType === 'percentage' && (discountAmount < 1 || discountAmount > 100))) {
+        const message = discountType === 'fixed' 
+            ? 'Discount amount must be between ₹1 and ₹10,000' 
+            : 'Discount percentage must be between 1% and 100%';
+        showError(discountInput, discountError, message);
         isValid = false;
     }
     
@@ -197,8 +334,11 @@ async function validateAndSubmit(e) {
             const data = {
                 code: codeInput.value,
                 discount: discountInput.value,
-                minAmount: minPurchaseInput.value
+                minAmount: minPurchaseInput.value,
+                type: discountType // Send the discount type (fixed or percentage)
             };
+
+            console.log("data is",data)
 
             // Show loading state
             Swal.fire({
@@ -256,6 +396,7 @@ async function validateAndSubmit(e) {
         }
     }
 }
+
 
 // Function to delete coupon
 async function deleteCoupon(couponId) {

@@ -361,6 +361,9 @@ cartController.applyCoupon = async (req,res) => {
         const couponDetails = await coupon.findById(couponId);
         console.log("Coupon Details",couponDetails);
         const couponAmount = couponDetails.discount;
+        const couponType = couponDetails.type;
+        let discountPrice;
+        
 
         if(totalPrice<couponDetails.minmumAmount)
         {
@@ -377,16 +380,33 @@ cartController.applyCoupon = async (req,res) => {
         
         // console.log("Cart Details",existingCart);
 
-        // Calculate total price of cart items
-        const discountPrice = existingCart.items.reduce((total, element) => {
-            // console.log(element)
-            const product = element.productId; // Get the product details
-            const variant = product.variants.find(variant => variant._id.toString() === element.variantId.toString()); // Find the selected variant
+        if(couponType == "fixed")
+        {
+            // Calculate total price of cart items
+            discountPrice = existingCart.items.reduce((total, element) => {
+                // console.log(element)
+                const product = element.productId; // Get the product details
+                const variant = product.variants.find(variant => variant._id.toString() === element.variantId.toString()); // Find the selected variant
+                
+                element.price = variant.salePrice  - ((variant.salePrice/totalPrice)*couponDetails.discount);
+                // Add the price of the variant * quantity to the total
+                return total + (element.price * element.quantity);
+            }, 0); // Initial value is 0
+        }
+        else
+        {   
+            discountPrice = existingCart.items.reduce((total, element) => {
+                // console.log(element)
+                const product = element.productId; // Get the product details
+                const variant = product.variants.find(variant => variant._id.toString() === element.variantId.toString()); // Find the selected variant
+                
+                element.price = variant.salePrice - ((variant.salePrice) * (couponDetails.discount / 100));
+
+                // Add the price of the variant * quantity to the total
+                return total + (element.price * element.quantity);
+            }, 0); // Initial value is 0
             
-            element.price = variant.salePrice  - ((variant.salePrice/totalPrice)*couponDetails.discount);
-            // Add the price of the variant * quantity to the total
-            return total + (element.price * element.quantity);
-        }, 0); // Initial value is 0
+        }
 
         if(existingCart  &&  existingCart.couponApplied)
         {

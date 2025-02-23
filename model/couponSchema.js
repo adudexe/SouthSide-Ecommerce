@@ -7,6 +7,12 @@ const couponSchema = new mongoose.Schema({
         required:true,
         unique:true
     },
+    type: {
+        type: String,
+        enum: ['fixed', 'percentage'],  // 'fixed' or 'percentage' type for the discount
+        required: true
+    },
+
     // isActive:{
     //     type:Boolean,
     //     required:true,
