@@ -161,24 +161,30 @@
                                         <div class="col-md-3">
                                             <div class="price-tag mb-2 mb-md-0">$<%= element.price %></div>
                                         </div>
-                                        <div class="col-md-3 text-md-end">
+                                        <div class="col-md-3 text-md-end gap-5">
+                                            <% if (element.status === "Delivered") { %>
+                                                <span class="status-badge bg-success" style="margin-right: 20px;"><%= element.status %></span>
+                                                <button class="return-btn btn-custom btn btn-sm" style="background-color: red; border: none;" data-id="<%= element._id %>">Return Product</button>
+                                            <% } else if (element.status === "Returned") { %>
+                                                <span class="status-badge bg-danger"><%= element.status %></span>
+                                            <% } else if (element.status === "Refunded") { %>
+                                                <span class="status-badge bg-success"><%= element.status %></span>
+                                            <% } else {%>
                                             <% if (element.status === "Pending") { %>
                                                 <span class="status-badge bg-warning text-dark"><%= element.status %></span>
                                             <% } else if (element.status === "Shipped") { %>
                                                 <span class="status-badge bg-info"><%= element.status %></span>
                                             <% } else if (element.status === "Cancelled") { %>
                                                 <span class="status-badge bg-danger"><%= element.status %></span>
-                                            <% } else if (element.status === "Delivered") { %>
-                                                <span class="status-badge bg-success"><%= element.status %></span>
                                             <% } %>
-                                            
                                             <div class="mt-2">
                                                 <% if(element.status == "Cancelled") { %>
                                                     <button class="btn-custom btn btn-outline-danger btn-sm" disabled>Cancel</button>
                                                 <% } else { %>
-                                                    <button class="cancel-btn btn-custom btn btn-outline-danger btn-sm" data-id="<%= element._id %>">Cancel</button>
+                                                    <button class="cancel-btn btn-custom btn  btn-sm"  style="background-color: red; border: none;" data-id="<%= element._id %>">Cancel</button>
                                                 <% } %>
                                             </div>
+                                        <% }  %>
                                         </div>
                                     </div>
                                 </div>
@@ -268,6 +274,81 @@
         $(document).ready(function() {
             $('.text-success').hide().fadeIn(1500);
         });
+
+
+        const returnBtn = document.querySelectorAll(".return-btn");
+        if(returnBtn.length)
+        {
+            returnBtn.forEach(button=> {
+            button.addEventListener("click", async (e) => {
+                const orderId = e.target.getAttribute("data-id");
+                
+                // Show cancellation reason modal
+                const { value: cancelReason, isDismissed } = await Swal.fire({
+                    title: 'Return Product',
+                    input: 'textarea',
+                    inputLabel: 'Please tell us why you want to return this product',
+                    inputPlaceholder: 'Enter your reason here...',
+                    inputAttributes: {
+                        'aria-label': 'Cancellation reason',
+                        'maxlength': '500'
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: 'Submit',
+                    cancelButtonText: 'Keep Order',
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'Please provide a reason for cancellation';
+                        }
+                        if (value.length < 10) {
+                            return 'Please provide a more detailed reason (minimum 10 characters)';
+                        }
+                    }
+                });
+
+                if (isDismissed) return;
+
+                try {
+                // Send cancellation request with reason
+                const response = await fetch(`/user/myAccount/order/return/${orderId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ reason: cancelReason })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to cancel the order. Status: ${response.status}`);
+                }
+
+                const details = await response.json();
+                console.log("Order canceled:", details);
+
+                // Show success message
+                await Swal.fire({
+                    title: 'Return Initiated',
+                    text:  details.message || 'Return has initiated succesfully',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+
+                window.location.reload();
+            } catch (err) {
+                console.error("Error canceling the order:", err);
+                
+                // Show error message
+                await Swal.fire({
+                    title: 'Error!',
+                    text: 'There was an error in returning the order. Please try again later.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+                
+            })
+        })
+    }
     </script>
 </body>
 </html>

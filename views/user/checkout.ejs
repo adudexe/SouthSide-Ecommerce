@@ -74,7 +74,7 @@
                         </div>
 
 
-                        <div class="order-totals" id="order-totals">
+                        <div class="order-total" id="order-totals">
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Subtotal</span>
                                 <span class="fw-bold total-amount"><%= total %> </span>
@@ -680,7 +680,8 @@
 
     async function applyCoupon(code, discount, minAmount, id) {
     const subtotal = parseFloat(document.querySelector('.total-amount').innerText);
-    const orderTotal = document.getElementById("order-totals");
+    const orderTotal = document.querySelector('#order-totals');
+    orderTotal.innerHTML = ""
     
     if (minAmount && subtotal < minAmount) {
         Swal.fire({
@@ -708,6 +709,7 @@
                 });
                 
                 const data = await response.json();
+                console.log("data is",data)
                 totalAmount = data.newPrice || 0;
 
                 if (data.success) {
@@ -715,7 +717,7 @@
                     orderTotal.innerHTML = `
                         <div class="d-flex justify-content-between mb-2">
                             <span>Subtotal</span>
-                            <span class="fw-bold total-amount">₹${data.oldPrice}</span>
+                            <span class="fw-bold total-amount">₹${Math.round(data.oldPrice)}</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Shipping</span>
@@ -723,28 +725,32 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span>Discount</span>
-                            <span class="fw-bold">-₹ ${data.oldPrice-data.newPrice}</span>
+                            <span class="fw-bold">-₹ ${data.couponAmount}</span>
                         </div>
                         <div class="d-flex justify-content-between border-top pt-3 mt-3">
                             <span class="h5 mb-0">Total</span>
-                            <span class="h5 mb-0 text-brand">₹${data.newPrice}</span>
+                            <span class="h5 mb-0 text-brand">₹${Math.round(data.newPrice)}</span>
                         </div>
                     `;
 
-                    const cod = document.getElementById("cod");
+                    // const cod = document.getElementById("cod");
+                    const cod = document.getElementById("payment-methods").querySelector("#cod")
 
-                    if(data.newPrice < 1000)
+                    if(cod)
                     {
-                        cod.innerHTML = '';
-                    }
-                    else
-                    {
-                        cod.innerHTML = `
-                            <input class="form-check-input" type="radio" name="payment_option" id="cod" value="cod" checked>
-                            <label class="form-check-label" for="cod">
-                                Cash on Delivery
-                            </label>
-                        `
+                        if(data.newPrice < 1000)
+                        {
+                            cod.innerHTML = '';
+                        }
+                        else
+                        {
+                            cod.innerHTML = `
+                                <input class="form-check-input" type="radio" name="payment_option" id="cod" value="cod" checked>
+                                <label class="form-check-label" for="cod">
+                                    Cash on Delivery
+                                </label>
+                            `
+                        }
                     }
 
 
@@ -775,11 +781,13 @@
                         appliedBadge.textContent = 'Applied';
                         buttonContainer.appendChild(appliedBadge);
                     }
+                    console.log("data is ",data)
+                    // console.log(data.message)
 
                     Swal.fire({
                         icon: 'success',
                         title: 'Coupon Applied!',
-                        text: data.message || `₹${discount} discount has been applied to your order`,
+                        text: data.message || ` ${discount} discount has been applied to your order`,
                         timer: 1500
                     });
                 } else {
@@ -808,11 +816,11 @@ async function removeCoupon(code, id) {
         
         if (data.success) {
             // Update the order totals display
-            const orderTotal = document.getElementById("order-totals");
+            const orderTotal = document.querySelector("#order-totals");
             orderTotal.innerHTML = `
                 <div class="d-flex justify-content-between mb-2">
                     <span>Subtotal</span>
-                    <span class="fw-bold total-amount">₹${data.totalPrice}</span>
+                    <span class="fw-bold total-amount">₹${Math.round(data.totalPrice)}</span>
                 </div>
                 <div class="d-flex justify-content-between mb-2">
                     <span>Shipping</span>
@@ -820,24 +828,27 @@ async function removeCoupon(code, id) {
                 </div>
                 <div class="d-flex justify-content-between border-top pt-3 mt-3">
                     <span class="h5 mb-0">Total</span>
-                    <span class="h5 mb-0 text-brand">₹${data.totalPrice}</span>
+                    <span class="h5 mb-0 text-brand">₹${Math.round(data.totalPrice)}</span>
                 </div>
             `;
 
-            const cod = document.getElementById("cod");
+            const cod = document.getElementById("payment-methods").querySelector("#cod")
 
-            if(data.newPrice < 1000)
+            if(cod)
             {
-                cod.innerHTML = '';
-            }
-            else
-            {
-                cod.innerHTML = `
-                    <input class="form-check-input" type="radio" name="payment_option" id="cod" value="cod" checked>
-                    <label class="form-check-label" for="cod">
-                        Cash on Delivery
-                    </label>
-                `
+                if(data.newPrice < 1000)
+                {
+                    cod.innerHTML = '';
+                }
+                else
+                {
+                    cod.innerHTML = `
+                        <input class="form-check-input" type="radio" name="payment_option" id="cod" value="cod" checked>
+                        <label class="form-check-label" for="cod">
+                            Cash on Delivery
+                        </label>
+                    `
+                }
             }
 
             // Reset total amount global variable

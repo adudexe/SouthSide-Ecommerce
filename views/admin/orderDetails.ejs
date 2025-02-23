@@ -15,19 +15,22 @@
                             <small class="text-muted" id="OrderId">Order ID: <%= orderDetails._id %></small>
                         </div>
                         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
-                            <div class="d-flex align-items-start justify-content-end gap-2">
-                                <select id="globalStatus" class=" form-select d-inline-block mb-lg-0 mb-15 mw-200">
-                                    <option value="">Change All Statuses</option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Processing">Processing</option>
-                                    <option value="Shipped">Shipped</option>
-                                    <option value="Delivered">Delivered</option>
-                                    <option value="Cancelled">Cancelled</option>
-                                    <option value="Refunded">Refunded</option>
-                                    <option value="Returned">Returned</option>
-                                </select>
-                                <button class="btn btn-primary" onclick="updateAllStatuses()">Apply to All</button>
-                            </div>
+                            <p><%= %></p>
+                            <% if (!( orderDetails.orderItems.find(elm => (elm.status === 'Refunded' || elm.status === 'Cancelled')  ) )) { %>
+                                <div class="d-flex align-items-start justify-content-end gap-2">
+                                    <select id="globalStatus" class=" form-select d-inline-block mb-lg-0 mb-15 mw-200">
+                                        <option value="">Change All Statuses</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Processing">Processing</option>
+                                        <option value="Shipped">Shipped</option>
+                                        <option value="Delivered">Delivered</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                        <option value="Refunded">Refunded</option>
+                                        <option value="Returned">Returned</option>
+                                    </select>
+                                    <button class="btn btn-primary" onclick="updateAllStatuses()">Apply to All</button>
+                                </div>
+                            <% } %>
                         </div>
                     </div>
                 </header>
@@ -90,7 +93,8 @@
                                     </thead>
                                     <tbody>
                                        <% orderDetails.orderItems.forEach((element, index) => { %>
-                                        <!-- <p><%= element %></p> -->
+                                        <!-- <p><%= element  %></p> -->
+                                        <p><%= //element.product.variants.find(elm => elm._id.toString() == element.variantId.toString()) %></p>
                                         <tr>
                                             <td>
                                                 <a class="itemside" href="#">
@@ -100,11 +104,11 @@
                                                     <div class="info"><%= element.product.productName %> <%=  element.product.variants[0].color %>, <%= element.product.variants[0].size %> </div>
                                                 </a>
                                             </td>
-                                            <td> $44.25 </td>
-                                            <td> 2 </td>
+                                            <td> ₹ <%= Math.round(element.price/element.quantity) %> </td>
+                                            <td> <%= element.quantity %> </td>
                                             <td>
-                                                <select class="form-select product-status" 
-                                                        data-item-id="<%= element._id %>">
+                                                <% if (element.status == "Refunded" || element.status == "Cancelled") { %>
+                                                    <select class="form-select product-status" data-item-id="<%= element._id %>" disabled>
                                                     <option value="Pending" <%= element.status === 'Pending' ? 'selected' : '' %>>Pending</option>
                                                     <option value="Processing" <%= element.status === 'Processing' ? 'selected' : '' %>>Processing</option>
                                                     <option value="Shipped" <%= element.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
@@ -113,6 +117,18 @@
                                                     <option value="Refunded" <%= element.status === 'Refunded' ? 'selected' : '' %>>Refunded</option>
                                                     <option value="Returned" <%= element.status === 'Returned' ? 'selected' : '' %>>Returned</option>
                                                 </select>
+                                                <% } else { %>
+                                                    <select class="form-select product-status" 
+                                                        data-item-id="<%= element._id %>">
+                                                        <option value="Pending" <%= element.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                                                        <option value="Processing" <%= element.status === 'Processing' ? 'selected' : '' %>>Processing</option>
+                                                        <option value="Shipped" <%= element.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
+                                                        <option value="Delivered" <%= element.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                        <option value="Cancelled" <%= element.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                                        <option value="Refunded" <%= element.status === 'Refunded' ? 'selected' : '' %>>Refunded</option>
+                                                        <option value="Returned" <%= element.status === 'Returned' ? 'selected' : '' %>>Returned</option>
+                                                    </select>
+                                                <% } %>
                                             </td>
                                             <td>
                                                 <% if (element.status === 'Cancelled' || element.status === 'Returned') { %>
@@ -125,7 +141,7 @@
                                                     </button>
                                                 <% } %>
                                             </td>
-                                            <td class="text-end"> $99.50 </td>
+                                            <td class="text-end">₹<%= Math.round(element.price)%></td>
                                         </tr>
                                        <% }) %> 
                                     </tbody>
@@ -203,17 +219,21 @@
             
             let reason = '';
             let title = '';
+
+            // console.log(itemStatus, item.returnReson)
             
             // Check for cancel reason
             if (itemStatus === 'Cancelled' && item.cancelReason) {
                 reason = item.cancelReason;
                 title = 'Cancellation Reason';
             } 
-            // Check for return reason
-            else if (itemStatus === 'Returned' && item.returnReason) {
-                reason = item.returnReason;
+            // // Check for return reason
+            else if (itemStatus === 'Returned' && item.returnReson) {
+                reason = item.returnReson;
                 title = 'Return Reason';
             }
+
+            
             
             if (reason) {
                 document.getElementById('reasonModalLabel').textContent = title;

@@ -251,7 +251,7 @@ checkoutController.placeOrder = async (req, res) => {
                         productImages: product.productImages
                     },
                     quantity: item.quantity,
-                    price: variant.salePrice * item.quantity,
+                    price:Math.round( ( item.price || variant.salePrice) * item.quantity),
                     status: 'Pending', // Default status when the order is created
                     productId: item.productId,
                     variantId: item.variantId,
@@ -259,7 +259,7 @@ checkoutController.placeOrder = async (req, res) => {
                 });
 
                 // Add to total price
-                totalAmount += variant.salePrice * item.quantity;
+                totalAmount += Math.round( ( item.price || variant.salePrice) * item.quantity);
 
                 // Decrement the quantity of the variant in the product
                 if (variant.quantity >= item.quantity) {
@@ -436,7 +436,7 @@ checkoutController.onlinePayment = async (req, res) => {
                         productImages: product.productImages
                     },
                     quantity: item.quantity,
-                    price: variant.salePrice * item.quantity,
+                    price: Math.round( ( item.price || variant.salePrice) * item.quantity),
                     status: 'Pending', // Default status when the order is created
                     productId: item.productId,
                     variantId: item.variantId,
@@ -444,7 +444,7 @@ checkoutController.onlinePayment = async (req, res) => {
                 });
 
                 // Add to total price
-                totalAmount += variant.salePrice * item.quantity;
+                totalAmount += Math.round( ( item.price || variant.salePrice) * item.quantity);
 
                 // Decrement the quantity of the variant in the product
                 if (variant.quantity >= item.quantity) {
@@ -577,7 +577,7 @@ checkoutController.onlinePayment = async (req, res) => {
                             productImages: product.productImages
                         },
                         quantity: item.quantity,
-                        price: variant.salePrice * item.quantity,
+                        price: Math.round( ( item.price || variant.salePrice) * item.quantity),
                         status: 'Pending', // Default status when the order is created
                         productId: item.productId,
                         variantId: item.variantId,
@@ -585,7 +585,7 @@ checkoutController.onlinePayment = async (req, res) => {
                     });
     
                     // Add to total price
-                    totalAmount += variant.salePrice * item.quantity;
+                    totalAmount += Math.round( ( item.price || variant.salePrice) * item.quantity);
     
                     // Decrement the quantity of the variant in the product
                     if (variant.quantity >= item.quantity) {

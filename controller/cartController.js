@@ -360,6 +360,7 @@ cartController.applyCoupon = async (req,res) => {
 
         const couponDetails = await coupon.findById(couponId);
         console.log("Coupon Details",couponDetails);
+        const couponAmount = couponDetails.discount;
 
         if(totalPrice<couponDetails.minmumAmount)
         {
@@ -415,7 +416,7 @@ cartController.applyCoupon = async (req,res) => {
 
             return res.status(500).json({success:true,message:"Failed to Apply Coupon"});
         }
-        return res.status(200).json({success:true,message:"Coupon Applied Successfully...",newPrice:discountPrice,oldPrice:totalPrice});
+        return res.status(200).json({success:true,message:"Coupon Applied Successfully...",newPrice:discountPrice,oldPrice:totalPrice,couponAmount});
         
     }
     catch(err)

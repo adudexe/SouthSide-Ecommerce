@@ -81,6 +81,7 @@ router.post('/verify-payment',userAuth.isLogged,userAuth.isBlocked,checkoutContr
 //Order Controller
 router.get("/myAccount/order/:id",orderController.loadOrderDetails);
 router.post("/myAccount/order/cancel/:id",orderController.cancelOrder);
+router.post("/myAccount/order/return/:id",orderController.returnOrder);
 router.get("/order/success",orderController.orderSuccess);
 router.get("/order/downloadinvoice/:id",orderController.downloadInvoice);
 
