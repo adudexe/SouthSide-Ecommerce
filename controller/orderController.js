@@ -243,7 +243,7 @@ orderController.downloadInvoice = async (req, res) => {
     doc.fontSize(12)
       .text(`Invoice Date: ${moment(order.invoiceDate).format('MMMM DD, YYYY')}`, { align: 'left' })
       .text(`Invoice Number: ${order._id.toString().slice(-8)}`, { align: 'left' })
-      .text(`Customer: ${order.userId.name}`, { align: 'left' });
+      .text(`Customer: ${req.session.user.name}`, { align: 'left' });
 
     doc.moveDown(1);
 
@@ -288,9 +288,9 @@ orderController.downloadInvoice = async (req, res) => {
     let rowY = tableTop + 20;
     order.orderItems.forEach(item => {
       doc.text(item.product.productName, columns.productName.x, rowY);
-      doc.text(`$${item.price.toFixed(2)}`, columns.price.x, rowY);
+      doc.text(`$${item.price.toFixed(2) / item.quantity}`, columns.price.x, rowY);
       doc.text(item.quantity, columns.quantity.x, rowY);
-      doc.text(`$${(item.price * item.quantity).toFixed(2)}`, columns.total.x, rowY);
+      doc.text(`$${(item.price).toFixed(2)}`, columns.total.x, rowY);
       rowY += 20;
 
       // Add table border for each row
