@@ -480,7 +480,7 @@
                                             })
                                         }).then(res => res.json())
                                             .then(data => {
-                                                // console.log("data is",data)
+                                                console.log("data is",data)
                                             if (data.success) {
                                                     Swal.fire({
                                                         title: "Order Placed..!",
@@ -512,22 +512,45 @@
                                     }
                                 };
                                 // alert("Payment is online");
-                                const rzp = new Razorpay(options);
-                                rzp.on()
-                                rzp.open('payment.failed',(response)=>{
-                                    console.log("We are in failed payment");
-                                    // alert("payment failed");
-                                }); 
+                                try{
+                                    const rzp = new Razorpay(options);
+                                    rzp.on('payment.failed', async (response) => {
+                                        // console.log("We are in failed payment");
+                                        console.log("Order Id is",order.order.order_id);
+
+                                        // SweetAlert2: Display a custom alert for payment failure
+                                        let responce = await fetch("/user/checkout/failed",{
+                                            method:"POST",
+                                            headers:{
+                                                "Content-Type":"application/json"
+                                            }
+                                        })
+                                        console.log("Responce",responce);
+                                        let details = await responce.json();
+                                        console.log("Details",details)
+
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Payment Failed',
+                                            text: 'Something went wrong with the payment. Please try again.',
+                                            showConfirmButton: true,  // Show the confirm button
+                                            confirmButtonText: 'OK'  // Text on the confirm button
+                                        }).then(() => {
+                                            // Redirect the user to another page after they click OK
+                                            window.location.href = '/user/myAccount';  // Modify this URL as needed
+                                        });
+
+                                    });
+
+                                    rzp.open()
+                                }
+                                catch(err)
+                                {
+                                    console.log("Error in Failed Payment",err);
+                                }
                                }   
                                else
                                {
-                                    // Swal.fire({
-                                    //     icon: 'error',
-                                    //     title: 'Error!',
-                                    //     text: order.order.message || 'Error in payment'
-                                    // }); 
-                                    //
-                                    
                                     Swal.fire({
                                     title: 'Payment Has Failed',
                                     text: 'Would you like to retry the payment',
@@ -594,12 +617,12 @@
                                     }
                                 };
                                 // alert("Payment is online");
-                                const rzp = new Razorpay(options);
-                                rzp.on()
-                                rzp.open('payment.failed',(response)=>{
-                                    console.log("We are in failed payment");
-                                    // alert("payment failed");
-                                });    
+                                // const rzp = new Razorpay(options);
+                                // rzp.on()
+                                // rzp.open('payment.failed',(response)=>{
+                                //     // console.log("We are in failed payment");
+                                //     // alert("payment failed");
+                                // });    
                                         }      
                                             })   
                             }
@@ -681,7 +704,7 @@
     async function applyCoupon(code, discount, minAmount, id) {
     const subtotal = parseFloat(document.querySelector('.total-amount').innerText);
     const orderTotal = document.querySelector('#order-totals');
-    orderTotal.innerHTML = ""
+    // orderTotal.innerHTML = ""
     
     if (minAmount && subtotal < minAmount) {
         Swal.fire({
