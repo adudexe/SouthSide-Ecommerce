@@ -455,13 +455,16 @@
                                     <p><%= //element %></p>
                                     <%})%>
                                     <p><%= //cartItems.items %></p>
+                                    <% let dis = 0 %>
+                                    <% let tot = 0 %>
                                     <% cartItems.items.forEach(element => { %>
                                         <!-- <p><%= //element.productId.isDeleted%> </p> -->
+
                                         <% if (!(element.productId.isDeleted) && !(element.productId.isBlocked)) { %>
                                             <tbody class="cartDetails">
                                                 <tr>
                                                     <% let productDetails = element.productId.variants.find((item)=>{return item._id == element.variantId.toString() }) %>
-                                                    
+                                                        <% dis = dis + element.productId.productOffer %>
                                                     <td class="image product-thumbnail"><img src="/<%=element.productId.productImages[0]%>" alt="element"></td>
                                                     <td class="product-des product-name product-table-name" data-product-id="<%= element.productId._id  %>" data-variant-id="<%= productDetails._id %>">
                                                         <h5 class="product-name"><a href="/user/product/<%= element.productId._id %>"><%= element.productId.productName %></a></h5>
@@ -469,7 +472,7 @@
                                                         </p>
                                                     </td>
                                                     <!-- <p><%= //productDetails %></p> -->
-                                                    <td class="price" data-title="Price"><span>₹ <%=productDetails.salePrice * element.quantity%></span></td>
+                                                    <td class="price" data-title="Price" ><span>₹ <%= productDetails.salePrice %></span></td>
                                                     <td class="text-center" data-title="Stock">
                                                         <div class="detail-qty border radius  m-auto cartQuantity" >
                                                             <a href="#" class="qty-up"  ><i class="fi-rs-angle-small-up"></i></a>
@@ -477,8 +480,8 @@
                                                             <a href="#" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
                                                         </div>
                                                     </td>
-                                                    <!-- <td class="text-right" data-title="Cart">
-                                                        <span>$65.00 </span>
+                                                    <!-- <td class="text-right" data-title="Cart" id="product-salePrice" data-price="<%= productDetails.salePrice %>">
+                                                        <span>₹<%=productDetails.salePrice * element.quantity%></span>
                                                     </td> -->
                                                     <td class="action cart-remove" data-title="Remove"><a href="#" class="text-muted"><i class="fi-rs-trash"></i></a></td>
                                                 </tr>
@@ -489,20 +492,30 @@
                             </div>
                             <div class="">
                                 <div class="row">
-                                    <div class="col-md-5 offset-md-7">
+                                    <div class="col-md-5 offset-md-7 cart-total-details">
                                         <div class="cart-totals bg-white p-30 border-radius-10 mb-50">
                                             <h4 class="mb-30">Cart Totals</h4>
-                                            <div class="d-flex justify-content-between price">
+                                            <div class="d-flex justify-content-between price" id="sub-total">
                                                 <h6>Subtotal</h6>
-                                                <h6 class="text-brand">₹ <%= totalPrice %></h6>
+                                                <h6 class="text-brand" >₹ <%= totalPrice + 80 %></h6>
                                             </div>
                                             <div class="divider-2 mt-10 mb-20"></div>
                                             <div class="d-flex justify-content-between">
                                                 <h6>Shipping</h6>
-                                                <h6 class="text-brand">Free </h6>
+                                                <h6 class="text-brand">80 </h6>
                                             </div>
                                             <div class="divider-2 mt-10 mb-20"></div>
-                                            <div class="d-flex justify-content-between price">
+                                            <!-- <div class="d-flex justify-content-between" id="discount">
+                                                <h6>Product Offer Discount</h6>
+                                                <h6 class="text-brand">-<%= dis %> </h6>
+                                            </div> -->
+                                            <div class="divider-2 mt-10 mb-20"></div>
+                                            <div class="d-flex justify-content-between">
+                                                <h6>Discount</h6>
+                                                <h6 class="text-brand">-80 </h6>
+                                            </div>
+                                            <div class="divider-2 mt-10 mb-20"></div>
+                                            <div class="d-flex justify-content-between price" id="totalPrice">
                                                 <h5 class="font-lg">Total</h5>
                                                 <h5 class="font-lg text-brand">₹ <%= totalPrice  %></h5>
                                             </div>
@@ -715,6 +728,24 @@
                     console.log(details)
                     if(details.success)
                     {
+                        document.getElementById("sub-total").innerHTML =""
+                            document.getElementById("sub-total").innerHTML=`
+                                <h6>Subtotal</h6>
+                                <h6 class="text-brand" >₹ ${details.totalPrice+80}</h6>
+                            `
+                            // document.getElementById("discount").innerHTML = ""
+                            // document.getElementById("discount").innerHTML = `
+                            //         <h6>Product Offer Discount</h6>
+                            //         <h6 class="text-brand">-${details.discount}</h6>
+                            // `
+
+                            
+
+                            document.getElementById("totalPrice").innerHTML = ""
+                            document.getElementById("totalPrice").innerHTML = `
+                                <h5 class="font-lg">Total</h5>
+                                <h5 class="font-lg text-brand">₹ ${details.totalPrice}</h5>
+                            `
                         // Toast.fire({
                         // icon: "error",
                         // title: "Max Quantity Reached.."
@@ -733,6 +764,7 @@
                 qtyDown.addEventListener("click",async (e)=>{
                     
                     e.preventDefault();
+
                         const productId = container.querySelector(".product-table-name").getAttribute("data-product-id");
                         //Getting product details from backend 
                         const variantId = container.querySelector(".product-table-name").getAttribute("data-variant-id");
@@ -773,7 +805,25 @@
                             // icon: "error",
                             // title: "Max Quantity Reached.."
                             // });
-                            quantity.textContent = newQuantity
+                            quantity.textContent = newQuantity;
+                            document.getElementById("sub-total").innerHTML =""
+                            document.getElementById("sub-total").innerHTML=`
+                                <h6>Subtotal</h6>
+                                <h6 class="text-brand" >₹ ${details.totalPrice+80}</h6>
+                            `
+                            // document.getElementById("discount").innerHTML = ""
+                            // document.getElementById("discount").innerHTML = `
+                            //         <h6>Product Offer Discount</h6>
+                            //         <h6 class="text-brand">-${details.discount}</h6>
+                            // `
+
+                            document.getElementById("totalPrice").innerHTML = ""
+                            document.getElementById("totalPrice").innerHTML = `
+                                <h5 class="font-lg">Total</h5>
+                                <h5 class="font-lg text-brand">₹ ${details.totalPrice}</h5>
+                            `
+
+
                         }
                         else
                         {
