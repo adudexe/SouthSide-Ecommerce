@@ -192,8 +192,12 @@
                                             <% } %>
                                             <div class="mt-2">
                                                 <% if(element.status == "Cancelled") { %>
-                                                    <button class="btn-custom btn btn-outline-danger btn-sm" disabled>Cancel</button>
-                                                <% } else { %>
+                                                    <!-- <button class="btn-custom btn btn-outline-danger btn-sm" disabled>Cancel</button> -->
+                                                    <% } else if(element.status == "ReturnInit") { %>
+                                                        <span class="status-badge bg-info">Retrun Iniitated</span>
+                                                    <% } else if(element.status == "CancelInit") { %>
+                                                        <span class="status-badge bg-info">Cancel Iniitated</span>
+                                                    <% } else { %>
                                                     <button class="cancel-btn btn-custom btn  btn-sm"  style="background-color: red; border: none;" data-id="<%= element._id %>">Cancel</button>
                                                 <% } %>
                                             </div>

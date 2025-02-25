@@ -1,105 +1,105 @@
 const mongoose = require("mongoose");
 const orderSchema = mongoose.Schema({
-    userId:{
-        type:mongoose.Schema.ObjectId,
-        ref:"User",
-        required:true
+    userId: {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+        required: true
     },
-    orderItems:[{
-            product:{
-                productName : {
-                    type:String,
-                    required:true
+    orderItems: [{
+        product: {
+            productName: {
+                type: String,
+                required: true
+            },
+            description: {
+                type: String,
+                required: true
+            },
+            category: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Category",
+                required: true,
+            },
+            productOffer: {
+                type: Number,
+                default: 0,
+            },
+            variants: [{
+                size: {
+                    type: String,
+                    required: false, // Optional, depending on your use case
                 },
-                description:{
-                    type:String,
-                    required:true
+                color: {
+                    type: String,
+                    required: false, // Optional, depending on your use case
                 },
-                category:{
-                    type:mongoose.Schema.Types.ObjectId,
-                    ref:"Category",
-                    required:true,
+                price: {
+                    type: Number,
+                    required: true,
                 },
-                productOffer:{
-                    type:Number,
-                    default:0,
+                salePrice: {
+                    type: Number,  //If discount is appled then the discount applied price should be added here..
+                    default: null,
                 },
-                variants:[{
-                    size: {
-                        type: String,
-                        required: false, // Optional, depending on your use case
-                    },
-                    color: {
-                        type: String,
-                        required: false, // Optional, depending on your use case
-                    },
-                    price: {
-                        type: Number,
-                        required: true,
-                    },
-                    salePrice: {
-                        type: Number,  //If discount is appled then the discount applied price should be added here..
-                        default: null,
-                    },
-                    quantity: {
-                        type: Number,
-                        default: 0,
-                        min: 0,
-                    },
-                    status: {
-                        type: String,
-                        enum: ["Available", "OutOfStock", "Discontinued"],
-                        default: "Available",
-                    },
-                }],
-            productImages:{
-                type:[String],
-                required:true,
+                quantity: {
+                    type: Number,
+                    default: 0,
+                    min: 0,
+                },
+                status: {
+                    type: String,
+                    enum: ["Available", "OutOfStock", "Discontinued"],
+                    default: "Available",
+                },
+            }],
+            productImages: {
+                type: [String],
+                required: true,
             }
         },
-        quantity:{
-            type:Number,
-            required:true,
+        quantity: {
+            type: Number,
+            required: true,
         },
-        price:{
-            type:Number,
-            default:0
+        price: {
+            type: Number,
+            default: 0
         },
-        status:{
-            type:String,
-            required:true,
-            enum:['Pending','Processing','Shipped','Delivered','Cancelled','Returned','Refunded']
+        status: {
+            type: String,
+            required: true,
+            enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned', 'Refunded', 'ReturnInit', 'CancelInit']
         },
-        cancelReason:{
-            type:String,
+        cancelReason: {
+            type: String,
         },
-        returnReson:{
-            type:String,
+        returnReson: {
+            type: String,
         },
-        productId:{
-            type:mongoose.Schema.Types.ObjectId
+        productId: {
+            type: mongoose.Schema.Types.ObjectId
         },
-        variantId:{
-            type:mongoose.Schema.Types.ObjectId
+        variantId: {
+            type: mongoose.Schema.Types.ObjectId
         }
     }],
-    totalPrice:{
-        type:Number,
-        required:true
+    totalPrice: {
+        type: Number,
+        required: true
     },
-    discount:{
-        type:Number,
-        default:0
+    discount: {
+        type: Number,
+        default: 0
     },
-    finalAmount:{
-        type:Number,
-        required:true
+    finalAmount: {
+        type: Number,
+        required: true
     },
-    addres:{
-        name:{
-            type:String,
-            required:true,
-            tirm:true,
+    addres: {
+        name: {
+            type: String,
+            required: true,
+            tirm: true,
         },
         street: {
             type: String,
@@ -136,31 +136,31 @@ const orderSchema = mongoose.Schema({
             required: true,  // Only one primary address can be true for a user
         }
     },
-    invoiceDate:{
-        type:Date
+    invoiceDate: {
+        type: Date
     },
-    createdOn:{
-        type:Date,
-        default:Date.now,
-        required:true
+    createdOn: {
+        type: Date,
+        default: Date.now,
+        required: true
     },
-    couponApplied:{
-        code:{
-            type:String,
+    couponApplied: {
+        code: {
+            type: String,
             // required:true,
             // unique:true
         },
-        discount:{
-            type:Number,
+        discount: {
+            type: Number,
             // required:true,
-            min:0
+            min: 0
         },
     },
-    paymentMethod:{
-        type:String,
-        required:true,
+    paymentMethod: {
+        type: String,
+        required: true,
     },
-    
+
 
     // status:{
     //     type:String,
@@ -174,4 +174,4 @@ const orderSchema = mongoose.Schema({
 
 })
 
-module.exports = mongoose.model("Order",orderSchema);
+module.exports = mongoose.model("Order", orderSchema);

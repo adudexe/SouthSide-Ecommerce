@@ -30,7 +30,7 @@ orderController.cancelOrder = async (req, res) => {
     const { reason } = req.body;
     const orderId = req.params.id;
     const userId = req.session.user._id;
-    let refundToWallet = null;
+    // let refundToWallet = null;
     let wallet = null;
 
 
@@ -69,14 +69,14 @@ orderController.cancelOrder = async (req, res) => {
       {
         $set: {
           "orderItems.$.cancelReason": reason,
-          "orderItems.$.status": "Cancelled" // Update the product's status to 'Cancelled'
+          "orderItems.$.status": "CancelInit" // Update the product's status to 'Cancelled'
         }
       },
       { new: true } // Return the updated order document
     );
 
     // Find the cancelled item from the order
-    const cancelledItem = cancelOrder.orderItems.find(item => item.status === "Cancelled");
+    const cancelledItem = cancelOrder.orderItems.find(item => item.status === "CancelInit");
     if (!cancelledItem) {
       return res.status(400).json({ message: "Cancelled item not found" });
     }
@@ -87,29 +87,29 @@ orderController.cancelOrder = async (req, res) => {
     console.log("New total wallet amount:", totalAmount);
 
     // If the payment method is 'online', add refund to wallet
-    if (orderDetails.paymentMethod === "online" || orderDetails.paymentMethod === "wallet") {
-      refundToWallet = await Wallet.findOneAndUpdate(
-        { userId: userId },
-        {
-          $push: {
-            transactions: {
-              transactionType: "credit",  // Refund transaction
-              amount: cancelledItem.price,
-              date: Date.now() // Set the transaction date
-            }
-          },
-          $set: {
-            totalAmount: totalAmount // Update the total amount in the wallet
-          }
-        },
-        { new: true }
-      );
-    }
+    // if (orderDetails.paymentMethod === "online" || orderDetails.paymentMethod === "wallet") {
+    //   refundToWallet = await Wallet.findOneAndUpdate(
+    //     { userId: userId },
+    //     {
+    //       $push: {
+    //         transactions: {
+    //           transactionType: "credit",  // Refund transaction
+    //           amount: cancelledItem.price,
+    //           date: Date.now() // Set the transaction date
+    //         }
+    //       },
+    //       $set: {
+    //         totalAmount: totalAmount // Update the total amount in the wallet
+    //       }
+    //     },
+    //     { new: true }
+    //   );
+    // }
 
     // console.log("Refund DB:", refundToWallet);
 
     //Find which product is cancelled 
-    const productVariant = cancelOrder.orderItems.find(item => item.status === "Cancelled");
+    const productVariant = cancelOrder.orderItems.find(item => item.status === "CancelInit");
 
 
     const updateProduct = await Products.findOneAndUpdate(
@@ -138,7 +138,7 @@ orderController.returnOrder = async (req, res) => {
     const { reason } = req.body;
     const orderId = req.params.id;
     const userId = req.session.user._id;
-    let refundToWallet = null;
+    // let refundToWallet = null;
     let wallet = null;
 
     console.log("We Are in return product and the reason is", reason)
@@ -161,7 +161,7 @@ orderController.returnOrder = async (req, res) => {
       {
         $set: {
           "orderItems.$.returnReson": reason,
-          "orderItems.$.status": "Returned" // Update the product's status to 'Cancelled'
+          "orderItems.$.status": "ReturnInit" // Update the product's status to 'Cancelled'
         }
       },
       { new: true } // Return the updated order document

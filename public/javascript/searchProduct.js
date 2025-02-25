@@ -9,17 +9,25 @@ document.addEventListener("DOMContentLoaded", () => {
     let totalPages = 1;
 
     const updatePagination = () => {
-        const pageItems = Array.from(pagination.querySelectorAll(".page-item"));
-        pageItems.forEach(item => {
-            const pageLink = item.querySelector(".page-link");
-            const pageNumber = parseInt(pageLink.textContent);
-            
-            if (pageNumber === currentPage) {
-                item.classList.add("active");
-            } else {
-                item.classList.remove("active");
-            }
-        });
+        //this is to update the pagination details
+
+
+
+
+
+        // const pageItems = Array.from(pagination.querySelectorAll(".page-item"));
+        // pageItems.forEach(item => {
+        //     const pageLink = item.querySelector(".page-link");
+        //     const pageNumber = parseInt(pageLink.textContent);
+
+        //     if (pageNumber === currentPage) {
+        //         item.classList.add("active");
+        //     } else {
+        //         item.classList.remove("active");
+        //     }
+        // });
+
+
     };
 
     const loadProducts = async () => {
@@ -71,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                     return acc;
                 }, "");
-                
+
 
                 products.appendChild(div);
 
@@ -98,13 +106,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Event listener for pagination links
     pagination.addEventListener("click", (e) => {
-        if (e.target && e.target.classList.contains("page-link")) {
-            const pageNumber = e.target.getAttribute("href");
-            if (pageNumber !== "#" && pageNumber !== "...") {
-                currentPage = parseInt(pageNumber);
-                loadProducts();
-            }
+        e.preventDefault();
+        const pageNumber = e.target.querySelector("#Number");
+        if (e.target.classList.contains("page-link") && e.target.classList.contains("left")) {
+            console.log(pageNumber)
+
         }
+        if (e.target.classList.contains("page-link") && e.target.classList.contains("right")) {
+            console.log(pageNumber)
+
+        }
+
+        //in this we will set the current pagenumber and again load the products
+        //              console.log(e.target && e.target.classList.contains("page-link"))
+        // if (e.target && e.target.classList.contains("page-link")) {
+
+        //     const pageNumber = e.target.querySelector(".page-item")
+        //     console.log("Page Number is", pageNumber);
+        //     if (pageNumber !== "#" && pageNumber !== "...") {
+        //         currentPage = parseInt(pageNumber);
+        //         loadProducts();
+        //     }
+        // }
+
+        //My Pagination Logic
+
+
     });
 
     // Initial products load

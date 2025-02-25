@@ -16,7 +16,7 @@
                         </div>
                         <div class="col-lg-6 col-md-6 ms-auto text-md-end">
                             <p><%= %></p>
-                            <% if (!( orderDetails.orderItems.find(elm => (elm.status === 'Refunded' || elm.status === 'Cancelled')  ) )) { %>
+                            <% if (!( orderDetails.orderItems.find(elm => (elm.status === 'Refunded' || elm.status === 'Cancelled' || elm.status === 'ReturnInit')  ) )) { %>
                                 <div class="d-flex align-items-start justify-content-end gap-2">
                                     <select id="globalStatus" class=" form-select d-inline-block mb-lg-0 mb-15 mw-200">
                                         <option value="">Change All Statuses</option>
@@ -24,9 +24,9 @@
                                         <option value="Processing">Processing</option>
                                         <option value="Shipped">Shipped</option>
                                         <option value="Delivered">Delivered</option>
-                                        <option value="Cancelled">Cancelled</option>
-                                        <option value="Refunded">Refunded</option>
-                                        <option value="Returned">Returned</option>
+                                        <!-- <option value="Cancelled">Cancelled</option> -->
+                                        <!-- <option value="Refunded">Refunded</option> -->
+                                        <!-- <option value="Returned">Returned</option> -->
                                     </select>
                                     <button class="btn btn-primary" onclick="updateAllStatuses()">Apply to All</button>
                                 </div>
@@ -107,16 +107,12 @@
                                             <td> ₹ <%= Math.round(element.price/element.quantity) %> </td>
                                             <td> <%= element.quantity %> </td>
                                             <td>
-                                                <% if (element.status == "Refunded" || element.status == "Cancelled") { %>
-                                                    <select class="form-select product-status" data-item-id="<%= element._id %>" disabled>
-                                                    <option value="Pending" <%= element.status === 'Pending' ? 'selected' : '' %>>Pending</option>
-                                                    <option value="Processing" <%= element.status === 'Processing' ? 'selected' : '' %>>Processing</option>
-                                                    <option value="Shipped" <%= element.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
-                                                    <option value="Delivered" <%= element.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                                    <option value="Cancelled" <%= element.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                                                    <option value="Refunded" <%= element.status === 'Refunded' ? 'selected' : '' %>>Refunded</option>
-                                                    <option value="Returned" <%= element.status === 'Returned' ? 'selected' : '' %>>Returned</option>
-                                                </select>
+                                                <% if ((element.status == "Refunded" )) { %>
+                                                        <p>Refunded</p>
+                                                <% } else if (element.status == "Cancelled") { %>
+                                                        <p>Cancelled</p>
+                                                <% } else if (element.status === 'ReturnInit') { %>
+                                                        <p>Return Requested</p>
                                                 <% } else { %>
                                                     <select class="form-select product-status" 
                                                         data-item-id="<%= element._id %>">
@@ -124,14 +120,15 @@
                                                         <option value="Processing" <%= element.status === 'Processing' ? 'selected' : '' %>>Processing</option>
                                                         <option value="Shipped" <%= element.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
                                                         <option value="Delivered" <%= element.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
-                                                        <option value="Cancelled" <%= element.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
-                                                        <option value="Refunded" <%= element.status === 'Refunded' ? 'selected' : '' %>>Refunded</option>
-                                                        <option value="Returned" <%= element.status === 'Returned' ? 'selected' : '' %>>Returned</option>
+                                                        <!-- <option value="Cancelled" <%= element.status === 'Cancelled' ? 'selected' : '' %>>Cancelled</option> -->
+                                                        <!-- <option value="Refunded" <%= element.status === 'Refunded' ? 'selected' : '' %>>Refunded</option> -->
+                                                        <!-- <option value="Returned" <%= element.status === 'Returned' ? 'selected' : '' %>>Returned</option> -->
+                                                        <!-- <option value="Returned" <%= element.status === 'ReturnInit' ? 'selected' : '' %>>ReturnInitiated</option> -->
                                                     </select>
-                                                <% } %>
+                                            <% } %>
                                             </td>
                                             <td>
-                                                <% if (element.status === 'Cancelled' || element.status === 'Returned') { %>
+                                                <% if (element.status === 'ReturnInit' || element.status === 'CancelInit') { %>
                                                     <button class="btn btn-sm btn-outline-primary show-reason-btn" 
                                                             onclick="showReasonModal(event)"
                                                             data-item-id="<%= element._id %>"
@@ -174,6 +171,7 @@
                         <!-- Reason text will be inserted here -->
                     </div>
                     <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"  id="accept">Accept</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -204,6 +202,8 @@
         // console.log("Id")
         function showReasonModal(e) {
             const {itemId,itemStatus,itemDetails} = e.target.dataset
+            
+            console.log({itemId,itemStatus,itemDetails})
             // Parse the orderDetails string to JSON object
             const orderDetails = JSON.parse(itemDetails);
             console.log(JSON.parse(itemDetails));            
@@ -212,6 +212,15 @@
             
             console.log(item);
 
+
+            const data = {
+                itemId:item._id,
+                orderId:orderDetails._id,
+                status:"Refunded"
+            }
+
+            console.log(data)
+            
             if (!item) {
                 console.error('Item not found:', itemId);
                 return;
@@ -219,20 +228,20 @@
             
             let reason = '';
             let title = '';
-
+            
             // console.log(itemStatus, item.returnReson)
             
             // Check for cancel reason
-            if (itemStatus === 'Cancelled' && item.cancelReason) {
-                reason = item.cancelReason;
-                title = 'Cancellation Reason';
-            } 
+            // if (itemStatus === 'Cancelled' && item.cancelReason) {
+            //     reason = item.cancelReason;
+            //     title = 'Cancellation Reason';
+            // } 
             // // Check for return reason
-            else if (itemStatus === 'Returned' && item.returnReson) {
+            if (itemStatus === 'Returned' && item.returnReson) {
                 reason = item.returnReson;
                 title = 'Return Reason';
             }
-
+            
             
             
             if (reason) {
@@ -247,7 +256,82 @@
                     confirmButtonText: 'OK'
                 });
             }
-    }
+            document.getElementById("accept").addEventListener("click",(e)=>{
+                sendStatusUpdate(data)
+                new bootstrap.Modal(document.getElementById('reasonModal')).hide();
+
+            })
+        }
+
+
+        function showReasonModal(e) {
+            const {itemId,itemStatus,itemDetails} = e.target.dataset
+            
+            console.log({itemId,itemStatus,itemDetails})
+            // Parse the orderDetails string to JSON object
+            const orderDetails = JSON.parse(itemDetails);
+            console.log(JSON.parse(itemDetails));            
+            // Find the specific order item
+            const item = orderDetails.orderItems.find(item => item._id === itemId);
+            
+            console.log(item);
+
+
+            let data = {}
+
+            console.log(data)
+            
+            if (!item) {
+                console.error('Item not found:', itemId);
+                return;
+            }
+            
+            let reason = '';
+            let title = '';
+            
+            // console.log(itemStatus, item.returnReson)
+            
+            // Check for cancel reason
+            if (itemStatus === 'CancelInit' && item.cancelReason) {
+                reason = item.cancelReason;
+                title = 'Cancellation Reason';
+                data = {
+                    itemId:item._id,
+                    orderId:orderDetails._id,
+                    status:"Cancelled"
+                }
+            } 
+            // // Check for return reason
+            if (itemStatus === 'ReturnInit' && item.returnReson) {
+                reason = item.returnReson;
+                title = 'Return Reason';
+                data = {
+                    itemId:item._id,
+                    orderId:orderDetails._id,
+                    status:"Refunded"
+                }
+            }
+            
+            
+            
+            if (reason) {
+                document.getElementById('reasonModalLabel').textContent = title;
+                document.getElementById('reasonModalBody').textContent = reason;
+                new bootstrap.Modal(document.getElementById('reasonModal')).show();
+            } else {
+                Swal.fire({
+                    title: 'No Reason Found',
+                    text: `No ${itemStatus.toLowerCase()} reason available for this item`,
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                });
+            }
+            document.getElementById("accept").addEventListener("click", function() {
+        sendStatusUpdate(data);  // Call the function to update the status
+        const modal = bootstrap.Modal.getInstance(document.getElementById('reasonModal'));
+        modal.hide();  // Properly hide the modal after status update
+    });
+        }
         
         
 
@@ -331,6 +415,7 @@
                         icon: 'success',
                         confirmButtonText: 'OK'
                     });
+                    window.location.reload()
                 } else {
                     throw new Error(data.message || 'Update failed');
                 }
@@ -363,6 +448,7 @@
                         icon: 'success',
                         confirmButtonText: 'OK'
                     });
+                    window.location.reload()
                 } else {
                     throw new Error(data.message || 'Bulk update failed');
                 }
