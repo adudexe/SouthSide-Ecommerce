@@ -26,8 +26,6 @@ userController.loadHomePage = async (req, res) => {
         else {
             return res.render("./user/landingPage", { products: product });
         }
-
-
     }
     catch (err) {
         console.log(err);
