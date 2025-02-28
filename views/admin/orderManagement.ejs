@@ -3,11 +3,11 @@
             <div class="content-header">
                 <div>
                     <h2 class="content-title card-title">Order List </h2>
-                    <p>Lorem ipsum dolor sit amet.</p>
+                    <!-- <p>Lorem ipsum dolor sit amet.</p> -->
                 </div>
-                <div>
+                <!-- <div>
                     <input type="text" placeholder="Search order ID" class="form-control bg-white">
-                </div>
+                </div> -->
             </div>
             <div class="card mb-4">
                 <!-- <header class="card-header">
@@ -53,7 +53,7 @@
                                         <td><%= element._id %></td>
                                         <td><b><%= element.addres.name %></b></td>
                                         <td><%= element.userId.email %></td>
-                                        <td>$<%= Math.round(element.totalPrice) %></td>
+                                        <td>₹<%= Math.round(element.totalPrice) %></td>
                                         <!-- <td><span class="badge rounded-pill alert-warning">Pending</span></td> -->
                                         <td><%= (element.createdOn).toLocaleDateString('en-US', {
                                             month: 'long',  // Full month name (e.g., "March")
@@ -79,14 +79,29 @@
                 </div> <!-- card-body end// -->
             </div> <!-- card end// -->
             <div class="pagination-area mt-15 mb-50">
+                <!-- <p>PageNumber is<%= totalPage %></p> -->
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-start">
-                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                        <li class="page-item"><a class="page-link" href="#">02</a></li>
-                        <li class="page-item"><a class="page-link" href="#">03</a></li>
-                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                        <li class="page-item"><a class="page-link" href="#">16</a></li>
-                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                        <% if (!pageNumber) { %>
+                         <%pageNumber = 1 %>
+                        <% } %>
+                        
+                        <% if (totalPage>0) { %>
+                                <% if (pageNumber > 1) { %>
+                                    <li class="page-item"><a class="page-link" href="/admin/orderManagement?PageNumber=<%=Number(pageNumber)-1 %>"><i class="material-icons md-chevron_left"></i></a></li>
+                                <% } %>
+                                <% for( let index = 1; index <= totalPage; index++ ) { %>
+                                    <% if (index == pageNumber) { %>
+                                        <li class="page-item active"><a class="page-link" href="/admin/orderManagement?PageNumber=<%=index %>"><%= index %></a></li>
+                                    <% } else { %>
+                                        <li class="page-item"><a class="page-link" href="/admin/orderManagement?PageNumber=<%=index %>"><%= index %></a></li>
+                                    <% } %>
+
+                                <% } %>
+                                <% if (pageNumber < totalPage) { %>
+                                    <li class="page-item"><a class="page-link" href="/admin/orderManagement?PageNumber=<%=Number(pageNumber)+1 %>"><i class="material-icons md-chevron_right"></i></a></li>
+                                <% } %>
+                        <% } %>
                     </ul>
                 </nav>
             </div>

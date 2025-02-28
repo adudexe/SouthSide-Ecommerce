@@ -17,7 +17,7 @@
                             <span class="icon icon-sm rounded-circle bg-primary-light"><i class="text-primary material-icons md-monetization_on"></i></span>
                             <div class="text">
                                 <h6 class="mb-1 card-title">Revenue</h6>
-                                <span>$<%= Math.round(total) %></span>
+                                <span>₹<%= Math.round(total) %></span>
                                 <span class="text-sm">
                                     Shipping fees are not included
                                 </span>
@@ -56,7 +56,7 @@
                         <article class="icontext">
                             <span class="icon icon-sm rounded-circle bg-info-light"><i class="text-info material-icons md-shopping_basket"></i></span>
                             <div class="text">
-                                <h6 class="mb-1 card-title">Monthly Earning</h6> <span>$<%= Math.round(currentMonthTotal[0].totalAmount) %></span>
+                                <h6 class="mb-1 card-title">Monthly Earning</h6> <span>₹<%= Math.round(currentMonthTotal[0].totalAmount) %></span>
                                 <span class="text-sm">
                                     Based in your local time.
                                 </span>
@@ -352,7 +352,7 @@
                                             <%= element.createdOn.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' }) %>
                                         </td>
                                         <td>
-                                            <%= element.totalPrice %>
+                                            ₹ <%= Math.floor(element.totalPrice) %>
                                         </td>
                                         <td>
                                             <i class="material-icons md-payment font-xxl text-muted"></i> <%= element.paymentMethod %>
@@ -397,12 +397,27 @@
             <div class="pagination-area mt-30 mb-50">
                 <nav aria-label="Page navigation example">
                     <ul class="pagination justify-content-start">
-                        <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                        <li class="page-item"><a class="page-link" href="#">02</a></li>
-                        <li class="page-item"><a class="page-link" href="#">03</a></li>
-                        <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                        <li class="page-item"><a class="page-link" href="#">16</a></li>
-                        <li class="page-item"><a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a></li>
+                        <!-- <p>PageNumber<%= pageNumber %></p> -->
+                        <% if (!pageNumber) { %>
+                            <%pageNumber = 1 %>
+                        <% } %>
+                        
+                        <% if (totalPage>0) { %>
+                                <% if (pageNumber > 1) { %>
+                                    <li class="page-item"><a class="page-link" href="/admin?PageNumber=<%=Number(pageNumber)-1 %>"><i class="material-icons md-chevron_left"></i></a></li>
+                                <% } %>
+                                <% for( let index = 1; index <= totalPage; index++ ) { %>
+                                    <% if (index == pageNumber) { %>
+                                        <li class="page-item active"><a class="page-link" href="/admin?PageNumber=<%=index %>"><%= index %></a></li>
+                                    <% } else { %>
+                                        <li class="page-item"><a class="page-link" href="/admin?PageNumber=<%=index %>"><%= index %></a></li>
+                                    <% } %>
+
+                                <% } %>
+                                <% if (pageNumber < totalPage) { %>
+                                    <li class="page-item"><a class="page-link" href="/admin?PageNumber=<%=Number(pageNumber)+1 %>"><i class="material-icons md-chevron_right"></i></a></li>
+                                <% } %>
+                        <% } %>
                     </ul>
                 </nav>
             </div>

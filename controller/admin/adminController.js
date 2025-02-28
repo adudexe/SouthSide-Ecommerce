@@ -402,18 +402,19 @@ adminController.generateSalesReport = async (req, res) => {
 
 adminController.loadDashboard = async (req, res) => {
   try {
-    // console.log("Load dashboard")
+    console.log("Req Query Params", req.query)
+    const pageNumber = req.query.PageNumber;
     let currentDate = new Date();
     let total = null;
     let count = null;
-    const orders = await Order.find().sort({ createdOn: -1 });
+    const orderCount = await Order.find().countDocuments();
+    const totalPage = Math.ceil(orderCount / 10)
+    const orders = await Order.find().sort({ createdOn: -1 }).skip(10 * (pageNumber - 1)).limit(10);
     const products = await Product.find().countDocuments();
     const category = await Category.find();
     const categories = await Category.find({ isListed: true }).countDocuments();
     const currentMonth = currentDate.getMonth() + 1;
 
-    // console.log("Current Date",currentDate);
-    // console.log("Current Mouth",currentMonth);
 
     const currentMonthTotal = await Order.aggregate([
       {
@@ -571,7 +572,7 @@ adminController.loadDashboard = async (req, res) => {
 
 
 
-    console.log("product", bestSellingProduct, 'category', bestSellingCategory);
+    // console.log("product", bestSellingProduct, 'category', bestSellingCategory);
 
     const topSellingProducts = await Order.aggregate([
       {
@@ -611,7 +612,7 @@ adminController.loadDashboard = async (req, res) => {
       }
     ]);
 
-    console.log(topSellingCategories, topSellingProducts)
+    // console.log(topSellingCategories, topSellingProducts)
 
 
     //   console.log(yearsAndMonths);
@@ -627,6 +628,8 @@ adminController.loadDashboard = async (req, res) => {
     }
 
     res.render('./admin/index', {
+      totalPage,
+      pageNumber,
       category,
       orders,
       total,
@@ -649,7 +652,8 @@ adminController.loadDashboard = async (req, res) => {
 
 adminController.dashboardFiltering = async (req, res) => {
   try {
-    console.log()
+    // console.log("Req Query Params", req.query)
+    // const pageNumber = req.query.PageNumber;
     const date = new Date();
     // let orders = null;
     const { endDate, startDate, category } = req.body;
@@ -683,9 +687,9 @@ adminController.dashboardFiltering = async (req, res) => {
     }
 
     // Now find the orders based on the built query
-    const orders = await Order.find(query).sort({ createdOn: -1 }); // Sort by createdOn in descending order
-
-    console.log(orders);
+    const orders = await Order.find(query).sort({ createdOn: -1 }) // Sort by createdOn in descending order
+    const count = await Order.find(query).countDocuments();
+    console.log(count);
 
     const yearsAndMonths = await Order.aggregate([
       // Step 1: Project year, month, and totalPrice for sales calculation
@@ -801,7 +805,7 @@ adminController.pageNumber = (req, res) => {
 
 adminController.loadUserManagement = async (req, res) => {
   try {
-
+    console.log("We are in loadManagement")
     const userlength = await User.find().countDocuments();
     const pageSize = Math.ceil(userlength / 10)
     const count = req.session.val || 0;
@@ -963,7 +967,7 @@ adminController.addProducts = async (req, res) => {
     console.log(category)
 
 
-    const offer = productOffer > category.discount ? category.discount : productOffer;
+    const offer = Number(productOffer) > category.discount ? category.discount : Number(productOffer);
 
     // Process images (check if files were uploaded or base64 data was provided)
     const productImages = [];
@@ -1031,7 +1035,7 @@ adminController.deleteProduct = async (req, res) => {
   try {
     const productId = req.params.id;
 
-    const deleteProduct = await Product.findByIdAndUpdate(productId, { isDeleted: true });
+    const deleteProduct = await Product.findByIdAndDelete(productId);
     const product = await Product.find();
     // console.log("Deleted Product",deleteProduct);
     if (deleteProduct) {

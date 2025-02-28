@@ -1,14 +1,21 @@
 const Orders = require("../../model/orderSchema");
 const Wallet = require("../../model/walletSchema");
 const Products = require("../../model/productScheme");
+const { pageNumber } = require("./adminController");
 const orderController = {};
 
 orderController.loadManagementPage = async (req, res) => {
     try {
-        const orders = await Orders.find().populate("userId").sort({ createdOn: -1 });
-        console.log("Order's", orders);
-        console.log("User's");
-        res.render("./admin/orderManagement", { orders });
+        console.log("We are in Ordermanagement")
+        const pageNumber = parseInt(req.query.PageNumber);
+        console.log("Req Params", req.params);
+        console.log("Req Query", req.query);
+        console.log(pageNumber)
+        // const orders = await Orders.find().populate("userId").sort({ createdOn: -1 }).skip(pageNumber - 1).limit(10)
+        const orders = await Orders.find().populate("userId").sort({ createdOn: -1 }).skip(10 * (pageNumber - 1)).limit(10);
+        const count = await Orders.find().countDocuments();
+        const totalPage = Math.ceil(count / 10);
+        res.render("./admin/orderManagement", { orders, totalPage, pageNumber });
     }
     catch (err) {
         console.log("Error in loading admin order ", err);
