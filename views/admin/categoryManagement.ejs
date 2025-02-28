@@ -23,11 +23,11 @@
                         <figure class="card border-1">
                             <!-- <p><%= element %></p> -->
                                 <div class="card-header bg-white text-center">
-                                    <h6 class="card-title m-0"><%= element.name %></h6>
+                                    <h6 class="card-title m-0 name"><%= element.name %></h6>
                                 </div>
                                 <% if (element.discount) { %>
                                     <div class="card-header bg-white text-center">
-                                        <h6 class="card-title m-0">discount <%= element.discount %>%</h6>
+                                        <h6 class="card-title m-0 discount">discount <%= element.discount %>%</h6>
                                     </div>
                                 <% } %>
                                 <figcaption class="card-body text-center ">
@@ -37,6 +37,7 @@
                                         <a type="button" class="btn btn-primary" href="/admin/category/list/<%= element._id %>">List</a>
                                     <!-- <a href="#"> 13 items </a> -->
                                     <% } %>
+                                    <a type="button" class="updateBtn btn btn-info" style="background-color: green; color: white;"   data-id="<%= element._id %>">update</a>
                                 </figcaption>
                         </figure>
                     </div>
@@ -75,6 +76,39 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Update Category Modal  -->
+            <div class="modal fade" id="updateCategoryModal" tabindex="-1" aria-labelledby="updateCategoryModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="updateCategoryModalLabel">Update Category</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="updateCategoryForm">
+                                <div class="mb-3">
+                                    <label for="updateCategoryName" class="form-label">Category Name</label>
+                                    <input type="text" class="form-control" id="updateCategoryName" name="categoryName" placeholder="Enter category name">
+                                    <div id="updateCategoryNameError" class="text-danger"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="updateCategoryOffer" class="form-label">Discount %</label>
+                                    <input type="number" class="form-control" id="updateCategoryOffer" name="categoryOffer" placeholder="Enter a discount %">
+                                    <div id="updateCategoryOfferError" class="text-danger"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="updateCategoryDescription" class="form-label">Category Description</label>
+                                    <textarea class="form-control" id="updateCategoryDescription" name="categoryDescription" rows="3" ></textarea>
+                                    <div id="updateCategoryDescriptionError" class="text-danger"></div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Category</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
         </section> <!-- content-main end// -->
         <footer class="main-footer font-xs">
             <div class="row pb-30 pt-15">
@@ -99,8 +133,116 @@
     <script src="assets/js/vendors/jquery.fullscreen.min.js"></script>
     <!-- Main Script -->
     <script src="assets/js/main.js" type="text/javascript"></script>
+    <!-- Include SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        document.getElementById('addCategoryForm').addEventListener('submit', async function(event) {
+        // console.log(document.querySelector("#updateBtn"))
+        document.querySelectorAll(".updateBtn").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+        try {
+            const id = e.target.getAttribute("data-id");
+            console.log("Category id", id);
+
+            let response = await fetch(`/admin/category/update/${id}`, {
+                method: "GET"
+            });
+
+            console.log(response);
+
+            let details = await response.json();
+            console.log(details);
+            console.log(details.categoryDetails.name);
+
+            // Get the modal element
+            var updateCategoryModal = new bootstrap.Modal(document.getElementById('updateCategoryModal'));
+
+            // Pre-fill the form fields with existing category data
+            document.querySelector("#updateCategoryName").value = details.categoryDetails.name;
+            document.querySelector("#updateCategoryOffer").value = details.categoryDetails.discount || ''; // Default to empty if no discount
+            document.querySelector("#updateCategoryDescription").value = details.categoryDetails.description || '';
+
+            // Show the modal
+            updateCategoryModal.show();
+
+            // Now listen for the form submission to update the category
+            document.querySelector("#updateCategoryForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                const updatedName = document.querySelector("#updateCategoryName").value;
+                const updatedOffer = document.querySelector("#updateCategoryOffer").value;
+                const updatedDescription = document.querySelector("#updateCategoryDescription").value;
+
+                // Check if any value has changed
+                if (
+                    updatedName === details.categoryDetails.name &&
+                    updatedOffer == details.categoryDetails.discount &&
+                    updatedDescription === details.categoryDetails.description
+                ) {
+                    // No changes made, show error message
+                    document.querySelector("#updateCategoryNameError").textContent = "No changes made to the category.";
+                    return;
+                }
+
+                // Otherwise, send a PUT request to update the category
+                try {
+                    let updateResponse = await fetch(`/admin/category/update/${id}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            name: updatedName,
+                            discount: updatedOffer,
+                            description: updatedDescription
+                        })
+                    });
+
+                    let updateResult = await updateResponse.json();
+                    console.log(updateResult);
+
+                    // Optionally, handle the response and show success message
+
+                    if (updateResult.success) {
+                        // Close the modal and refresh the page or update the UI as needed
+                        alert("Category updated successfully!");
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Category updated successfully!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+
+                        updateCategoryModal.hide();
+                        location.reload(); // Or update the page with new details without reloading
+                    } else {
+                        Swal.fire({
+                        icon: 'error',
+                        title: 'An error occurred',
+                        text: 'Failed to Update the category'
+                    });
+                    }
+                } catch (err) {
+                    console.log("Error updating category:", err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'An error occurred',
+                        text: 'An error occurred while adding the category.'
+                    });
+                }
+            });
+        } catch (err) {
+            console.log("Error in fetching category details");
+            console.log(err);
+        }
+    });
+});
+
+
+
+
+
+    document.getElementById('addCategoryForm').addEventListener('submit', async function(event) {
     try {
         // Clear previous error messages
         clearErrors();
@@ -155,18 +297,32 @@
         const data = await response.json();
         
         if (data.success) {
-            alert('Category added successfully!');
+            Swal.fire({
+                icon: 'success',
+                title: 'Category added successfully!',
+                showConfirmButton: false,
+                timer: 1500
+            });
+
             $('#addCategoryModal').modal('hide');
             document.getElementById('addCategoryForm').reset();
 
             // Refresh the category list
             refreshCategoryList();
         } else {
-            alert('Error: ' + data.message);
+            Swal.fire({
+            icon: 'error',
+            title: 'Error refreshing categories',
+            text:  data.message || 'An error occurred while refreshing the category list.'
+        });
         }
     } catch (error) {
         console.log('Error:', error);
-        alert('An error occurred while adding the category.');
+        Swal.fire({
+            icon: 'error',
+            title: 'Error refreshing categories',
+            text: 'An error occurred while refreshing the category list.'
+        });
     }
 });
 
@@ -204,6 +360,7 @@ async function refreshCategoryList() {
                                     `<a type="button" class="btn btn-danger" href="/admin/category/unlist/${category._id}">Unlist</a>` : 
                                     `<a type="button" class="btn btn-primary" href="/admin/category/list/${category._id}">List</a>`
                                 }
+                                      <a type="button" class="updateBtn btn btn-info" style="background-color: green; color: white;"   data-id="${category._id}">update</a>
                             </figcaption>
                         </figure>
                 `;

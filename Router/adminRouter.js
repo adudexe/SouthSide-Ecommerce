@@ -30,6 +30,8 @@ admin.post("/categoryManagement", adminAuth.requireAuth, adminController.manageC
 admin.get("/category/unlist/:id", adminController.unlistCategory);
 admin.get("/category/list/:id", adminController.listCategory);
 admin.get('/category/updateList', adminAuth.requireAuth, adminController.updateList);
+admin.get('/category/update/:id', adminAuth.requireAuth, adminController.loadSpecificCategory);
+admin.put('/category/update/:id', adminAuth.requireAuth, adminController.upateCategory);
 admin.get('/logout', adminAuth.requireAuth, adminController.logout);
 
 //Order Management
@@ -42,6 +44,7 @@ admin.put("/orderManagement/details/bukStatus", adminAuth.requireAuth, orderCont
 admin.get("/coupons", adminAuth.requireAuth, couponController.loadPage);
 admin.post("/coupons/add", adminAuth.requireAuth, couponController.addCoupon);
 admin.delete("/coupons/delete/:id", adminAuth.requireAuth, couponController.deleteCoupon)
+
 
 
 admin.post('/sales-report', adminAuth.requireAuth, adminController.generateSalesReport);

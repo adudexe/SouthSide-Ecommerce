@@ -840,11 +840,61 @@ adminController.deleteProduct = async (req, res) => {
 adminController.loadCategory = async (req, res) => {
   try {
     const cat = await Category.find();
-    console.log(cat);
+    // console.log(cat);
     res.render("./admin/categoryManagement", { category: cat });
   }
   catch (err) {
     console.log("error in loading CategoryPage" + err);
+  }
+}
+
+adminController.loadSpecificCategory = async (req, res) => {
+  try {
+    const id = req.params.id
+    // console.log(req.params)
+    console.log("Category Id", id);
+    const categoryDetails = await Category.findById(id);
+    console.log("Category Details", categoryDetails)
+    if (categoryDetails) {
+      return res.status(200).json({ success: true, categoryDetails });
+    }
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+  catch (err) {
+    console.log("Error in Load Specific Category", err);
+    res.status(500).send("Internal Server Error")
+  }
+}
+
+adminController.upateCategory = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { name, discount, description } = req.body;
+    console.log("Id ", id);
+    const updateCategory = await Category.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          name: name,
+          discount: discount,
+          description: description,
+        }
+      },
+      { new: true } // This option returns the updated document
+    );
+
+
+
+    if (updateCategory) {
+      return res.status(200).json({ success: true, message: "Category Successfully Updated" })
+    }
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
+
+
+
+  }
+  catch (err) {
+    console.log("Error in Update Category", err);
   }
 }
 
