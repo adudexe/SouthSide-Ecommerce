@@ -1,8 +1,7 @@
-// const e = require("express");
-
 let cropper;
 //I should add all image elements to this at first so that when removing i would be able to know images are removed and all....
 let selectedFiles = [];
+let oldImages = [];
 let currentFileIndex = 0; // Track which image is being cropped
 let variants = []; // Store the variants
 let oldVariantDetals = {};
@@ -19,7 +18,7 @@ oldProductDetails.description = document.querySelector("#product_description").i
 console.log(oldProductDetails);
 
 JSON.parse(document.querySelector("#variantsPreview").getAttribute("data-variants")).forEach(elm => {
-    
+
     variants.push(elm)
 })
 
@@ -31,12 +30,7 @@ JSON.parse(document.querySelector("#variantsPreview").getAttribute("data-variant
 */
 
 
-//Add images to selected files
-// document.querySelectorAll(".imageelm").forEach((elm)=>{
-//     // console.log("Images",elm)
 
-//     selectedFiles.push(elm);
-// })
 
 document.querySelectorAll(".imageelm").forEach((elm) => {
     // console.log("Images", elm);
@@ -59,9 +53,10 @@ document.querySelectorAll(".imageelm").forEach((elm) => {
             };
 
             reader.readAsDataURL(file); // Read the image file as a data URL (base64 string)
-            
+
             // Push the file to your selected files array
             selectedFiles.push(file);
+            oldImages.push(file)
             // console.log("Selected Files: ", selectedFiles);
         })
         .catch(error => {
@@ -72,16 +67,42 @@ document.querySelectorAll(".imageelm").forEach((elm) => {
 
 console.log(selectedFiles)
 
-document.querySelectorAll(".remove-btn").forEach((btn)=>{
-    btn.addEventListener("click",(e)=>{
+
+
+document.querySelectorAll(".remove-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
         e.preventDefault();
+        e.target.parentNode.remove()
+        // console.log("Details", e.target.getAttribute("data-id"))
         removeImage(e.target);
+        console.log(selectedFiles)
     })
 })
+
+function removeImage(imgElement) {
+    // console.log(selectedFiles);
+    // console.log("Image elemenat ", )
+
+    if (imgElement.parentElement.getAttribute("data-id")) {
+        const position = parseInt(imgElement.parentElement.getAttribute("data-id"))
+
+        console.log(selectedFiles.splice(position - 1, 1))
+    }
+
+    const index = selectedFiles.findIndex(file => file.name === imgElement.dataset.name);
+    // if (before == selectedFiles.length()) {
+    //     console.log("Not gone");
+    // }
+    if (index > -1) {
+        selectedFiles.splice(index, 1); // Remove the file from the array
+        imgElement.parentNode.remove(); // Remove the image from the preview
+    }
+}
 
 
 
 const imageInput = document.getElementById("imagesInput");
+const imagePreview = document.getElementById("imagePreview");
 const variantPreview = document.getElementById("variantsPreview");
 let cropImage = document.getElementById("cropImage");
 const cropperModal = new bootstrap.Modal(document.getElementById("cropperModal"));
@@ -93,63 +114,55 @@ var myModal = new bootstrap.Modal(document.getElementById('variantModal'));
 
 // console.log("selected Image",selectedFiles);
 
-variantPreview.querySelectorAll(".edit-btn").forEach((button)=>{
-    button.addEventListener("click",(e)=>{
+variantPreview.querySelectorAll(".edit-btn").forEach((button) => {
+    button.addEventListener("click", (e) => {
         e.preventDefault()
         showVariantModal(e.target.parentElement.parentElement);
     })
 })
 
-function showVariantModal(data)
-{
+function showVariantModal(data) {
     myModal.show();
-    variantModal.querySelector("#selectedSize").innerText = data.querySelector('#size').innerText 
+    variantModal.querySelector("#selectedSize").innerText = data.querySelector('#size').innerText
     variantModal.querySelector("#variant_color").value = data.querySelector("#color").innerText
-    variantModal.querySelector("#variant_status").value =  data.querySelector("#status").innerText
+    variantModal.querySelector("#variant_status").value = data.querySelector("#status").innerText
     variantModal.querySelector("#variant_price").value = Number(data.querySelector("#salePrice").innerText)
     variantModal.querySelector("#variant_quantity").value = Number(data.querySelector("#quantity").innerText)
-    
+
     newVariant._id = data.querySelector('#size').getAttribute("data-id");
-    
+
     oldVariantDetals.id = data.querySelector('#size').getAttribute("data-id");
-    oldVariantDetals.size = data.querySelector('#size').innerText 
+    oldVariantDetals.size = data.querySelector('#size').innerText
     oldVariantDetals.color = data.querySelector("#color").innerText
     oldVariantDetals.status = data.querySelector("#status").innerText
     oldVariantDetals.price = Number(data.querySelector("#salePrice").innerText)
     oldVariantDetals.quantity = Number(data.querySelector("#quantity").innerText)
 
     // console.log( oldVariantDetals )
-    
+
 }
 
 addVariantBtn.addEventListener("click", () => {
     myModal.show();
 });
 
-document.querySelectorAll(".imageContainer").forEach((element)=>{
-    element.addEventListener("click",(e)=>{
-        // console.log(e.target);
-        openCropperModal(e.target)
-    })
-})
+// document.querySelectorAll(".imageContainer").forEach((element) => {
+//     element.addEventListener("click", (e) => {
+//         // console.log(e.target);
+//         openCropperModal(e.target)
+//     })
+// })
 
 
 
-function removeImage(imgElement) {
-    // console.log(selectedFiles);
-    const index = selectedFiles.findIndex(file => file.name === imgElement.dataset.name);
-    if (index > -1) {
-        selectedFiles.splice(index, 1); // Remove the file from the array
-        imgElement.parentNode.remove(); // Remove the image from the preview
-    }
-}
+
 
 function openCropperModal(imgElement) {
-    console.log("Image Element from Cropper modal",imgElement)
+    console.log("Image Element from Cropper modal", imgElement)
     cropImage.src = imgElement.src;
     cropImage.id = imgElement.id;
     cropImage.classList = imgElement.classList
-    cropImage.dataId =imgElement.getAttribute("data-id");
+    cropImage.dataId = imgElement.getAttribute("data-id");
 
     // Initialize cropper only if it hasn't been initialized
     if (cropper) {
@@ -173,7 +186,7 @@ cropButton.addEventListener('click', function () {
         console.error("Cropper is not initialized.");
         return; // Exit if cropper is not initialized
     }
-
+    console.log(selectedFiles)
     // Get the cropped canvas with desired dimensions
     cropper.getCroppedCanvas({
         width: 100,
@@ -193,17 +206,17 @@ cropButton.addEventListener('click', function () {
 
         // console.log(cropImage.dataId)
 
-        // console.log("Before Cropping ",selectedFiles);
-        // console.log("Croped Image",croppedFile);
+        console.log("Before Cropping ", selectedFiles);
+        console.log("Croped Image", croppedFile);
         // Replace the selected image with the cropped one
-        selectedFiles[cropImage.dataId] = croppedFile
-        
+        selectedFiles[currentFileIndex] = croppedFile;
 
-        // console.log("After Cropping",selectedFiles);
+
+        console.log("After Cropping", selectedFiles);
 
         // Update the image preview
         // console.log(cropImage)
-        // console.log("Cropped Image",URL.createObjectURL(croppedFile))
+        console.log("Cropped Image", URL.createObjectURL(croppedFile))
         document.getElementById(cropImage.id).src = URL.createObjectURL(croppedFile);
 
         // Hide the cropper modal and destroy the cropper instance
@@ -221,12 +234,13 @@ imageInput.addEventListener("change", (e) => {
 
     selectedFiles = []; // Clear previous selections
     imagePreview.innerHTML = ''; // Clear previous previews
+    console.log(imagePreview)
     currentFileIndex = 0; // Reset index
 
     Array.from(files).forEach((file, index) => {
-        
-        
-        
+
+
+
         if (!file.type.startsWith('image/')) {
             Swal.fire({
                 title: "Error",
@@ -240,6 +254,7 @@ imageInput.addEventListener("change", (e) => {
         if (selectedFiles.length < 3) {
             const reader = new FileReader();
             reader.onload = function (e) {
+                imagePreview.parentElement.classList.remove("row")
                 const imgElement = document.createElement('img');
                 imgElement.src = e.target.result;
                 imgElement.classList.add('img-thumbnail');
@@ -280,141 +295,46 @@ imageInput.addEventListener("change", (e) => {
 //variant details....
 
 
-document.querySelector("#saveVariantBtn").addEventListener("click",()=>{
-    
-   
-    newVariant.size = variantModal.querySelector("#variant_size").value || variantModal.querySelector("#selectedSize").innerText 
-    newVariant.color =variantModal.querySelector("#variant_color").value 
-    newVariant.status =  variantModal.querySelector("#variant_status").value 
-    newVariant.price = Number(variantModal.querySelector("#variant_price").value) 
-    newVariant.quantity = Number(variantModal.querySelector("#variant_quantity").value) 
+document.querySelector("#saveVariantBtn").addEventListener("click", () => {
 
-// console.log("helo")
 
-    // console.log(
-    //     !(newVariant.size == oldVariantDetals.size &&
-    //         newVariant.color == oldVariantDetals.color &&
-    //         newVariant.status == oldVariantDetals.status &&
-    //         newVariant.price == oldVariantDetals.price &&
-    //         newVariant.quantity == oldVariantDetals.quantity )
-    // )
-    
+    newVariant.size = variantModal.querySelector("#variant_size").value || variantModal.querySelector("#selectedSize").innerText
+    newVariant.color = variantModal.querySelector("#variant_color").value
+    newVariant.status = variantModal.querySelector("#variant_status").value
+    newVariant.price = Number(variantModal.querySelector("#variant_price").value)
+    newVariant.quantity = Number(variantModal.querySelector("#variant_quantity").value)
 
     if (
         !(newVariant.size == oldVariantDetals.size &&
-        newVariant.color == oldVariantDetals.color &&
-        newVariant.status == oldVariantDetals.status &&
-        newVariant.price == oldVariantDetals.price &&
-        newVariant.quantity == oldVariantDetals.quantity )
-    )
-    {
-        console.log("Before Updating",newVariant)
+            newVariant.color == oldVariantDetals.color &&
+            newVariant.status == oldVariantDetals.status &&
+            newVariant.price == oldVariantDetals.price &&
+            newVariant.quantity == oldVariantDetals.quantity)
+    ) {
+        console.log("Before Updating", newVariant)
         //Change the details in the varaiats array..
-        variants.forEach((item,index) => {
-            if(item._id == newVariant._id)
-            {
+        variants.forEach((item, index) => {
+            if (item._id == newVariant._id) {
                 console.log(variants[index])
                 variants[index] = newVariant;
                 // console.log(variants)
-            }       
+            }
         })
 
-        console.log("After Updating",variants);
+        console.log("After Updating", variants);
 
     }
 
     myModal.hide()
 })
 
-
-// document.querySelector("#publishBtn").addEventListener("click", async (e) => {
-//     try {
-//         e.preventDefault();
-
-//         let isVariantChanged = false;  // Flag to check if the variant has changed
-//         let isProductChanged = false;  // Flag to check if the product details have changed
-
-//         // Check if the variant has changed
-//         if (
-//             newVariant.size !== oldVariantDetals.size ||
-//             newVariant.color !== oldVariantDetals.color ||
-//             newVariant.status !== oldVariantDetals.status ||
-//             newVariant.price !== oldVariantDetals.price ||
-//             newVariant.quantity !== oldVariantDetals.quantity
-//         ) {
-//             isVariantChanged = true;
-//         }
-
-//         // Check if the product details have changed
-//         if (
-//             oldProductDetails.title !== document.querySelector("#product_title").value ||
-//             oldProductDetails.offer !== document.querySelector("#product_offer").value ||
-//             oldProductDetails.category !== document.querySelector("#test").innerText ||
-//             oldProductDetails.description !== document.querySelector("#product_description").innerHTML
-//         ) {
-//             isProductChanged = true;
-//         }
-
-//         // If no changes in variants or product details, show an error message
-//         if (!isVariantChanged && !isProductChanged) {
-//             Toast.fire({
-//                 icon: "error",
-//                 title: "No changes detected. Please update something before submitting."
-//             });
-//         } else {
-//             // Create a new FormData object
-//             let formData = new FormData();
-
-//             // Append product details
-//             formData.append("product_id",document.querySelector("#product_title").getAttribute("data-id"))
-//             formData.append("product_title", document.querySelector("#product_title").value);
-//             formData.append("product_offer", document.querySelector("#product_offer").value);
-//             formData.append("product_category", document.querySelector("#test").value || document.getElementById('product_category').value);
-//             formData.append("product_description", document.querySelector("#product_description").innerHTML);
-
-//             // Append variant details (in case variants were changed)
-//             formData.append("variants", JSON.stringify(variants));  // You can send this as JSON string or as individual form fields
-
-//             // Append selected image files
-//             selectedFiles.forEach((file, index) => {
-//                 console.log(file);
-//                 formData.append(`image_${index+1}`, file);  // Append each image with a unique name (e.g., image_0, image_1, etc.)
-//             });
-
-//             // Proceed with sending the FormData to the backend
-//             let response = await fetch("/admin/products/edit", {
-//                 method: "POST",
-//                 body: formData  // Send the FormData object
-//             });
-
-//             let details = await response.json();
-
-//             if (details.success) {
-//                 // Handle success (e.g., show a success message)
-//                 Toast.fire({
-//                     icon: "success",
-//                     title: "Product and variants updated successfully!"
-//                 });
-//             } else {
-//                 // Handle failure (e.g., show an error message)
-//                 Toast.fire({
-//                     icon: "error",
-//                     title: "Failed to update the product and variants."
-//                 });
-//             }
-//         }
-
-//     } catch (err) {
-//         console.error('Error occurred during the update:', err);
-//     }
-// });
-
 document.querySelector("#publishBtn").addEventListener("click", async (e) => {
     try {
         e.preventDefault();
+        console.log(selectedFiles)
         const productCard = document.getElementById("productCard");
-        
-        console.log(document.querySelector("#test").value )
+
+        console.log(document.querySelector("#test").value)
         console.log(document.getElementById('product_category').value)
 
         let isVariantChanged = false;  // Flag to check if the variant has changed
@@ -425,6 +345,21 @@ document.querySelector("#publishBtn").addEventListener("click", async (e) => {
         const offer = document.querySelector("#product_offer").value;
         const category = document.getElementById('product_category').value;
         const description = document.querySelector("#product_description").innerHTML;
+        const changed = [];
+        console.log(selectedFiles)
+        for (let i = 0; i < selectedFiles.length; i++) {
+            console.log(selectedFiles[i], "!==", oldImages[i])
+            if (selectedFiles[i] !== oldImages[i]) {
+                isProductChanged = true
+            }
+        }
+        if (selectedFiles.length > 4) {
+            Toast.fire({
+                icon: "error",
+                title: "Only 3 image's are needed"
+            });
+            return;
+        }
 
         // Check for missing required fields (Example: title, offer, category, description)
         if (!title || !offer || !category || !description) {
@@ -439,7 +374,7 @@ document.querySelector("#publishBtn").addEventListener("click", async (e) => {
         if (
             oldProductDetails.title !== title ||
             oldProductDetails.offer !== offer ||
-            oldProductDetails.category !==  category ||
+            oldProductDetails.category !== category ||
             oldProductDetails.description !== description
         ) {
             isProductChanged = true;
@@ -470,7 +405,7 @@ document.querySelector("#publishBtn").addEventListener("click", async (e) => {
             formData.append("product_id", document.querySelector("#product_title").getAttribute("data-id"));
             formData.append("product_title", title);
             formData.append("product_offer", offer);
-            formData.append("product_category",  category );
+            formData.append("product_category", category);
             formData.append("product_description", description);
 
             // Append variant details (in case variants were changed)
@@ -490,107 +425,21 @@ document.querySelector("#publishBtn").addEventListener("click", async (e) => {
             let details = await response.json();
 
             if (details.success) {
-                // Handle success (e.g., show a success message)
-                Toast.fire({
-                    icon: "success",
-                    title: "Product and variants updated successfully!"
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000, // Duration of Toast
+                    timerProgressBar: true,
                 });
-            //     productCard.innerHTML = `
-            //         <div class="card-body" id="card-body">
-            //             <form id="productForm" enctype="multipart/form-data">
-            //                 <div class="row">
-            //                     <!-- Product Title -->
-            //                     <div class="col-md-6">
-            //                         <label for="product_title" class="form-label">Product Title</label>
-            //                         <input type="text" id="product_title" name="product_title" class="form-control" value="${details.updatedProduct.productName}" data-id="${details.updatedProduct._id}">
-            //                         <small id="product_title_error" class="text-danger" style="display: none;">Product title is required.</small>
-            //                     </div>
-            //                     <!-- Product Price -->
-            //                     <div class="col-md-6">
-            //                         <label for="product_offer" class="form-label">Product Offer</label>
-            //                         <input type="number" id="product_offer" name="product_offer" class="form-control" min="0" max="90" value="${details.updatedProduct.productOffer}">
-            //                         <small id="product_offer_error" class="text-danger" style="display: none;">Product Offer is required.</small>
-            //                     </div>
-            //                     <!-- Image -->
-            //                     <div class="col-md-6">
-            //                         <label class="form-label">Image</label>
-            //                         <input type="file" id="imagesInput" class="form-control" accept="image/*" multiple>
-            //                     </div>
-            //                     <!-- Product Category -->
-            //                     <div class="col-md-6">
-            //                         <label for="product_category" class="form-label">Product Category</label>
-            //                         <select id="product_category" name="product_category" class="form-select">
-            //                             <option id="test" value="${details.updatedProduct.category._id}">${details.updatedProduct.category.name}</option>
-            //                             ${details.updatedProduct.categories.map(category => {
-            //                                 if (category.isListed) {
-            //                                     return `<option value="${category._id}">${category.name}</option>`;
-            //                                 }
-            //                                 return '';
-            //                             }).join('')}
-            //                         </select>
-            //                         <small id="product_category_error" class="text-danger" style="display: none;">Product category is required.</small>
-            //                     </div>
-            //                 </div>
 
-            //                 <div class="row">
-            //                     <!-- Product Description -->
-            //                     <div class="col-md-12">
-            //                         <label for="product_description" class="form-label">Product Description</label>
-            //                         <textarea id="product_description" name="product_description" class="form-control" rows="4">${details.updatedProduct.description}</textarea>
-            //                         <small id="product_description_error" class="text-danger" style="display: none;">Product Description is required.</small>
-            //                     </div>
-            //                 </div>
-            //                 <div class="row mt-2">
-            //                     <div class="col-md-6 row">
-            //                         ${details.updatedProduct.productImages.map((image, index) => {
-            //                             return `
-            //                                 <div id="imagePreview" class="col">
-            //                                     <!-- Images Will be displayed Here -->
-            //                                     <div class="img-thumbnail-container" data-id="${index + 1}">
-            //                                         <button class="remove-btn">X</button>
-            //                                         <img src="/${image}" data-id="${index + 1}" class="imageelm imageContainer" id="image_${index + 1}">
-            //                                     </div>
-            //                                 </div>
-            //                             `;
-            //                         }).join('')}
-            //                     </div>
-            //                 </div>
-            //                 <!-- Add Variant Button -->
-            //                 <div class="col-md-12 mt-4">
-            //                     <button type="button" class="btn btn-secondary mt-4" id="addVariantBtn">Add Variant</button>
-            //                 </div>
-
-            //                 <!-- Variants Preview Section -->
-            //                 <div id="variantsPreview" class="mt-4 row" data-variants="${JSON.stringify(details.updatedProduct.variants)}">
-            //                     ${details.updatedProduct.variants.map((variant, index) => {
-            //                         return `
-            //                             <div id="variantsContainer">
-            //                                 <div class="col-md-4 mb-3">
-            //                                     <div class="card p-2">
-            //                                         <h6>Variant ${index + 1}</h6>
-            //                                         <p><strong>Size:</strong> <span id="size" data-id="${variant._id}">${variant.size}</span></p>
-            //                                         <p><strong>Color:</strong> <span id="color">${variant.color}</span></p>
-            //                                         <p><strong>Status:</strong> <span id="status">${variant.status}</span></p>
-            //                                         <p><strong>Price:</strong> $<span id="salePrice">${variant.salePrice}</span></p>
-            //                                         <p><strong>Quantity:</strong> <span id="quantity">${variant.quantity}</span></p>
-            //                                         <div class="buttons row gap-4 p-4">
-            //                                             <button class="btn btn-success btn-sm col edit-btn">Edit</button>
-            //                                             <button class="btn btn-danger btn-sm col" onclick="removeVariant()">Remove</button>
-            //                                         </div>
-            //                                     </div>
-            //                                 </div>
-            //                             </div>
-            //                         `;
-            //                     }).join('')}
-            //                 </div>
-
-            //                 <!-- Submit Button -->
-            //                 <button type="button" id="publishBtn" class="btn btn-primary mt-4">Update Product</button>
-            //             </form>
-            //         </div>
-            // `;
-
-                window.location.reload();
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Product and variants updated successfully!'
+                }).then(() => {
+                    // This will trigger after the Toast is closed
+                    window.location.reload(); // Reload the page
+                });
 
             } else {
                 // Handle failure (e.g., show an error message)
@@ -607,10 +456,6 @@ document.querySelector("#publishBtn").addEventListener("click", async (e) => {
 });
 
 
-
-
-
-
 const Toast = Swal.mixin({
     toast: true,
     position: "top-end",
@@ -618,7 +463,7 @@ const Toast = Swal.mixin({
     timer: 3000,
     timerProgressBar: true,
     didOpen: (toast) => {
-      toast.onmouseenter = Swal.stopTimer;
-      toast.onmouseleave = Swal.resumeTimer;
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
     }
-  });
+});

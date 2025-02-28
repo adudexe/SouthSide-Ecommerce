@@ -31,9 +31,9 @@ document.addEventListener("DOMContentLoaded", (e) => {
             currentFileIndex = 0; // Reset index
 
             Array.from(files).forEach((file, index) => {
-                
-                
-                
+
+
+
                 if (!file.type.startsWith('image/')) {
                     Swal.fire({
                         title: "Error",
@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
             });
         });
 
-        
+
         function removeImage(imgElement) {
             console.log(selectedFiles);
             const index = selectedFiles.findIndex(file => file.name === imgElement.dataset.name);
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
 
         function openCropperModal(imgElement) {
             // console.log(imgElement)
-            console.log("Selected Images",selectedFiles);
+            console.log("Selected Images", selectedFiles);
             cropImage.src = imgElement.src;
             cropImage.id = imgElement.id;
 
@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
                 minContainerHeight: 500, // Minimum container height for cropping
                 minContainerWidth: 500, // Minimum container width for cropping
                 viewMode: 3, // Keep the crop box inside the canvas
-                
+
             });
 
             cropperModal.show();
