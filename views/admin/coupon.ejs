@@ -128,6 +128,36 @@
             </div>
         </div>
     </div>
+
+   <% if ((totalPage > 1)) { %>
+    <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <!-- <p>PageNumber<%= pageNumber %></p> -->
+                <% if (!pageNumber) { %>
+                    <%pageNumber = 1 %>
+                <% } %>
+                
+                <% if (totalPage>0) { %>
+                        <% if (pageNumber > 1) { %>
+                            <li class="page-item"><a class="page-link" href="/admin/coupons?PageNumber=<%=Number(pageNumber)-1 %>"><i class="material-icons md-chevron_left"></i></a></li>
+                        <% } %>
+                        <% for( let index = 1; index <= totalPage; index++ ) { %>
+                            <% if (index == pageNumber) { %>
+                                <li class="page-item active"><a class="page-link" href="/admin/coupons?PageNumber=<%=index %>"><%= index %></a></li>
+                            <% } else { %>
+                                <li class="page-item"><a class="page-link" href="/admin/coupons?PageNumber=<%=index %>"><%= index %></a></li>
+                            <% } %>
+
+                        <% } %>
+                        <% if (pageNumber < totalPage) { %>
+                            <li class="page-item"><a class="page-link" href="/admin/coupons?PageNumber=<%=Number(pageNumber)+1 %>"><i class="material-icons md-chevron_right"></i></a></li>
+                        <% } %>
+                <% } %>
+            </ul>
+        </nav>
+    </div>
+   <% } %>
 </section>
 
 <script>
