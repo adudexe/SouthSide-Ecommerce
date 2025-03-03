@@ -200,6 +200,8 @@ async function generateReport() {
             body: JSON.stringify(dateRange), // Send dateRange data to the backend
         });
 
+        console.log(response);
+
         // Handle the response from the backend
         if (response.ok) {
             // Assuming the backend sends the PDF as a file in response

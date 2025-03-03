@@ -23,7 +23,6 @@ adminController.generateSalesReport = async (req, res) => {
     const { startDate, endDate } = req.body;
     let orders;
 
-
     // If no date range is provided, fetch all orders
     if (!startDate && !endDate) {
       orders = await Order.find();
@@ -118,9 +117,9 @@ adminController.generateSalesReport = async (req, res) => {
         .text(order._id.toString().slice(-8), columns.orderId.x, rowY)
         .text(order.userId.toString().slice(-6), columns.userId.x, rowY)
         .text(moment(order.invoiceDate).format('DD/MM/YY'), columns.date.x, rowY)
-        .text(`$${order.totalPrice.toFixed(2)}`, columns.price.x, rowY)
-        .text(`$${order.discount.toFixed(2)}`, columns.discount.x, rowY)
-        .text(`$${order.finalAmount.toFixed(2)}`, columns.final.x, rowY)
+        .text(`Rs ${order.totalPrice.toFixed(2)}`, columns.price.x, rowY)  // Changed to Rs
+        .text(`Rs ${order.discount.toFixed(2)}`, columns.discount.x, rowY)    // Changed to Rs
+        .text(`Rs ${order.finalAmount.toFixed(2)}`, columns.final.x, rowY)    // Changed to Rs
         .text(order.paymentMethod, columns.payment.x, rowY);
 
       rowY += 20;
@@ -180,10 +179,10 @@ adminController.generateSalesReport = async (req, res) => {
       .font('Helvetica')
       .moveDown(0.5)
       .text(`Total Number of Orders: ${totalOrders}`)
-      .text(`Gross Sales (Before Discounts): $${totalGrossSales.toFixed(2)}`)
-      .text(`Total Discounts Applied: $${totalDiscounts.toFixed(2)}`)
-      .text(`Net Sales (After Discounts): $${totalSales.toFixed(2)}`)
-      .text(`Average Order Value: $${averageOrderValue.toFixed(2)}`);
+      .text(`Gross Sales (Before Discounts): Rs ${totalGrossSales.toFixed(2)}`)   // Changed to Rs
+      .text(`Total Discounts Applied: Rs ${totalDiscounts.toFixed(2)}`)               // Changed to Rs
+      .text(`Net Sales (After Discounts): Rs ${totalSales.toFixed(2)}`)              // Changed to Rs
+      .text(`Average Order Value: Rs ${averageOrderValue.toFixed(2)}`);              // Changed to Rs
 
     doc.moveDown(1.5);
 
@@ -216,6 +215,9 @@ adminController.generateSalesReport = async (req, res) => {
     return res.status(500).send({ message: 'Internal Server Error' });
   }
 };
+
+
+
 
 
 adminController.loadDashboard = async (req, res) => {
