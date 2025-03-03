@@ -4,7 +4,6 @@ const cart = require("../model/cartSchema");
 const statusCode = require("../public/javascript/statusCodes");
 const cartController = {};
 
-
 cartController.loadCartPage = async (req, res) => {
     try {
         const userId = req.session.user._id;
