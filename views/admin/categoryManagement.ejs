@@ -209,7 +209,7 @@
 
                     if (updateResult.success) {
                         // Close the modal and refresh the page or update the UI as needed
-                        alert("Category updated successfully!");
+                        // alert("Category updated successfully!");
                         Swal.fire({
                             icon: 'success',
                             title: 'Category updated successfully!',
@@ -354,24 +354,37 @@ async function refreshCategoryList() {
             div.classList.add("col-md-4");
             data.categories.forEach(category => {
                 div.innerHTML = `
-                    
-                        <figure class="card border-1">
+                    <figure class="card border-1">
+                        <div class="card-header bg-white text-center">
+                            <h6 class="card-title m-0">${category.name}</h6>
+                        </div>
+                        
+                        ${category.isListed ? `
                             <div class="card-header bg-white text-center">
-                                <h6 class="card-title m-0">${category.name}</h6>
+                                <h6 class="card-title m-0 discount">Discount ${element.discount}%</h6>
                             </div>
-                            <figcaption class="card-body text-center">
-                                ${category.isListed ? 
-                                    `<a type="button" class="btn btn-danger" href="/admin/category/unlist/${category._id}">Unlist</a>` : 
-                                    `<a type="button" class="btn btn-primary" href="/admin/category/list/${category._id}">List</a>`
-                                }
-                                      <a type="button" class="updateBtn btn btn-info" style="background-color: green; color: white;"   data-id="${category._id}">update</a>
-                            </figcaption>
-                        </figure>
+                        ` : ''}
+                        
+                        <figcaption class="card-body text-center">
+                            ${category.isListed ? 
+                                `<a type="button" class="btn btn-danger" href="/admin/category/unlist/${category._id}">Unlist</a>` : 
+                                `<a type="button" class="btn btn-primary" href="/admin/category/list/${category._id}">List</a>`
+                            }
+                            <a type="button" class="updateBtn btn btn-info" style="background-color: green; color: white;" data-id="${category._id}">Update</a>
+                        </figcaption>
+                    </figure>
                 `;
+
                 categoryListContainer.appendChild(div);
             });
         } else {
-            alert('Error fetching categories');
+            Swal.fire({
+                icon: 'error',
+                title: 'Ops',
+                text: 'Error refreshing categories',
+                showConfirmButton: false,
+                timer: 1500
+            });
         }
     } catch (error) {
         console.log('Error refreshing category list:', error);
