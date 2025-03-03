@@ -46,34 +46,42 @@
                                     <th scope="col" class="text-end"> Action </th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <% orders.forEach(element => { %>
-                                    <!-- <p><%= //element %></p> -->
+                            <% if (orders.length < 1) { %>
+                                <tbody>
                                     <tr>
-                                        <td><%= element._id %></td>
-                                        <td><b><%= element.addres.name %></b></td>
-                                        <td><%= element.userId.email %></td>
-                                        <td>₹<%= Math.round(element.totalPrice) %></td>
-                                        <!-- <td><span class="badge rounded-pill alert-warning">Pending</span></td> -->
-                                        <td><%= (element.createdOn).toLocaleDateString('en-US', {
-                                            month: 'long',  // Full month name (e.g., "March")
-                                            day: 'numeric', // Day of the month (e.g., "25")
-                                            year: 'numeric' // Full year (e.g., "2020")
-                                          }); %></td>
-                                        <td class="text-end">
-                                            <a href="/admin/orderManagement/details/<%= element._id %>" class="btn btn-md rounded font-sm">Detail</a>
-                                            <div class="dropdown">
-                                                <!-- <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a> -->
-                                                <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="#">View detail</a>
-                                                    <!-- <a class="dropdown-item" href="#">Edit info</a> -->
-                                                    <!-- <a class="dropdown-item text-danger" href="#">Delete</a> -->
-                                                </div>
-                                            </div> <!-- dropdown //end -->
-                                        </td>
+                                        <td colspan="6" class="text-center">No orders available</td>
                                     </tr>
-                                <% }) %>
-                            </tbody>
+                                </tbody>
+                            <% } else { %>
+                                <tbody>
+                                    <% orders.forEach(element => { %>
+                                        <!-- <p><%= //element %></p> -->
+                                        <tr>
+                                            <td><%= element._id %></td>
+                                            <td><b><%= element.addres.name %></b></td>
+                                            <td><%= element.userId.email %></td>
+                                            <td>₹<%= Math.round(element.totalPrice) %></td>
+                                            <!-- <td><span class="badge rounded-pill alert-warning">Pending</span></td> -->
+                                            <td><%= (element.createdOn).toLocaleDateString('en-US', {
+                                                month: 'long',  // Full month name (e.g., "March")
+                                                day: 'numeric', // Day of the month (e.g., "25")
+                                                year: 'numeric' // Full year (e.g., "2020")
+                                              }); %></td>
+                                            <td class="text-end">
+                                                <a href="/admin/orderManagement/details/<%= element._id %>" class="btn btn-md rounded font-sm">Detail</a>
+                                                <div class="dropdown">
+                                                    <!-- <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a> -->
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item" href="#">View detail</a>
+                                                        <!-- <a class="dropdown-item" href="#">Edit info</a> -->
+                                                        <!-- <a class="dropdown-item text-danger" href="#">Delete</a> -->
+                                                    </div>
+                                                </div> <!-- dropdown //end -->
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            <% } %>
                         </table>
                     </div> <!-- table-responsive //end -->
                 </div> <!-- card-body end// -->

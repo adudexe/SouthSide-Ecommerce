@@ -11,14 +11,14 @@
                 <header class="card-header">
                     <div class="row align-items-center">
                         
-                        <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+                        <!-- <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
                             <select class="form-select">
                                 <option selected>Sort By</option>
                                 <option>Name</option>
                                 <option>Email</option>
                                 <option>Date</option>
                             </select>
-                        </div>
+                        </div> -->
                         <!-- <div class="col-md-2 col-6">
                             <select class="form-select">
                                 <option selected>Status</option>
@@ -46,9 +46,7 @@
                                 </thead>
                                 <tbody>
                                     <% users.forEach(user => { %>
-                                        <% if (user.name == "admin") { %>
-                                            <% continue %>
-                                        <% } else { %>
+                                        <% if (user.name !== "admin") { %>
                                             <tr>
                                                 <th><%= user.id  %></th>
                                                 <td><b><%= user.name %></b></td>

@@ -17,31 +17,35 @@
             
             <div class="card mb-4 ">
                 <div class="CardBody card-body d-flex flex-row gap-3 flex-wrap" id="category-list">
+                   <% if (category.length == 0) { %>
+                    <p>No Category Found</p>
+                   <% } else { %>
                     <% category.forEach(element => { %>
-                <!-- col.// -->
-                    <div class="col-xl-2 col-lg-3 col-md-4 col-6">
-                        <figure class="card border-1">
-                            <!-- <p><%= element %></p> -->
-                                <div class="card-header bg-white text-center">
-                                    <h6 class="card-title m-0 name"><%= element.name %></h6>
-                                </div>
-                                <% if (element.discount) { %>
-                                    <div class="card-header bg-white text-center">
-                                        <h6 class="card-title m-0 discount">discount <%= element.discount %>%</h6>
-                                    </div>
-                                <% } %>
-                                <figcaption class="card-body text-center ">
-                                    <% if (element.isListed) { %>
-                                        <a type="button" class="btn btn-danger" href="/admin/category/unlist/<%= element._id %>">Unlist</a>
-                                    <% } else { %>
-                                        <a type="button" class="btn btn-primary" href="/admin/category/list/<%= element._id %>">List</a>
-                                    <!-- <a href="#"> 13 items </a> -->
-                                    <% } %>
-                                    <a type="button" class="updateBtn btn btn-info" style="background-color: green; color: white;"   data-id="<%= element._id %>">update</a>
-                                </figcaption>
-                        </figure>
-                    </div>
-                    <% }) %>
+                        <!-- col.// -->
+                            <div class="col-xl-2 col-lg-3 col-md-4 col-6">
+                                <figure class="card border-1">
+                                    <!-- <p><%= element %></p> -->
+                                        <div class="card-header bg-white text-center">
+                                            <h6 class="card-title m-0 name"><%= element.name %></h6>
+                                        </div>
+                                        <% if (element.discount) { %>
+                                            <div class="card-header bg-white text-center">
+                                                <h6 class="card-title m-0 discount">discount <%= element.discount %>%</h6>
+                                            </div>
+                                        <% } %>
+                                        <figcaption class="card-body text-center ">
+                                            <% if (element.isListed) { %>
+                                                <a type="button" class="btn btn-danger" href="/admin/category/unlist/<%= element._id %>">Unlist</a>
+                                            <% } else { %>
+                                                <a type="button" class="btn btn-primary" href="/admin/category/list/<%= element._id %>">List</a>
+                                            <!-- <a href="#"> 13 items </a> -->
+                                            <% } %>
+                                            <a type="button" class="updateBtn btn btn-info" style="background-color: green; color: white;"   data-id="<%= element._id %>">update</a>
+                                        </figcaption>
+                                </figure>
+                            </div>
+                            <% }) %>
+                    <% } %>
                 </div> <!-- row.// -->
             </div> <!-- card-body end// -->
             

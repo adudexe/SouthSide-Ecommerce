@@ -338,31 +338,36 @@
                                 </tr>
                             </thead>
                             <tbody id="orders">
-                                <% orders.forEach(element => { %>
+                                <% if (orders.length === 0) { %>
                                     <tr>
-                                        <!-- <td class="text-center">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="transactionCheck02">
-                                                <label class="form-check-label" for="transactionCheck02"></label>
+                                        <td colspan="6" class="text-center py-4">
+                                            <div class="alert alert-info text-center" role="alert">
+                                                <i class="fas fa-exclamation-circle"></i> No orders available.
                                             </div>
-                                        </td> -->
-                                        <td><a href="#" class="fw-bold text-primary"><%= element._id %></a></td>
-                                        <td><%= element.addres.name %></td>
-                                        <td>
-                                            <%= element.createdOn.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' }) %>
-                                        </td>
-                                        <td>
-                                            ₹ <%= Math.floor(element.totalPrice) %>
-                                        </td>
-                                        <td>
-                                            <i class="material-icons md-payment font-xxl text-muted"></i> <%= element.paymentMethod %>
-                                        </td>
-                                        <td>
-                                            <a href="/admin/orderManagement/details/<%= element._id %>" class="btn btn-sm btn-outline-primary">View Details</a>
                                         </td>
                                     </tr>
-                                <% }) %>
+                                <% } else { %>
+                                    <% orders.forEach(element => { %>
+                                        <tr>
+                                            <td><a href="#" class="fw-bold text-primary"><%= element._id %></a></td>
+                                            <td><%= element.addres.name %></td>
+                                            <td>
+                                                <%= element.createdOn.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: '2-digit' }) %>
+                                            </td>
+                                            <td>
+                                                ₹ <%= Math.floor(element.totalPrice) %>
+                                            </td>
+                                            <td>
+                                                <i class="material-icons md-payment font-xxl text-muted"></i> <%= element.paymentMethod %>
+                                            </td>
+                                            <td>
+                                                <a href="/admin/orderManagement/details/<%= element._id %>" class="btn btn-sm btn-outline-primary">View Details</a>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                <% } %>
                             </tbody>
+                            
                         </table>
                     </div>
                 </div>
@@ -422,7 +427,7 @@
                 </nav>
             </div>
         </section> <!-- content-main end// -->
-
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="/admin/assets/js/index.js"></script>
 

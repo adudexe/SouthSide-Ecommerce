@@ -212,12 +212,22 @@ async function generateReport() {
             // If the response is not OK, log the error
             const errorData = await response.json();
             console.error("Error generating the report:", errorData.message);
-            alert(`Error: ${errorData.message}`);
+            Swal.fire({
+                icon: 'error',  // Indicates an error
+                title: 'Oops!',  // Title of the alert
+                text: `Error: ${errorData.message}`,  // The error message
+                confirmButtonText: 'OK'  // Button text
+            });
+
         }
     } catch (error) {
-        // Catch any errors during the fetch call
         console.error("An error occurred while generating the report:", error);
-        alert("An error occurred while generating the report.");
+        Swal.fire({
+            icon: 'error',  // Indicates an error
+            title: 'Oops!',  // Title of the alert
+            text: `An error occurred while generating the report.`,  // The error message
+            confirmButtonText: 'OK'  // Button text
+        });
     }
 }
 
