@@ -36,6 +36,9 @@ userController.userLogin = async (req, res) => {
         const { email, password } = req.body;
         console.log({ email, password });
         const user = await User.findOne({ email })
+        if (!user.password) {
+            return res.status(statusCode.OK).json({ success: false, message: "Cannot Login With Credentials" });
+        }
         // console.log(user.orders);
         // const cart = await cart.find({userId:user._id})
 
@@ -70,6 +73,7 @@ userController.userLogin = async (req, res) => {
 
     } catch (err) {
         console.log("Error in Logging In " + err);
+        res.status(statusCode.FORBIDDEN).json({ message: err.message });
     }
 
 }
@@ -85,7 +89,7 @@ userController.loadLoginPage = (req, res) => {
         else {
             let message = req.session.message || req.flash('success') || req.flash('error') || ''; // checks if any message is present in the following session or flash message
             delete req.session.message; // The session containing the message will be deleted for new message to be held.
-            // console.log("Message from Load login Page", message);
+            console.log("Message from Load login Page", message);
             if (typeof (message) == "object") {
                 message = ''
             }
