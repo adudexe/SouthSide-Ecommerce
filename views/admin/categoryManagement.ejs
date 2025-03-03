@@ -215,10 +215,12 @@
                             title: 'Category updated successfully!',
                             showConfirmButton: false,
                             timer: 1500
+                        }).then(() => {
+                            // This will execute after the alert closes
+                            updateCategoryModal.hide();
+                            window.location.reload();  // Corrected spelling of 'location'
                         });
 
-                        updateCategoryModal.hide();
-                        window.location.reload(); 
                     } else {
                         Swal.fire({
                         icon: 'error',
