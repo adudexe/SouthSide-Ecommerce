@@ -13,7 +13,6 @@ const nodemailer = require("nodemailer");
 const Product = require("../../model/productScheme");
 // const { json } = require("express");
 const userController = {};
-
 //To Load Home Page
 userController.loadHomePage = async (req, res) => {
     try {
