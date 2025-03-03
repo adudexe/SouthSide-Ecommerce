@@ -46,26 +46,31 @@
                                 </thead>
                                 <tbody>
                                     <% users.forEach(user => { %>
-                                        <tr>
-                                            <th><%= user.id  %></th>
-                                            <td><b><%= user.name %></b></td>
-                                            <td><%= user.email %></td>
-                                            <td>
-                                                <% if (user.isBlocked) { %>
-                                                    <span class="text-danger" href>Blocked</span>
-                                                <% } else {  %>
-                                                <span class="text-primary" >Not Blocked</span>
-                                                <% } %>
-                                            </td>
-                                            <td><%= user.createdAt.toLocaleDateString('en-GB') %></td>
-                                            <td class="text-end">    
-                                                <% if (user.isBlocked) { %>
-                                                    <a type="button" class="btn btn-outline-info" href="/admin/unblock/<%= user.id %>">UnBlock</a>
-                                                <% }else { %>
-                                                    <a type="button" class="btn btn-outline-danger"  href="/admin/block/<%= user.id %>">Block</a>    
-                                                <% } %>
-                                            </td>
-                                        </tr>
+                                        <% if (user.name == "admin") { %>
+                                            <% continue %>
+                                        <% } else { %>
+                                            <tr>
+                                                <th><%= user.id  %></th>
+                                                <td><b><%= user.name %></b></td>
+                                                <td><%= user.email %></td>
+                                                <td>
+                                                    <% if (user.isBlocked) { %>
+                                                        <span class="text-danger" href>Blocked</span>
+                                                    <% } else {  %>
+                                                    <span class="text-primary" >Not Blocked</span>
+                                                    <% } %>
+                                                </td>
+                                                <td><%= user.createdAt.toLocaleDateString('en-GB') %></td>
+                                                <td class="text-end">    
+                                                    <% if (user.isBlocked) { %>
+                                                        <a type="button" class="btn btn-outline-info" href="/admin/unblock/<%= user.id %>">UnBlock</a>
+                                                    <% }else { %>
+                                                        <a type="button" class="btn btn-outline-danger"  href="/admin/block/<%= user.id %>">Block</a>    
+                                                    <% } %>
+                                                </td>
+                                            </tr>
+                                        <% } %>
+                                        
                                     <% }) %>
                                 </tbody>
                             </table>
