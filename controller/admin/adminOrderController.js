@@ -58,7 +58,7 @@ orderController.changeBulkStatus = async (req, res) => {
                 console.log("Order Price", order.totalPrice);
                 console.log("Wallet Details", wallet);
 
-                amount = wallet.totalAmount + order.totalPrice
+                amount = (wallet.totalAmount ? wallet.totalAmount : 0) + order.totalPrice
 
                 order.orderItems.forEach(async (item) => {
                     console.log("Order Items", item);
@@ -110,7 +110,7 @@ orderController.changeBulkStatus = async (req, res) => {
             console.log("Order Price", order.totalPrice);
             console.log("Wallet Details", wallet);
 
-            amount = wallet.totalAmount + order.totalPrice
+            amount = (wallet.totalAmount ? wallet.totalAmount : 0) + order.totalPrice
 
             order.orderItems.forEach(async (item) => {
                 console.log("Order Items", item);
@@ -206,7 +206,7 @@ orderController.changeSingleStatus = async (req, res) => {
                 updateProduct = await order.save();
                 console.log("Product Price", product.price);
                 console.log("UpdateProduct", updateProduct);
-                let amount = wallet.totalAmount + product.price;
+                let amount = (wallet.totalAmount ? wallet.totalAmount : 0) + product.price;
                 const refundToWallet = await Wallet.findOneAndUpdate(
                     { userId: userId },
                     {
@@ -247,7 +247,7 @@ orderController.changeSingleStatus = async (req, res) => {
             updateProduct = await order.save();
             console.log("Product Price", product.price);
             console.log("UpdateProduct", updateProduct);
-            let amount = wallet.totalAmount + product.price;
+            let amount = (wallet.totalAmount ? wallet.totalAmount : 0) + product.price;
             const refundToWallet = await Wallet.findOneAndUpdate(
                 { userId: userId },
                 {

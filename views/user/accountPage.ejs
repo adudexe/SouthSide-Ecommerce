@@ -808,12 +808,13 @@
                                     <div class="tab-pane fade" id="wallet-detail" role="tabpanel" aria-labelledby="wallet-detail-tab">
                                         <section class="ps-100 pb-150">
                                             <div class="container">
+                                                <!-- <p><%= wallet.totalAmount %></p> -->
                                                 <!-- Wallet Balance Card -->
                                                 <div class="wallet-card">
                                                     <div class="wallet-balance">
                                                         <div>
                                                             <div class="balance-label">Total Balance</div>
-                                                            <div class="balance-amount">₹<%= wallet ? wallet.totalAmount : '0' %></div>
+                                                            <div class="balance-amount">₹<%= wallet.totalAmount ? wallet.totalAmount : '0' %></div>
                                                         </div>
                                                         <div class="wallet-icon">
                                                             <i class="fas fa-wallet"></i>

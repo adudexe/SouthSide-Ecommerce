@@ -86,9 +86,12 @@ userController.loadLoginPage = (req, res) => {
         else {
             let message = req.session.message || req.flash('success') || req.flash('error') || ''; // checks if any message is present in the following session or flash message
             delete req.session.message; // The session containing the message will be deleted for new message to be held.
+            // console.log("Message from Load login Page", message);
             if (typeof (message) == "object") {
                 message = ''
             }
+            // req.session.user.;
+            // console.log("User Session", req.session.user)
             res.render('./user/loginPage', { error: message || '' }); // The Login page will be rendered along with the error message.
         }
     }

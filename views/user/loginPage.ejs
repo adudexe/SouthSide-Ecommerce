@@ -15,6 +15,7 @@
   <div class="w-full max-w-6xl flex flex-col lg:flex-row items-center lg:items-start justify-between gap-16 p-8">
     <!-- Left Section -->
     <div class="text-center lg:text-left space-y-6 flex flex-col justify-spacebetween gap-4 items-center">
+      <span data-failed="<%= error || null %>" id="error"></span>
       <h1 class="text-6xl font-extrabold mb-4">SOUTH SIDE</h1>
       <p class="text-xl font-medium">FIND CLOTHES THAT MATCH YOUR STYLE</p>
       <button
@@ -57,6 +58,30 @@
   <script src="/javascript/loginValidation.js"></script>
   <!-- Modal for email input (Forget password) -->
   <script src="/javascript/forgetPassword.js"></script>
+  <script>
+    let error = document.getElementById('error');
+
+    let failedGootleAuth = error.getAttribute("data-failed");
+
+    if(failedGootleAuth)
+          {
+            const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          });
+          Toast.fire({
+            title: failedGootleAuth || "Account Blocked",
+            icon: "error"
+          });
+        }
+  </script>
 
   
 </body>

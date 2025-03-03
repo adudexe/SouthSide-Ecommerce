@@ -14,20 +14,18 @@ userAuth.isLogged = async (req, res, next) => {
 
 
     //To Check if the user is logged in...
-    if((req.session && req.session.user) || req.user)
-    {
+    if ((req.session && req.session.user) || req.user) {
       // return res.redirect("/user/home")
       return next();
     }
-    else
-    {
+    else {
       return res.redirect("/user/login");
     }
     res.redirect("/user/login");
   }
   catch (error) {
-    console.log("Error in auth",error);
-    res.status(500).json({"message":"Internal Server Error"});
+    console.log("Error in auth", error);
+    res.status(500).json({ "message": "Internal Server Error" });
   }
 };
 
@@ -40,18 +38,27 @@ userAuth.googleSession = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    console.log("User Details ", user);
+
     // Store user in session
     req.session.user = user;
-   
+
 
 
     // Check if the user is blocked
     if (user.isBlocked) {
+      // console.log("Is Blocked is True........");
       // Instead of redirecting and sending JSON, redirect first
-      req.session.message = "Your account Has Been  Blocked"
+      req.session.user = null
+      req.session.message = "Your account Has Been Blocked"
+
+      // console.log(req.session.message)
       return res.redirect("/user/login"); // Redirect to login if blocked
+
+      console.log("After Redirection")
     }
 
+    console.log("Redy to redirect to home");
     // Redirect to the home page if the user is not blocked
     res.redirect("/user/home");
 
@@ -62,42 +69,37 @@ userAuth.googleSession = async (req, res, next) => {
 }
 
 
-userAuth.isBlocked = async (req,res,next) => {
+userAuth.isBlocked = async (req, res, next) => {
   try {
     const user = await User.findById(req.session.user._id);
-    if(user && user.isBlocked)
-    {
-      req.session.destroy((err)=>{
-        if(err)
-        {
-          console.log("error in destroing the sesion",err);
+    if (user && user.isBlocked) {
+      req.session.destroy((err) => {
+        if (err) {
+          console.log("error in destroing the sesion", err);
           return next(err);
         }
-        req.flash("error","Your Account has been blocked")
-        return res.redirect("/user/login");  
-        }) 
+        req.flash("error", "Your Account has been blocked")
+        return res.redirect("/user/login");
+      })
     }
     // Cart Checking and Allotement
     const userId = req.session.user._id
-    
-    const cartDetails = await cart.findOne({userId:userId});
-    if(!cartDetails)
-    {
-      if(userId)
-        {
-          const userCart = new cart({
-            userId:userId,
-          })
-          await userCart.save();
-        }
-        else
-        {
-          throw "User Not Logged In";
-        }
+
+    const cartDetails = await cart.findOne({ userId: userId });
+    if (!cartDetails) {
+      if (userId) {
+        const userCart = new cart({
+          userId: userId,
+        })
+        await userCart.save();
+      }
+      else {
+        throw "User Not Logged In";
+      }
     }
     next();
   } catch (error) {
-    console.log("Error in Checking Blocked...",error);
+    console.log("Error in Checking Blocked...", error);
   }
 }
 
