@@ -109,12 +109,12 @@ shopController.loadShopPage = async (req, res) => {
   try {
     let offset = req.query.offset
     console.log("The value of Offset is ", offset);
-    const limit = 6;
+    // const limit = 6;
     if (offset < 1 || !offset) {
       offset = 1;
     }
 
-    const cartDetails = await products.find().populate('category').skip(offset).limit(6);
+    const cartDetails = await products.find().populate('category')
     res.render("./user/shopList", { cartDetails, offset });
   }
   catch (error) {
