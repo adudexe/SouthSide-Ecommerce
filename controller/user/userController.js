@@ -231,6 +231,7 @@ userController.verifyOTP = async (req, res) => {
 userController.userLogout = (req, res) => {
     try {
         if ((req.session && req.session.user) || req.user) {
+            req.session.user = null;
             req.session.destroy((err) => {
                 console.log("Error in Destroing Session", err);
             })
@@ -352,7 +353,7 @@ userController.registerUser = async (req, res) => {
 
 userController.updateDetails = async (req, res) => {
     try {
-        console.log("hi");
+        // console.log("hi");
         const userId = req.session.user._id;
         const newValues = req.body;
         console.log(userId, newValues)
