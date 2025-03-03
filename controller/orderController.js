@@ -288,9 +288,9 @@ orderController.downloadInvoice = async (req, res) => {
     let rowY = tableTop + 20;
     order.orderItems.forEach(item => {
       doc.text(item.product.productName, columns.productName.x, rowY);
-      doc.text(`$${item.price.toFixed(2) / item.quantity}`, columns.price.x, rowY);
+      doc.text(`Rs${item.price.toFixed(2) / item.quantity}`, columns.price.x, rowY);
       doc.text(item.quantity, columns.quantity.x, rowY);
-      doc.text(`$${(item.price).toFixed(2)}`, columns.total.x, rowY);
+      doc.text(`Rs${(item.price).toFixed(2)}`, columns.total.x, rowY);
       rowY += 20;
 
       // Add table border for each row
@@ -306,13 +306,13 @@ orderController.downloadInvoice = async (req, res) => {
     doc.fontSize(10)
       .font('Helvetica')
       .moveDown(0.5)
-      .text(`Total Price: $${order.totalPrice.toFixed(2)}`);
+      .text(`Total Price: Rs${order.totalPrice.toFixed(2)}`);
 
     if (order.discount > 0) {
-      doc.text(`Discount: -$${order.discount.toFixed(2)}`);
+      doc.text(`Discount: -Rs${order.discount.toFixed(2)}`);
     }
 
-    doc.text(`Final Amount: $${order.finalAmount.toFixed(2)}`);
+    doc.text(`Final Amount: Rs${order.finalAmount.toFixed(2)}`);
 
     doc.moveDown(1);
 
