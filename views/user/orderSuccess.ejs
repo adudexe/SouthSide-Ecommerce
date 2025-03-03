@@ -220,15 +220,15 @@
                                         </div>
                                     </td>
                                     <td class="text-center"><%= element.quantity %></td>
-                                    <td class="text-end">$<%= (element.price/element.quantity).toFixed(2) %></td>
-                                    <td class="text-end">$<%= element.price.toFixed(2) %></td>
+                                    <td class="text-end">₹<%= (element.price/element.quantity).toFixed(2) %></td>
+                                    <td class="text-end">₹<%= element.price.toFixed(2) %></td>
                                 </tr>
                                 <% }); %>
                             </tbody>
                             <tfoot class="border-top">
                                 <tr>
                                     <td colspan="3" class="text-end"><strong>Total:</strong></td>
-                                    <td class="text-end"><strong>$<%= orderDetails.totalPrice.toFixed(2) %></strong></td>
+                                    <td class="text-end"><strong>₹<%= orderDetails.totalPrice.toFixed(2) %></strong></td>
                                 </tr>
                             </tfoot>
                         </table>

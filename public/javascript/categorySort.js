@@ -2,7 +2,7 @@
 //     let currentPage = 1; // Default page
 //     const productsContainer = document.getElementById("shop-products");
 //     const paginationContainer = document.querySelector(".pagination");
-    
+
 
 //     // Function to load products based on the selected page
 //     async function loadProducts(catType, page) {
@@ -56,7 +56,7 @@
 //                         }
 //                         return acc;
 //                     }, "");
-                    
+
 
 //                     productsContainer.appendChild(div);
 //                 } else {
@@ -190,17 +190,17 @@ async function filterFunction() {
 
         const response = await fetch(`/user/shop/filter?filters=${filter.join(",")}&sortType=${sortTyp}`, {
             method: "POST",
-            headers:{
-                "Content-Type":"application/json"
+            headers: {
+                "Content-Type": "application/json"
             },
-            body:JSON.stringify({filter})
+            body: JSON.stringify({ filter })
         });
 
         const details = await response.json();
 
         if (details.success) {
             // Clear previous products
-            products.innerHTML = ""; 
+            products.innerHTML = "";
 
             // Check if there are products in the response
             if (details.products && details.products.length > 0) {
@@ -228,8 +228,8 @@ async function filterFunction() {
                                 <div class="product-content-wrap">
                                     <h2><a href="/user/product/${product._id}">${product.productName}</a></h2>
                                     <div class="product-price">
-                                        <span>$${product.variants[0].salePrice}</span>
-                                        <span class="old-price">$${product.variants[0].price}</span>
+                                        <span>₹${product.variants[0].salePrice}</span>
+                                        <span class="old-price">₹${product.variants[0].price}</span>
                                     </div>
                                     <div class="product-action-1 show">
                                         <a aria-label="Add To Cart" class="action-btn hover-up add-to-wishlist" onClick="(event)=>{event.preventDefault()}">

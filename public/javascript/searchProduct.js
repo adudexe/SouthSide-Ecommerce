@@ -64,8 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
                                     <div class="product-content-wrap">
                                         <h2><a href="/user/product/${product._id}">${product.productName}</a></h2>
                                         <div class="product-price">
-                                            <span>$${product.variants[0].salePrice}</span>
-                                            <span class="old-price">$${product.variants[0].price}</span>
+                                            <span>₹${product.variants[0].salePrice}</span>
+                                            <span class="old-price">₹${product.variants[0].price}</span>
                                         </div>
                                         <div class="product-action-1 show">
                                             <a aria-label="Add To Cart" class="action-btn hover-up" onClick="(event)=>{event.preventDefault()}">
