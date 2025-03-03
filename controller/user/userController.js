@@ -39,22 +39,11 @@ userController.userLogin = async (req, res) => {
         if (!user.password) {
             return res.status(statusCode.OK).json({ success: false, message: "Cannot Login With Credentials" });
         }
-        // console.log(user.orders);
-        // const cart = await cart.find({userId:user._id})
-
-
-        // //To set the cart id in the user modal during login
-        // const cartDetailsUpdate = await User.findByIdAndUpdate(user._id,{cart:card._id});
-        // console.log(cartDetailsUpdate);
-
         if (user) {
             if (!user.isBlocked) {
                 const match = await bcrypt.compare(password, user.password);
                 if (match) {
                     req.session.user = user;
-                    // console.log(req.session.user);
-                    // console.log("sessi",req.session.user.isBlocked)
-                    // console.log(req.user);
                     res.status(statusCode.OK).json({ success: true, redirected: "/user/home" });
                 }
                 else {
