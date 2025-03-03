@@ -18,7 +18,9 @@ userController.loadHomePage = async (req, res) => {
     try {
         const sessionUser = req.session.user
         const product = await Product.find().populate('category').limit(4);
-
+        if (sessionUser.isBlocked) {
+            return res.redirect("/user/home");
+        }
         if (sessionUser) {
             return res.render("./user/landingPage", { products: product, user: sessionUser });
         }
@@ -33,32 +35,38 @@ userController.loadHomePage = async (req, res) => {
 
 userController.userLogin = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        console.log({ email, password });
-        const user = await User.findOne({ email })
-        if (!user.password) {
-            return res.status(statusCode.OK).json({ success: false, message: "Cannot Login With Credentials" });
-        }
-        if (user) {
-            if (!user.isBlocked) {
-                const match = await bcrypt.compare(password, user.password);
-                if (match) {
-                    req.session.user = user;
-                    res.status(statusCode.OK).json({ success: true, redirected: "/user/home" });
-                }
-                else {
-                    res.status(statusCode.OK).json({ success: false, message: "Cannot Login" });
-                }
-            }
-            else {
-                res.status(statusCode.FORBIDDEN).json({ message: "Your Account Has Been Blcoked.." });
-            }
 
-
+        if (req.session.user) {
+            return res.redirect("/user/home")
         }
         else {
-            res.status(statusCode.NOT_FOUND).json({ message: "User Not Found" });
+            const { email, password } = req.body;
+            console.log({ email, password });
+            const user = await User.findOne({ email })
+            if (!user.password) {
+                return res.status(statusCode.OK).json({ success: false, message: "Cannot Login With Credentials" });
+            }
+            if (user) {
+                if (!user.isBlocked) {
+                    const match = await bcrypt.compare(password, user.password);
+                    if (match) {
+                        req.session.user = user;
+                        res.status(statusCode.OK).json({ success: true, redirected: "/user/home" });
+                    }
+                    else {
+                        res.status(statusCode.OK).json({ success: false, message: "Cannot Login" });
+                    }
+                }
+                else {
+                    res.status(statusCode.FORBIDDEN).json({ message: "Your Account Has Been Blcoked.." });
+                }
+            }
+
+            else {
+                res.status(statusCode.NOT_FOUND).json({ message: "User Not Found" });
+            }
         }
+
 
     } catch (err) {
         console.log("Error in Logging In " + err);
