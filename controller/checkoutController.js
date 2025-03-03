@@ -525,7 +525,7 @@ checkoutController.walletOrder = async (req, res) => {
             return res.status(404).json({ success: false, message: "Address Not Found.." });
         }
 
-        if (wallet.totalAmount < totalprice) {
+        if (wallet.totalAmount < totalprice || !(wallet.walletAmount)) {
             return res.status(403).json({ success: false, message: "Insufficient Amount in the wallet.." })
         }
 
