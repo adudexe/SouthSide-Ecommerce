@@ -21,6 +21,7 @@ userController.loadHomePage = async (req, res) => {
 
         // If user is blocked, redirect to home page with an optional message
         if (sessionUser && sessionUser.isBlocked) {
+            req.session.user = null;
             return res.redirect("/user/home");  // Optionally, add a flash message or reason for redirect
         }
 

@@ -12,7 +12,6 @@ userAuth.isLogged = async (req, res, next) => {
     // console.log(req.session.user);
     //Till here
 
-
     //To Check if the user is logged in...
     if ((req.session && req.session.user) || req.user) {
       // return res.redirect("/user/home")
@@ -38,28 +37,18 @@ userAuth.googleSession = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // console.log("User Details ", user);
-
-    // Store user in session
     req.session.user = user;
-
-
 
     // Check if the user is blocked
     if (user.isBlocked) {
-      // console.log("Is Blocked is True........");
-      // Instead of redirecting and sending JSON, redirect first
       req.session.user = null
       req.session.message = "Your account Has Been Blocked"
 
-      // console.log(req.session.message)
       return res.redirect("/user/login"); // Redirect to login if blocked
 
       console.log("After Redirection")
     }
 
-    // console.log("Redy to redirect to home");
-    // Redirect to the home page if the user is not blocked
     res.redirect("/user/home");
 
   } catch (error) {
@@ -73,6 +62,7 @@ userAuth.isBlocked = async (req, res, next) => {
   try {
     const user = await User.findById(req.session.user._id);
     if (user && user.isBlocked) {
+      req.session.user = null;
       req.session.destroy((err) => {
         if (err) {
           console.log("error in destroing the sesion", err);
