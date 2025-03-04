@@ -117,6 +117,31 @@ checkoutController.addNewAddress = async (req, res) => {
     }
 }
 
+// checkoutController.setAddress = async (req, res) => {
+//     try {
+//         const addressId = req.params.id;
+//         const userId = req.session.user._id;
+//         console.log("Address Id", addressId);
+
+//         //Get the address which is primary and set it to false and set the new id as primary 
+//         //Get the addres which is primary 
+//         const primaryAddress = await Address.findOneAndUpdate({ userId: userId, isPrimary: true }, { $set: { isPrimary: false } }, { new: true });
+//         // if (!primaryAddress) {
+//         //     return res.status(500).json({ success: false, message: "Error in setting the address to primary." });
+//         // }
+//         const newPrimaryAddress = await Address.findByIdAndUpdate(addressId, { $set: { isPrimary: true } });
+
+//         if (!newPrimaryAddress) {
+//             return res.status(500).json({ success: false, message: "Error in setting the address to primary." });
+//         }
+
+//         return res.status(200).json({ success: true, message: "New Address has been set" });
+//     }
+//     catch (err) {
+//         console.log("Error in Setting address", err);
+//         res.status(500).send("Error in setting address..");
+//     }
+// }
 checkoutController.setAddress = async (req, res) => {
     try {
         const addressId = req.params.id;
@@ -125,10 +150,16 @@ checkoutController.setAddress = async (req, res) => {
 
         //Get the address which is primary and set it to false and set the new id as primary 
         //Get the addres which is primary 
-        const primaryAddress = await Address.findOneAndUpdate({ userId: userId, isPrimary: true }, { $set: { isPrimary: false } }, { new: true });
-        if (!primaryAddress) {
-            return res.status(500).json({ success: false, message: "Error in setting the address to primary." });
-        }
+        // const primaryAddress = await Address.findOneAndUpdate({ userId: userId, isPrimary: true }, { $set: { isPrimary: false } }, { new: true });
+        // if (!primaryAddress) {
+        //     return res.status(500).json({ success: false, message: "Error in setting the address to primary." });
+        // }
+        // Check if primary address is present if present then sent to false 
+
+        const prevPrimary = await Address.findOneAndUpdate({ userId: userId, isPrimary: true }, { $set: { isPrimary: false } }, { new: true });
+
+        console.log("PrevPrivamry", prevPrimary);
+
         const newPrimaryAddress = await Address.findByIdAndUpdate(addressId, { $set: { isPrimary: true } });
 
         if (!newPrimaryAddress) {
