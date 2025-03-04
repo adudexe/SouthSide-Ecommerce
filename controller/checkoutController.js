@@ -40,6 +40,15 @@ checkoutController.loadCheckout = async (req, res) => {
         // Fetch available coupons
         const coupons = await Coupon.find({});
 
+
+        const totalPrice = cart.items.reduce((total, element) => {
+            const product = element.productId; // Get the product details
+            const variant = product.variants.find(variant => variant._id.toString() === element.variantId.toString()); // Find the selected variant
+
+            // Add the price of the variant * quantity to the total
+            return total + (variant.salePrice * element.quantity);
+        }, 0); // Initial value is 0
+
         //If cart.coupoon applied is true then apply the discount percent to each product other then add find the total 
 
         if (cart && cart.items) {
@@ -57,6 +66,7 @@ checkoutController.loadCheckout = async (req, res) => {
         }
 
         console.log("Total Price from cart", total);
+        console.log("Total price 2 ", totalPrice)
 
         res.render('user/checkout', {
             cart,
@@ -272,7 +282,7 @@ checkoutController.placeOrder = async (req, res) => {
                         productImages: product.productImages
                     },
                     quantity: item.quantity,
-                    price: Math.round((item.price || variant.salePrice) * item.quantity),
+                    price: Math.floor((item.price || variant.salePrice) * item.quantity),
                     status: 'Pending', // Default status when the order is created
                     productId: item.productId,
                     variantId: item.variantId,
@@ -280,7 +290,7 @@ checkoutController.placeOrder = async (req, res) => {
                 });
 
                 // Add to total price
-                totalAmount += Math.round((item.price || variant.salePrice) * item.quantity);
+                totalAmount += Math.floor((item.price || variant.salePrice) * item.quantity);
 
                 // Decrement the quantity of the variant in the product
                 if (variant.quantity >= item.quantity) {
@@ -331,10 +341,11 @@ checkoutController.createOrder = async (req, res) => {
     try {
         console.log("We are in create order");
         console.log("Total in session", req.session.totalPrice);
+        const userId = req.session.user._id;
         let order = {};
-        const { amount, currency, receipt, notes } = req.body;
+        const { amount, currency, receipt, notes, orderId } = req.body;
 
-        console.log("Amount From Front end ", amount);
+        console.log("Req.body", req.body);
 
         const phoneNumber = await Address.findOne({ userId: req.session.user._id, isPrimary: true }, { phone: 1 });
         console.log("Key ", process.env.RAZORPAY_KEY_ID);
@@ -347,36 +358,75 @@ checkoutController.createOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: "Address Not Selected" });
         }
 
-        const options = {
-            amount: (req.session.totalPrice || amount) * 100, // Convert amount to paise
-            currency,
-            receipt,
-            notes,
-        };
-
-        const orders = await razorpay.orders.create(options);
 
 
-        console.log(orders);
+        if (orderId) {
+            const orderDetails = await Order.findOne({ _id: orderId })
 
-        order = {
-            order_id: orders.id,
-            userName: req.session.user.name,
-            email: req.session.user.email,
-            phone: phoneNumber.phone,
-            payment_id: process.env.RAZORPAY_KEY_ID,
-            amount: orders.amount,
-            currency: orders.currency,
-            receipt: orders.receipt,
-            status: 'created',
+            console.log("Amount From Front end ", amount);
+
+            const options = {
+                amount: (req.session.totalPrice || amount) * 100, // Convert amount to paise
+                currency,
+                receipt,
+                notes,
+            };
+
+            const orders = await razorpay.orders.create(options);
+
+
+            console.log(orders);
+
+            order = {
+                order_id: orders.id,
+                userName: req.session.user.name,
+                email: req.session.user.email,
+                phone: phoneNumber.phone,
+                payment_id: process.env.RAZORPAY_KEY_ID,
+                amount: orders.amount,
+                currency: orders.currency,
+                receipt: orders.receipt,
+                status: 'created',
+            }
+
+            // console.log(order);
+        }
+        else {
+            const cartItems = await Cart.findOne({ userId: userId })
+            if ((cartItems.items).length < 1) {
+                return res.status(404).json({ success: false, message: "User Cart is Empty...." });
+            }
+            const options = {
+                amount: (req.session.totalPrice || amount) * 100, // Convert amount to paise
+                currency,
+                receipt,
+                notes,
+            };
+
+            const orders = await razorpay.orders.create(options);
+
+
+            console.log(orders);
+
+            order = {
+                order_id: orders.id,
+                userName: req.session.user.name,
+                email: req.session.user.email,
+                phone: phoneNumber.phone,
+                payment_id: process.env.RAZORPAY_KEY_ID,
+                amount: orders.amount,
+                currency: orders.currency,
+                receipt: orders.receipt,
+                status: 'created',
+            }
+
         }
 
-        // console.log(order);
 
-        res.status(200).json({ succes: true, order }); // Send order details to frontend, including order ID
+        res.status(200).json({ success: true, order }); // Send order details to frontend, including order ID
     } catch (error) {
         console.error(error);
-        res.status(500).json({ succes: false, message: 'Error creating order' });
+        res.status(500).json({ success: false, message: 'Error creating order' });
     }
 }
 
@@ -437,6 +487,9 @@ checkoutController.onlinePayment = async (req, res) => {
                     // Get the user Cart Details
                     const cartItems = await Cart.findOne({ userId: userId }).populate("items.productId");
                     console.log("Cart Items", cartItems);
+                    if ((cartItems.items).length < 1) {
+                        return res.status(404).json({ success: false, message: "User Cart is Empty...." });
+                    }
                     const coupon = await Coupon.findOne(cartItems.couponApplied);
                     if (coupon) {
 
@@ -474,7 +527,7 @@ checkoutController.onlinePayment = async (req, res) => {
                                     productImages: product.productImages
                                 },
                                 quantity: item.quantity,
-                                price: Math.round((item.price || variant.salePrice) * item.quantity),
+                                price: Math.floor((item.price || variant.salePrice) * item.quantity),
                                 status: 'Pending', // Default status when the order is created
                                 productId: item.productId,
                                 variantId: item.variantId,
@@ -482,7 +535,7 @@ checkoutController.onlinePayment = async (req, res) => {
                             });
 
                             // Add to total price
-                            totalAmount += Math.round((item.price || variant.salePrice) * item.quantity);
+                            totalAmount += Math.floor((item.price || variant.salePrice) * item.quantity);
 
                             // Decrement the quantity of the variant in the product
                             if (variant.quantity >= item.quantity) {
@@ -573,6 +626,9 @@ checkoutController.walletOrder = async (req, res) => {
         // Get the user Cart Details
         const cartItems = await Cart.findOne({ userId: userId }).populate("items.productId");
         console.log("Cart Items", cartItems);
+        if ((cartItems.items).length < 1) {
+            return res.status(404).json({ success: false, message: "User Cart is Empty...." });
+        }
         const coupon = await Coupon.findOne(cartItems.couponApplied);
         console.log("Coupons", coupon);
 
@@ -614,7 +670,7 @@ checkoutController.walletOrder = async (req, res) => {
                         productImages: product.productImages
                     },
                     quantity: item.quantity,
-                    price: Math.round((item.price || variant.salePrice) * item.quantity),
+                    price: Math.floor((item.price || variant.salePrice) * item.quantity),
                     status: 'Pending', // Default status when the order is created
                     productId: item.productId,
                     variantId: item.variantId,
@@ -622,7 +678,7 @@ checkoutController.walletOrder = async (req, res) => {
                 });
 
                 // Add to total price
-                totalAmount += Math.round((item.price || variant.salePrice) * item.quantity);
+                totalAmount += Math.floor((item.price || variant.salePrice) * item.quantity);
 
                 // Decrement the quantity of the variant in the product
                 if (variant.quantity >= item.quantity) {
@@ -767,7 +823,7 @@ checkoutController.failedPayment = async (req, res) => {
                             productImages: product.productImages
                         },
                         quantity: item.quantity,
-                        price: Math.round((item.price || variant.salePrice) * item.quantity),
+                        price: Math.floor((item.price || variant.salePrice) * item.quantity),
                         status: 'Pending', // Default status when the order is created
                         productId: item.productId,
                         variantId: item.variantId,
@@ -775,7 +831,7 @@ checkoutController.failedPayment = async (req, res) => {
                     });
 
                     // Add to total price
-                    totalAmount += Math.round((item.price || variant.salePrice) * item.quantity);
+                    totalAmount += Math.floor((item.price || variant.salePrice) * item.quantity);
 
                     // Decrement the quantity of the variant in the product
                     if (variant.quantity >= item.quantity) {

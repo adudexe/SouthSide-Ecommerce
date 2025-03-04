@@ -383,7 +383,7 @@
                                     'Content-Type': 'application/json'
                                     },
                                     // body:JSON.stringify(orderType),
-                                    body: JSON.stringify({ amount, currency: 'INR', receipt: 'receipt#1', notes: {} })
+                                    body: JSON.stringify({ amount, currency: 'INR', receipt: 'receipt#1', notes: {} ,orderId })
                                 });
 
                                 console.log("Responce is",response)
@@ -391,7 +391,7 @@
                                 const order = await response.json();
                                 console.log("Order Response",order);
                                 // Open Razorpay Checkout
-                               if(order.succes)
+                               if(order.success)
                                {
                                 const options = {
                                     key: order.order.payment_id, // Replace with your Razorpay key_id

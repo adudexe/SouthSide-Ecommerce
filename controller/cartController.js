@@ -372,7 +372,7 @@ cartController.applyCoupon = async (req, res) => {
         const couponAmount = couponDetails.discount;
         const couponType = couponDetails.type;
         let discountPrice;
-
+        console.log(totalPrice, "<", couponDetails.minmumAmount, (totalPrice < couponDetails.minmumAmount))
 
         if (totalPrice < couponDetails.minmumAmount) {
             return res.status(403).json({ success: false, message: "Please Add product till minimum amount is reached..." });
