@@ -21,6 +21,8 @@ admin.get("/page/:val", adminController.pageNumber);
 admin.get("/productManagement", adminAuth.requireAuth, adminController.loadProductManagement);
 admin.get("/addProduct", adminAuth.requireAuth, adminController.addProduct);
 admin.delete("/products/:id", adminAuth.requireAuth, adminController.deleteProduct);
+admin.put("/products/:id", adminAuth.requireAuth, adminController.blockProduct);
+admin.patch("/products/:id", adminAuth.requireAuth, adminController.unblockProduct);
 admin.post("/products/add", adminAuth.requireAuth, adminController.upload, adminController.addProducts)
 admin.get("/products/edit/:id", adminAuth.requireAuth, adminController.productUpdatePage)
 admin.post("/products/edit", adminController.upload, adminController.updateProduct)

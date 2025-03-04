@@ -209,38 +209,43 @@ async function filterFunction() {
 
                 // Generate product list HTML
                 div.innerHTML = details.products.reduce((acc, product) => {
-                    return acc + `
-                        <div class="col-lg-4 col-md-6 col-sm-12 mb-30">
-                            <div class="product-cart-wrap">
-                                <div class="product-img-action-wrap">
-                                    <div class="product-img product-img-zoom">
-                                        <a href="/user/product/${product._id}"> 
-                                            <img class="default-img" src="/${product.productImages[0]}" alt="${product.productName}"> 
-                                            <img class="hover-img" src="/${product.productImages[1]}" alt="${product.productName}"> 
-                                        </a>
+                    // Only add product if it's not blocked
+                    if (product.isBlocked === false) {
+                        return acc + `
+                            <div class="col-lg-4 col-md-6 col-sm-12 mb-30">
+                                <div class="product-cart-wrap">
+                                    <div class="product-img-action-wrap">
+                                        <div class="product-img product-img-zoom">
+                                            <a href="/user/product/${product._id}"> 
+                                                <img class="default-img" src="/${product.productImages[0]}" alt="${product.productName}"> 
+                                                <img class="hover-img" src="/${product.productImages[1]}" alt="${product.productName}"> 
+                                            </a>
+                                        </div>
+                                        <div class="product-action-1">
+                                            <a aria-label="Add To Wishlist" class="action-btn hover-up">
+                                                <i class="fi-rs-heart add-to-wishlist" data-id="${product._id}" data-variantId="${product.variants[0]._id}"></i>
+                                            </a>
+                                        </div>
                                     </div>
-                                    <div class="product-action-1">
-                                        <a aria-label="Add To Wishlist" class="action-btn hover-up">
-                                            <i class="fi-rs-heart add-to-wishlist" data-id="${product._id}" data-variantId="${product.variants[0]._id}"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="product-content-wrap">
-                                    <h2><a href="/user/product/${product._id}">${product.productName}</a></h2>
-                                    <div class="product-price">
-                                        <span>₹${product.variants[0].salePrice}</span>
-                                        <span class="old-price">₹${product.variants[0].price}</span>
-                                    </div>
-                                    <div class="product-action-1 show">
-                                        <a aria-label="Add To Cart" class="action-btn hover-up add-to-wishlist" onClick="(event)=>{event.preventDefault()}">
-                                            <i class="fi-rs-shopping-bag-add"></i>
-                                        </a>
+                                    <div class="product-content-wrap">
+                                        <h2><a href="/user/product/${product._id}">${product.productName}</a></h2>
+                                        <div class="product-price">
+                                            <span>₹${product.variants[0].salePrice}</span>
+                                            <span class="old-price">₹${product.variants[0].price}</span>
+                                        </div>
+                                        <div class="product-action-1 show">
+                                            <a aria-label="Add To Cart" class="action-btn hover-up add-to-wishlist" onClick="(event)=>{event.preventDefault()}">
+                                                <i class="fi-rs-shopping-bag-add"></i>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    }
+                    return acc;  // Return the accumulated string for non-blocked products
                 }, "");
+
 
                 products.appendChild(div);
             } else {

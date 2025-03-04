@@ -839,6 +839,47 @@ adminController.deleteProduct = async (req, res) => {
   }
 }
 
+adminController.blockProduct = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    console.log("Product Id", productId);
+    const updateProduct = await Product.findOneAndUpdate(
+      { _id: productId },
+      { $set: { isBlocked: true } },
+      { new: true }
+    );
+    console.log("Updated Product", updateProduct.isBlocked);
+    if (updateProduct.isBlocked) {
+      return res.status(200).json({ success: true, message: "Product Successfully Blocked" });
+    }
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+  catch (err) {
+    console.log("Error in Block Product", err);
+  }
+}
+
+adminController.unblockProduct = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    console.log("Product Id", productId);
+    const updateProduct = await Product.findOneAndUpdate(
+      { _id: productId },
+      { $set: { isBlocked: false } },
+      { new: true }
+    );
+    console.log("Updated Product", updateProduct.isBlocked);
+    if (!(updateProduct.isBlocked)) {
+      return res.status(200).json({ success: true, message: "Product Successfully UnBlocked" });
+    }
+    return res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+  catch (err) {
+    console.log("Error in Block Product", err);
+  }
+}
+
+
 adminController.loadCategory = async (req, res) => {
   try {
     const cat = await Category.find();

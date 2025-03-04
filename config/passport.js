@@ -9,7 +9,7 @@ const Wallet = require("../model/walletSchema");
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://adude.shop/user/auth/google/callback"
+    callbackURL: "http://localhost:3000/user/auth/google/callback"
 },
     async (accessToken, refreshToken, profile, done) => {
         try {
@@ -25,7 +25,7 @@ passport.use(new GoogleStrategy({
             } else {
                 // If no user is found, check if the user exists by email
                 user = await User.findOne({ email: profile.emails[0].value });
-                console.log("Found user by email:", user);
+                // console.log("Found user by email:", user);
 
                 if (user) {
                     // User found by email but no Google ID, update with Google ID

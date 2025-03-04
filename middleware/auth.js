@@ -38,7 +38,7 @@ userAuth.googleSession = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log("User Details ", user);
+    // console.log("User Details ", user);
 
     // Store user in session
     req.session.user = user;
@@ -58,7 +58,7 @@ userAuth.googleSession = async (req, res, next) => {
       console.log("After Redirection")
     }
 
-    console.log("Redy to redirect to home");
+    // console.log("Redy to redirect to home");
     // Redirect to the home page if the user is not blocked
     res.redirect("/user/home");
 

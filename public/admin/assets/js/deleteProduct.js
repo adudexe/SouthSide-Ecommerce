@@ -48,12 +48,11 @@ try {
                     // Re-render the product list after deletion
                     const updatedProducts = details.product; // Assuming response contains updated product list
                     cardBody.innerHTML = ""; // Clear the existing products
-                    let value = updatedProducts.find((item)=>{
+                    let value = updatedProducts.find((item) => {
                         return (!item.isDeleted);
                     })
                     console.log(value);
-                    if(value)
-                    {
+                    if (value) {
                         // Dynamically render each product
                         updatedProducts.forEach((element) => {
                             if (!element.isDeleted) {
@@ -88,8 +87,7 @@ try {
                             }
                         });
                     }
-                    else
-                    {
+                    else {
                         cardBody.innerHTML = `<p>No Products Found</p>`
                     }
                 } else {
@@ -98,6 +96,106 @@ try {
                         icon: "error",
                         title: details.message || "Internal Server Error"
                     });
+                }
+            }
+        }
+    });
+
+} catch (error) {
+    console.log("Error in Product Deletion and rendering", error);
+}
+
+
+try {
+    const cardBody = document.getElementById("card-body");
+
+    // Delegate the event listener for delete buttons
+    cardBody.addEventListener("click", async (e) => {
+        if (e.target.classList.contains("block-btn")) {
+            const productId = e.target.getAttribute("data-id");
+
+            // Show confirmation prompt
+            let result = await Swal.fire({
+                title: "Are you sure?",
+                text: "That you want to block this product",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, block it"
+            });
+
+            if (result.isConfirmed) {
+                // Send DELETE request to the server
+                const response = await fetch(`/admin/products/${productId}`, {
+                    method: "PUT"
+                });
+
+                const details = await response.json();
+                console.log(details);
+
+                if (response.ok) {
+                    // Show success message
+                    Toast.fire({
+                        icon: "success",
+                        title: details.message || "Product Blocked Successfully"
+                    }).then(() => {
+                        location.reload();
+                    });
+
+                } else {
+                    // Show error message
+                    Toast.fire({
+                        icon: "error",
+                        title: details.message || "Internal Server Error"
+                    });
+                }
+            }
+        }
+    });
+
+} catch (error) {
+    console.log("Error in Product Deletion and rendering", error);
+}
+
+
+try {
+    const cardBody = document.getElementById("card-body");
+
+    // Delegate the event listener for delete buttons
+    cardBody.addEventListener("click", async (e) => {
+        if (e.target.classList.contains("unblock-btn")) {
+            const productId = e.target.getAttribute("data-id");
+
+            // Show confirmation prompt
+            let result = await Swal.fire({
+                title: "Are you sure?",
+                text: "That you want to unblock this product ",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, unblock it!"
+            });
+
+            if (result.isConfirmed) {
+                // Send DELETE request to the server
+                const response = await fetch(`/admin/products/${productId}`, {
+                    method: "PATCH"
+                });
+
+                const details = await response.json();
+                console.log(details);
+
+                if (response.ok) {
+                    // Show success message
+                    Toast.fire({
+                        icon: "success",
+                        title: details.message || "Product UnBlocked Successfully"
+                    }).then(() => {
+                        location.reload();
+                    });
+
                 }
             }
         }

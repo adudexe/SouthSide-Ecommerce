@@ -42,21 +42,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 const div = document.createElement("div");
                 div.classList.add("row");
 
-                // Generate product list HTML
                 div.innerHTML = data.products.reduce((acc, product) => {
-                    if (!product.isDeleted && !product.isBlocked) {
+                    // Only add product if it's not blocked
+                    if (product.isBlocked === false) {
                         return acc + `
                             <div class="col-lg-4 col-md-6 col-sm-12 mb-30">
                                 <div class="product-cart-wrap">
                                     <div class="product-img-action-wrap">
                                         <div class="product-img product-img-zoom">
-                                            <a href="/user/product/${product._id}">
-                                                <img class="default-img" src="/${product.productImages[0]}" alt="">
-                                                <img class="hover-img" src="/${product.productImages[1]}" alt="">
+                                            <a href="/user/product/${product._id}"> 
+                                                <img class="default-img" src="/${product.productImages[0]}" alt="${product.productName}"> 
+                                                <img class="hover-img" src="/${product.productImages[1]}" alt="${product.productName}"> 
                                             </a>
                                         </div>
                                         <div class="product-action-1">
-                                            <a aria-label="Add To Wishlist" class="action-btn hover-up " >
+                                            <a aria-label="Add To Wishlist" class="action-btn hover-up">
                                                 <i class="fi-rs-heart add-to-wishlist" data-id="${product._id}" data-variantId="${product.variants[0]._id}"></i>
                                             </a>
                                         </div>
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                             <span class="old-price">₹${product.variants[0].price}</span>
                                         </div>
                                         <div class="product-action-1 show">
-                                            <a aria-label="Add To Cart" class="action-btn hover-up" onClick="(event)=>{event.preventDefault()}">
+                                            <a aria-label="Add To Cart" class="action-btn hover-up add-to-wishlist" onClick="(event)=>{event.preventDefault()}">
                                                 <i class="fi-rs-shopping-bag-add"></i>
                                             </a>
                                         </div>
@@ -77,8 +77,9 @@ document.addEventListener("DOMContentLoaded", () => {
                             </div>
                         `;
                     }
-                    return acc;
+                    return acc;  // Return the accumulated string for non-blocked products
                 }, "");
+
 
 
                 products.appendChild(div);

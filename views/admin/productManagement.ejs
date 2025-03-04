@@ -51,15 +51,21 @@
                                     </a>
                                 </div>
                                 <div class="col-lg-2 col-sm-2 col-4 col-price">
-                                    <span>₹<%= element.variants[0].price %></span>
+                                    <span>₹<%= //element.variants[0].price %></span>
                                 </div>
                                 <div class="col-lg-1 col-sm-2 col-4 col-date">
-                                    <span><%= element.createdAt.toLocaleDateString('en-GB') %></span>
+                                    <span><%= //element.createdAt.toLocaleDateString('en-GB') %></span>
                                 </div>
+                               
                                 <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
                                     <a href="/admin/products/edit/<%= element._id %>" class="btn btn-sm font-sm rounded btn-brand">Edit</a>
                                     <a class="btn btn-sm font-sm btn-light rounded delete-btn" data-id="<%= element._id %>">Delete</a>
-                                    <a href="#" class="btn btn-sm btn-danger rounded" data-id="<%=element._id%>">Block</a>
+                                    <% if (element.isBlocked) { %>
+                                        <a href="#" class="btn btn-sm btn-info rounded unblock-btn" data-id="<%=element._id%>">UnBlock</a>
+                                    <% } else { %>
+                                        <a href="#" class="btn btn-sm btn-danger rounded block-btn" data-id="<%=element._id%>">Block</a>
+                                    <% } %>
+                                    
                                 </div>
                             </div>
                         </article>

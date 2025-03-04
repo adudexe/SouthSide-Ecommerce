@@ -16,22 +16,28 @@ const userController = {};
 //To Load Home Page
 userController.loadHomePage = async (req, res) => {
     try {
-        const sessionUser = req.session.user
-        const product = await Product.find().populate('category').limit(4);
-        if (sessionUser.isBlocked) {
-            return res.redirect("/user/home");
+        const sessionUser = req.session.user;  // Get session user data
+        const products = await Product.find().populate('category').limit(4);  // Get 4 products
+
+        // If user is blocked, redirect to home page with an optional message
+        if (sessionUser && sessionUser.isBlocked) {
+            return res.redirect("/user/home");  // Optionally, add a flash message or reason for redirect
         }
+
+        // If the user is logged in, render landing page with products and user info
         if (sessionUser) {
-            return res.render("./user/landingPage", { products: product, user: sessionUser });
+            return res.render("./user/landingPage", { products, user: sessionUser });
         }
-        else {
-            return res.render("./user/landingPage", { products: product });
-        }
+
+        // If no user is logged in, just render the landing page with products
+        return res.render("./user/landingPage", { products });
+
+    } catch (err) {
+        console.log(err);  // Log error for debugging
+        return res.status(500).render("error", { message: "Something went wrong. Please try again later." });  // Optional: Render an error page
     }
-    catch (err) {
-        console.log(err);
-    }
-}
+};
+
 
 userController.userLogin = async (req, res) => {
     try {
@@ -86,7 +92,7 @@ userController.loadLoginPage = (req, res) => {
         else {
             let message = req.session.message || req.flash('success') || req.flash('error') || ''; // checks if any message is present in the following session or flash message
             delete req.session.message; // The session containing the message will be deleted for new message to be held.
-            console.log("Message from Load login Page", message);
+            // console.log("Message from Load login Page", message);
             if (typeof (message) == "object") {
                 message = ''
             }
