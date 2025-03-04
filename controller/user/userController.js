@@ -16,15 +16,15 @@ const userController = {};
 //To Load Home Page
 userController.loadHomePage = async (req, res) => {
     try {
-        const sessionUser = req.session.user;  // Get session user data
+        // Get session user data
         const products = await Product.find().populate('category').limit(4);  // Get 4 products
 
         // If user is blocked, redirect to home page with an optional message
-        if (sessionUser && sessionUser.isBlocked) {
+        if (req.session.user && req.session.user.isBlocked) {
             req.session.user = null;
-            return res.redirect("/user/home");  // Optionally, add a flash message or reason for redirect
+            // return res.redirect("/user/home");  // Optionally, add a flash message or reason for redirect
         }
-
+        const sessionUser = req.session.user;
         // If the user is logged in, render landing page with products and user info
         if (sessionUser) {
             return res.render("./user/landingPage", { products, user: sessionUser });
