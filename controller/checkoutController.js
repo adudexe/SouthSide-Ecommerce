@@ -518,14 +518,15 @@ checkoutController.walletOrder = async (req, res) => {
         const primaryAddress = await Address.findOne({ userId: userId, isPrimary: true });
         const wallet = await Wallet.findOne({ userId: userId });
 
-        console.log("Wallet Details", wallet)
+        console.log("Wallet Details", wallet);
+        console.log("Wallet Amount", wallet.totalAmount);
         console.log("Total Price", totalprice);
 
         if (!primaryAddress) {
             return res.status(404).json({ success: false, message: "Address Not Found.." });
         }
 
-        if (wallet.totalAmount < totalprice || !(wallet.walletAmount)) {
+        if (wallet.totalAmount < totalprice || !(wallet.totalAmount)) {
             return res.status(403).json({ success: false, message: "Insufficient Amount in the wallet.." })
         }
 
