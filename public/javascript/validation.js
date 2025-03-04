@@ -15,8 +15,9 @@ signUpForm.addEventListener('submit', async (e) => {
     // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/ ;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-    // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/;
-    const passwordRegex = /^[a-zA-Z0-9]{5,6}$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+={}\[\]:;"'<>,.?/-]*$/
+
+    // const passwordRegex = /^[a-zA-Z0-9]{5,6}$/;
 
     let isValid = true;
 
@@ -172,7 +173,6 @@ async function validateAndSubmitOTP() {
             });
             return;
         }
-
 
         // Send OTP to the backend for verification
         const response = await fetch("/user/verifyOtp", {

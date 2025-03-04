@@ -28,7 +28,6 @@ document.getElementById('forgetPasswordLink').addEventListener('click', function
     }
   }).then((result) => {
     if (result.isConfirmed) {
-      // Call your API to send OTP here
       // sendOtpModal(result.value);
       emailVerification(result.value);
       // console.log(result.value);
@@ -174,11 +173,17 @@ function newPasswordModal() {
     confirmButtonText: 'Submit',
     cancelButtonText: 'Cancel',
     preConfirm: () => {
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[a-zA-Z\d!@#$%^&*()_+={}\[\]:;"'<>,.?/-]*$/
       const oldPassword = document.getElementById('oldPassword').value;
       const newPassword = document.getElementById('newPassword').value;
 
       if (!newPassword || !oldPassword) {
         Swal.showValidationMessage('Please enter both passwords!');
+        return false;
+      }
+
+      if (!passwordRegex.test(newPassword)) {
+        isValid = false;
         return false;
       }
 
