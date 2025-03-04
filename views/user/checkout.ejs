@@ -416,15 +416,29 @@
             const primaryAddress = document.querySelector('#primary-address .address-details');
             //Get the Payment Method
             // Get the selected payment option value
-            const paymentOption = document.querySelector('input[name="payment_option"]:checked').value;
+            const paymentMethod = document.querySelector('input[name="payment_option"]:checked');
 
+            if(!paymentMethod)
+            {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Payment Method Required',
+                    text: 'Please select a payment Method Before Placing the order'
+                });
+            }
+
+            const paymentOption = paymentMethod.value;
             // Log it to the console (optional, for debugging)
             // console.log('Selected Payment Option:', paymentOption);
 
             // Send the selected value to the backend using fetch
             const orderType = {"OrderType":paymentOption};
             
+            console.log("Payment Option",paymentMethod)
 
+            console.log("Order Type",orderType.OrderType)
+
+            
            
 
 
@@ -539,7 +553,7 @@
                                 try{
                                     const rzp = new Razorpay(options);
                                     rzp.on('payment.failed', async (response) => {
-                                        // console.log("We are in failed payment");
+                                        console.log("We are in failed payment");
                                         console.log("Order Id is",order.order.order_id);
 
                                         // SweetAlert2: Display a custom alert for payment failure

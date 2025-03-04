@@ -452,6 +452,7 @@ cartController.applyCoupon = async (req, res) => {
 cartController.removeCoupon = async (req, res) => {
     try {
         console.log("We are inside Remove Coupon")
+        req.session.totalPrice = 0
         const userId = req.session.user._id;
         const cartDetailsUpdate = await cart.findOneAndUpdate(
             { userId: userId },
@@ -469,9 +470,10 @@ cartController.removeCoupon = async (req, res) => {
             // Add the price of the variant * quantity to the total
             return total + (variant.salePrice * element.quantity);
         }, 0); // Initial value is 0
-
+        console.log("Total Price", totalPrice);
+        console.log("Session Total before", req.session.totalPrice)
         req.session.totalPrice = totalPrice
-
+        console.log("Session Total After", req.session.totalPrice)
         if (!cartDetailsUpdate) {
             return res.status(400).json({ success: false, message: "Failed to remove the coupon" });
         }

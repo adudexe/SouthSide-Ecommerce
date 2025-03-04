@@ -183,7 +183,7 @@ function newPasswordModal() {
       }
 
       // if (!passwordRegex.test(newPassword)) {
-      //   isValid = false;
+      //   Swal.showValidationMessage('Password must be at least 6 characters long, contain at least one uppercase letter, and one number.');
       //   return false;
       // }
 

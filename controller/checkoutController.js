@@ -215,6 +215,9 @@ checkoutController.placeOrder = async (req, res) => {
         if (!cartItems) {
             return res.status(404).json({ success: false, message: "User Cart Not Found..." });
         }
+        if ((cartItems.items).length < 1) {
+            return res.status(404).json({ success: false, message: "User Cart is Empty...." });
+        }
 
         // Prepare order items and total calculation
         const orderItems = [];
@@ -258,7 +261,6 @@ checkoutController.placeOrder = async (req, res) => {
             }
         }
 
-
         // Apply any discounts (if needed)
         let discount = (totalAmount - totalprice) || 0
         // let finalAmount = req.session.total - discount;
@@ -297,10 +299,15 @@ checkoutController.placeOrder = async (req, res) => {
 checkoutController.createOrder = async (req, res) => {
     try {
         console.log("We are in create order");
+        console.log("Total in session", req.session.totalPrice);
         let order = {};
         const { amount, currency, receipt, notes } = req.body;
+
+        console.log("Amount From Front end ", amount);
+
         const phoneNumber = await Address.findOne({ userId: req.session.user._id, isPrimary: true }, { phone: 1 });
         console.log("Key ", process.env.RAZORPAY_KEY_ID);
+        // console.log("Amount", amount)
 
         console.log("Phone Number", phoneNumber);
 
@@ -310,7 +317,7 @@ checkoutController.createOrder = async (req, res) => {
         }
 
         const options = {
-            amount: amount * 100, // Convert amount to paise
+            amount: (req.session.totalPrice || amount) * 100, // Convert amount to paise
             currency,
             receipt,
             notes,
@@ -664,7 +671,7 @@ checkoutController.failedPayment = async (req, res) => {
     try {
         console.log("We are in failed Payments");
         console.log("The req.body", req.body);
-        const { orderId } = req.body;
+        const { orderId, totalPrice } = req.body;
         if (orderId) {
             return res.status(200).json({ success: true, status: 'ok', message: "Order Placed Without Payment Cancel or Continue Payment in Order details" });
         }
@@ -673,7 +680,7 @@ checkoutController.failedPayment = async (req, res) => {
             let product = null;
             let variant = null;
             let appliedCoupon = {};
-
+            console.log("Total Price From the front  end is ", totalPrice);
             // Get the primary address for the user
             const userId = req.session.user._id;
             const totalprice = req.session.totalPrice; //calcualte the total price...

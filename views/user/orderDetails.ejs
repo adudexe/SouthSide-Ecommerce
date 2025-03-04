@@ -175,33 +175,37 @@
                                             <div class="price-tag mb-2 mb-md-0">₹<%= element.price %></div>
                                         </div>
                                         <div class="col-md-3 text-md-end gap-5">
-                                            <% if (element.status === "Delivered") { %>
-                                                <span class="status-badge bg-success" style="margin-right: 20px;"><%= element.status %></span>
-                                                <button class="return-btn btn-custom btn btn-sm" style="background-color: red; border: none;" data-id="<%= element._id %>">Return Product</button>
-                                            <% } else if (element.status === "Returned") { %>
-                                                <span class="status-badge bg-danger"><%= element.status %></span>
-                                            <% } else if (element.status === "Refunded") { %>
-                                                <span class="status-badge bg-success"><%= element.status %></span>
+                                            <%if(Order[0].paymentMethod == "failed"){ %>
+                                                <span class="status-badge bg-danger">Payment Failed</span>
                                             <% } else {%>
-                                            <% if (element.status === "Pending") { %>
-                                                <span class="status-badge bg-warning text-dark"><%= element.status %></span>
-                                            <% } else if (element.status === "Shipped") { %>
-                                                <span class="status-badge bg-info"><%= element.status %></span>
-                                            <% } else if (element.status === "Cancelled") { %>
-                                                <span class="status-badge bg-danger"><%= element.status %></span>
-                                            <% } %>
-                                            <div class="mt-2">
-                                                <% if(element.status == "Cancelled") { %>
-                                                    <!-- <button class="btn-custom btn btn-outline-danger btn-sm" disabled>Cancel</button> -->
-                                                    <% } else if(element.status == "ReturnInit") { %>
-                                                        <span class="status-badge bg-info">Retrun Iniitated</span>
-                                                    <% } else if(element.status == "CancelInit") { %>
-                                                        <span class="status-badge bg-info">Cancel Iniitated</span>
-                                                    <% } else { %>
-                                                    <button class="cancel-btn btn-custom btn  btn-sm"  style="background-color: red; border: none;" data-id="<%= element._id %>">Cancel</button>
+                                                <% if (element.status === "Delivered") { %>
+                                                    <span class="status-badge bg-success" style="margin-right: 20px;"><%= element.status %></span>
+                                                    <button class="return-btn btn-custom btn btn-sm" style="background-color: red; border: none;" data-id="<%= element._id %>">Return Product</button>
+                                                <% } else if (element.status === "Returned") { %>
+                                                    <span class="status-badge bg-danger"><%= element.status %></span>
+                                                <% } else if (element.status === "Refunded") { %>
+                                                    <span class="status-badge bg-success"><%= element.status %></span>
+                                                <% } else {%>
+                                                <% if (element.status === "Pending") { %>
+                                                    <span class="status-badge bg-warning text-dark"><%= element.status %></span>
+                                                <% } else if (element.status === "Shipped") { %>
+                                                    <span class="status-badge bg-info"><%= element.status %></span>
+                                                <% } else if (element.status === "Cancelled") { %>
+                                                    <span class="status-badge bg-danger"><%= element.status %></span>
                                                 <% } %>
-                                            </div>
-                                        <% }  %>
+                                                <div class="mt-2">
+                                                    <% if(element.status == "Cancelled") { %>
+                                                        <!-- <button class="btn-custom btn btn-outline-danger btn-sm" disabled>Cancel</button> -->
+                                                        <% } else if(element.status == "ReturnInit") { %>
+                                                            <span class="status-badge bg-info">Retrun Iniitated</span>
+                                                        <% } else if(element.status == "CancelInit") { %>
+                                                            <span class="status-badge bg-info">Cancel Iniitated</span>
+                                                        <% } else { %>
+                                                                <button class="cancel-btn btn-custom btn  btn-sm"  style="background-color: red; border: none;" data-id="<%= element._id %>">Cancel</button>
+                                                        <% } %>
+                                                </div>
+                                            <% }  %>
+                                        <% } %>
                                         </div>
                                     </div>
                                 </div>

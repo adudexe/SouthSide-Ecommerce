@@ -757,12 +757,13 @@ adminController.addProducts = async (req, res) => {
     console.log(category)
 
 
-    const offer = Number(productOffer) > category.discount ? category.discount : Number(productOffer);
+    const offer = (!category.discount)
+      ? Number(productOffer)  // If category.discount is falsy, assign productOffer to offer
+      : Math.min(Number(productOffer), category.discount);  // Otherwise, assign the smaller of productOffer and category.discount
+
 
     // Process images (check if files were uploaded or base64 data was provided)
     const productImages = [];
-    // console.log(Object.entries(req.files));
-    // console.log(Object.entries(req.files));
     if (Object.entries(req.files).length > 0) {
       // Files were uploaded using multer
       Object.entries(req.files).forEach(file => {
@@ -1034,7 +1035,10 @@ adminController.updateProduct = async (req, res) => {
 
     const productVariants = productDetails.variants;
 
-    const offer = Number(product_offer) > categoryDetails.discount ? categoryDetails.discount : Number(product_offer);
+    const offer = (!categoryDetails.discount)
+      ? Number(product_offer)  // If category.discount is falsy, assign productOffer to offer
+      : Math.min(Number(product_offer), categoryDetails.discount);  // Otherwise, assign the smaller of productOffer and category.discount
+
     // console.log("Offer",offer);
 
 
@@ -1063,10 +1067,10 @@ adminController.updateProduct = async (req, res) => {
         variant.price = updatedVariant.price;
         variant.quantity = updatedVariant.quantity;
         variant.status = updatedVariant.status;
-        variant.salePrice = Math.floor(updatedVariant.price - (updatedVariant.price * offer / 100));
+        variant.salePrice = Math.floor(updatedVariant.price - ((updatedVariant.price * offer) / 100));
         newVariants.push(variant);
       } else {
-        variant.salePrice = Math.floor(variant.price - (variant.price * offer / 100));
+        variant.salePrice = Math.floor(variant.price - ((variant.price * offer) / 100));
         newVariants.push(variant);
       }
     });
