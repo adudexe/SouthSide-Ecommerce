@@ -409,7 +409,7 @@
                         icon: 'success',
                         confirmButtonText: 'OK'
                     });
-                    window.location.reload()
+                    window.location.reload(true)
                 } else {
                     throw new Error(data.message || 'Update failed');
                 }
@@ -442,7 +442,7 @@
                         icon: 'success',
                         confirmButtonText: 'OK'
                     });
-                    window.location.reload()
+                    window.location.reload(true)
                 } else {
                     throw new Error(data.message || 'Bulk update failed');
                 }
