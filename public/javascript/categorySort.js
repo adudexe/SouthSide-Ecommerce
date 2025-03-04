@@ -234,14 +234,16 @@ async function filterFunction() {
                                             <span class="old-price">₹${product.variants[0].price}</span>
                                         </div>
                                         <div class="product-action-1 show">
-                                            <a aria-label="Add To Cart" class="action-btn hover-up add-to-wishlist" onClick="(event)=>{event.preventDefault()}">
-                                                <i class="fi-rs-shopping-bag-add"></i>
-                                            </a>
+                                            
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         `;
+
+                        /*<a aria-label="Add To Cart" class="action-btn hover-up add-to-wishlist" onClick="(event)=>{event.preventDefault()}">
+                                                <i class="fi-rs-shopping-bag-add"></i>
+                                            </a> */
                     }
                     return acc;  // Return the accumulated string for non-blocked products
                 }, "");
