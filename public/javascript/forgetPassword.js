@@ -182,10 +182,10 @@ function newPasswordModal() {
         return false;
       }
 
-      if (!passwordRegex.test(newPassword)) {
-        isValid = false;
-        return false;
-      }
+      // if (!passwordRegex.test(newPassword)) {
+      //   isValid = false;
+      //   return false;
+      // }
 
       // if (newPassword !== confirmPassword) {
       //   Swal.showValidationMessage('Passwords do not match!');
