@@ -124,14 +124,20 @@
                         </div>
                     </div>
                 </div>
+                
 
                 <!-- Address Section (Right Side - 4 columns) -->
                 <div class="col-lg-4">
                     <div class="billing-details-wrap bg-white p-4 rounded shadow-sm h-100">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h4 class="mb-0">Delivery Address</h4>
-                            <% if (!userAddress || !userAddress.some(addr => addr.isPrimary)) { %>
+                            <% if (!(userAddress) && !(userAddress.length > 0 )) { %>
                                 <button class="btn btn-sm btn-primary" id="add-new-address-btn">Add New</button>
+                            <% } else if(!(userAddress.some(vl=> vl.isPrimary==true))){ %>
+                                <br>
+                                <button class="btn btn-outline-primary btn-sm" id="change-address-btn">
+                                    Select Address
+                                </button>
                             <% } %>
                         </div>
                         
@@ -177,13 +183,13 @@
                                                     <h6 class="mb-1 text-primary"><%= coupon.code %></h6>
                                                     <p class="mb-0 small">
                                                         <span class="text-success">₹<%= coupon.discount %> off</span>
-                                                        <% if (coupon.minmumAmount) { %>
-                                                            <span class="text-muted"> | Min. Purchase: ₹<%= coupon.minmumAmount %></span>
+                                                        <% if (coupon.minAmount) { %>
+                                                            <span class="text-muted"> | Min. Purchase: ₹<%= coupon.minAmount %></span>
                                                         <% } %>
                                                     </p>
                                                 </div>
                                                 <button class="btn btn-sm btn-outline-primary" 
-                                                        onclick="applyCoupon('<%= coupon.code %>', '<%= coupon.discount %>', '<%= coupon.minmumAmount %>','<%= coupon._id%>')">
+                                                        onclick="applyCoupon('<%= coupon.code %>', '<%= coupon.discount %>', '<%= coupon.minAmount %>','<%= coupon._id%>')">
                                                     Apply
                                                 </button>
                                             </div>
@@ -201,7 +207,7 @@
                                                     </p>
                                                 </div>
                                                 <button class="btn btn-sm btn-outline-primary" 
-                                                        onclick="applyCoupon('<%= coupon.code %>', '<%= coupon.discount %>', '<%= coupon.minAmount %>','<%= coupon._id%>')">
+                                                        onclick="applyCoupon('<%= coupon.code %>', '<%= coupon.discount %>', '<%= coupon.minmumAmount %>','<%= coupon._id%>')">
                                                     Apply
                                                 </button>
                                             </div>
