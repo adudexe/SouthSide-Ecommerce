@@ -18,9 +18,9 @@ userController.loadHomePage = async (req, res) => {
     try {
         // Get session user data
         const products = await Product.find().populate('category').limit(4);  // Get 4 products
-
+        const user = await User.findOne({ _id: req.session.user._id });
         // If user is blocked, redirect to home page with an optional message
-        if (req.session.user && req.session.user.isBlocked) {
+        if (req.session.user && user.isBlocked) {
             req.session.user = null;
             // return res.redirect("/user/home");  // Optionally, add a flash message or reason for redirect
         }
