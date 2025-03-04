@@ -16,28 +16,37 @@ const userController = {};
 //To Load Home Page
 userController.loadHomePage = async (req, res) => {
     try {
-        // Get session user data
-        const products = await Product.find().populate('category').limit(4);  // Get 4 products
-        const user = await User.findOne({ _id: req.session.user._id });
-        // If user is blocked, redirect to home page with an optional message
-        if (req.session.user && user.isBlocked) {
+        const sessionUser = req.session.user || null;
+        const userId = sessionUser ? sessionUser._id : null;
+
+
+        // console.log("session User", sessionUser);
+        // Fetch the first 4 products and populate the category
+        const products = await Product.find().populate('category').limit(4);
+
+        // Fetch the user data if the user is logged in
+        const user = userId ? await User.findById(userId) : null;
+
+        // Check if the user is blocked and clear the session if necessary
+        if (sessionUser && user && user.isBlocked) {
             req.session.user = null;
-            // return res.redirect("/user/home");  // Optionally, add a flash message or reason for redirect
+            res.locals.user = null;
+            return res.redirect("/user/home");  // Optional: Redirect with message or flash notification
         }
-        const sessionUser = req.session.user;
-        // If the user is logged in, render landing page with products and user info
+
+        // If user is logged in, render the landing page with products and user info
         if (sessionUser) {
             return res.render("./user/landingPage", { products, user: sessionUser });
         }
 
-        // If no user is logged in, just render the landing page with products
+        // If no user is logged in, render the landing page with products only
         return res.render("./user/landingPage", { products });
-
     } catch (err) {
-        console.log(err);  // Log error for debugging
-        return res.status(500).render("error", { message: "Something went wrong. Please try again later." });  // Optional: Render an error page
+        console.error("Error loading home page:", err);  // Improved logging for better debugging
+        return res.status(500).render("error", { message: "Something went wrong. Please try again later." });  // Improved error handling
     }
-};
+}
+    ;
 
 
 userController.userLogin = async (req, res) => {
