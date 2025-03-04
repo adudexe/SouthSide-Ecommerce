@@ -111,8 +111,6 @@
                                                         <p>Refunded</p>
                                                 <% } else if (element.status == "Cancelled") { %>
                                                         <p>Cancelled</p>
-                                                <% } else if (element.status === 'ReturnInit') { %>
-                                                        <p>Return Requested</p>
                                                 <% } else { %>
                                                     <select class="form-select product-status" 
                                                         data-item-id="<%= element._id %>">
@@ -121,9 +119,7 @@
                                                         <option value="Shipped" <%= element.status === 'Shipped' ? 'selected' : '' %>>Shipped</option>
                                                         <option value="Delivered" <%= element.status === 'Delivered' ? 'selected' : '' %>>Delivered</option>
                                                         <option value="Cancelled" <%= element.status === 'CancelInit' ? 'selected' : '' %>>Cancel Request</option>
-                                                        <!-- <option value="Refunded" <%= element.status === 'Refunded' ? 'selected' : '' %>>Refunded</option> -->
-                                                        <!-- <option value="Returned" <%= element.status === 'Returned' ? 'selected' : '' %>>Returned</option> -->
-                                                        <!-- <option value="Returned" <%= element.status === 'ReturnInit' ? 'selected' : '' %>>ReturnInitiated</option> -->
+                                                        <option value="Returned" <%= element.status === 'ReturnInit' ? 'selected' : '' %>>Return Request</option>
                                                     </select>
                                             <% } %>
                                             </td>
