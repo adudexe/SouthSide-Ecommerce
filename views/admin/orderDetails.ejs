@@ -253,8 +253,8 @@
                     confirmButtonText: 'OK'
                 });
             }
-            document.getElementById("accept").addEventListener("click",(e)=>{
-                sendStatusUpdate(data)
+            document.getElementById("accept").addEventListener("click",async (e)=>{
+                await sendStatusUpdate(data)
                 new bootstrap.Modal(document.getElementById('reasonModal')).hide();
                 window.location.reload(true);
             })
@@ -323,8 +323,8 @@
                     confirmButtonText: 'OK'
                 });
             }
-            document.getElementById("accept").addEventListener("click", function() {
-        sendStatusUpdate(data);  // Call the function to update the status
+            document.getElementById("accept").addEventListener("click", async function() {
+        await sendStatusUpdate(data);  // Call the function to update the status
         const modal = bootstrap.Modal.getInstance(document.getElementById('reasonModal'));
         modal.hide();  // Properly hide the modal after status update
         window.location.reload(true);
