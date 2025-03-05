@@ -6,7 +6,6 @@ const Coupon = require("../model/couponSchema");
 const Wallet = require("../model/walletSchema");
 const Razorpay = require('razorpay');
 var { validatePaymentVerification, validateWebhookSignature } = require('razorpay/dist/utils/razorpay-utils');
-const { readInt16 } = require("pdfkit/js/data");
 const checkoutController = {};
 
 
@@ -50,9 +49,9 @@ checkoutController.loadCheckout = async (req, res) => {
             return total + (variant.salePrice * element.quantity);
         }, 0); // Initial value is 0
 
-        // if (req.session.totalPrice !== totalPrice) {
-        //     req.session.totalPrice = totalPrice
-        // }
+        if (req.session.totalPrice !== totalPrice) {
+            req.session.totalPrice = totalPrice
+        }
 
         //If cart.coupoon applied is true then apply the discount percent to each product other then add find the total 
 
