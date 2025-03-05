@@ -189,8 +189,8 @@ cropButton.addEventListener('click', function () {
     console.log(selectedFiles)
     // Get the cropped canvas with desired dimensions
     cropper.getCroppedCanvas({
-        width: 100,
-        height: 200,
+        width: 800,
+        height: 800,
         imageSmoothingEnabled: true,
         imageSmoothingQuality: 'high'
     }).toBlob((blob) => {
@@ -205,8 +205,10 @@ cropButton.addEventListener('click', function () {
         });
 
         // console.log(cropImage.dataId)
+        console.log("Cropped file", croppedFile)
 
         console.log("Before Cropping ", selectedFiles);
+
         console.log("Croped Image", croppedFile);
         // Replace the selected image with the cropped one
         selectedFiles[currentFileIndex] = croppedFile;
@@ -346,7 +348,7 @@ document.querySelector("#publishBtn").addEventListener("click", async (e) => {
         const category = document.getElementById('product_category').value;
         const description = document.querySelector("#product_description").innerHTML;
         const changed = [];
-        console.log(selectedFiles)
+        // console.log(selectedFiles)
         for (let i = 0; i < selectedFiles.length; i++) {
             console.log(selectedFiles[i], "!==", oldImages[i])
             if (selectedFiles[i] !== oldImages[i]) {
@@ -357,6 +359,13 @@ document.querySelector("#publishBtn").addEventListener("click", async (e) => {
             Toast.fire({
                 icon: "error",
                 title: "Only 3 image's are needed"
+            });
+            return;
+        }
+        if (selectedFiles.length < 2) {
+            Toast.fire({
+                icon: "error",
+                title: "Alteast 3 image's are needed"
             });
             return;
         }
