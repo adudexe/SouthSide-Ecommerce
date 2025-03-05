@@ -183,9 +183,6 @@ shopController.searchItem = async (req, res) => {
 
     // Fetch products
     const searchProduct = await products.find(query)
-      .skip(skip)
-      .limit(parseInt(limit));
-
     // Count total matching products
     const totalProducts = await products.countDocuments(query);
     const totalPages = Math.ceil(totalProducts / limit);
