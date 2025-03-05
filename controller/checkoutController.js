@@ -397,7 +397,7 @@ checkoutController.createOrder = async (req, res) => {
                 return res.status(404).json({ success: false, message: "User Cart is Empty...." });
             }
             const options = {
-                amount: (req.session.totalPrice || amount) * 100, // Convert amount to paise
+                amount: (req.session.totalPrice || Math.floor(Number(amount))) * 100, // Convert amount to paise
                 currency,
                 receipt,
                 notes,

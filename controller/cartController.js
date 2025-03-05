@@ -30,7 +30,7 @@ cartController.loadCartPage = async (req, res) => {
         console.log("TotalPrice is ", totalPrice); // Logs total price
 
         //adding the total price to session
-        req.session.totalPrice = totalPrice;
+        req.session.totalPrice = Math.floor(totalPrice);
 
         // console.log(cartDetails);
         res.render("./user/cartPage", { cartItems: cartDetails, products: productDetails, totalPrice: totalPrice });
@@ -428,7 +428,7 @@ cartController.applyCoupon = async (req, res) => {
         )
         await existingCart.save();
 
-        req.session.totalPrice = discountPrice;
+        req.session.totalPrice = Math.floor(discountPrice);
         console.log("totalprice changed")
 
         // console.log("Discount Price ",discountPrice);
@@ -472,7 +472,7 @@ cartController.removeCoupon = async (req, res) => {
         }, 0); // Initial value is 0
         console.log("Total Price", totalPrice);
         console.log("Session Total before", req.session.totalPrice)
-        req.session.totalPrice = totalPrice
+        req.session.totalPrice = Math.floor(totalPrice);
         console.log("Session Total After", req.session.totalPrice)
         if (!cartDetailsUpdate) {
             return res.status(400).json({ success: false, message: "Failed to remove the coupon" });
